@@ -61,6 +61,18 @@ function renkFor(kat: string) {
   return '#fff0d6'
 }
 export default function Home() {
+  if (BAKIMDA) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#fff7ee', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'sans-serif', textAlign: 'center' }}>
+        <div>
+          <div style={{ fontSize: '60px' }}>🧇</div>
+          <h1 style={{ fontSize: '26px' }}>WaffLia Sweet Kumpir</h1>
+          <p style={{ color: '#666' }}>Şu an menümüzü güzelleştiriyoruz.</p>
+          <p style={{ fontWeight: 'bold' }}>Birazdan tekrar buradayız 💛</p>
+        </div>
+      </div>
+    )
+  }
   const [user, setUser] = useState<any>(null)
   const [kat, setKat] = useState('Tümü')
   const [arama, setArama] = useState('')
