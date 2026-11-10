@@ -39,8 +39,7 @@ const URUNLER = [
 const KATS = ['Tümü', 'Bowl Waffle', 'Kare Waffle', 'Kumpir', 'Künefe & Katmer', 'Sufle']
 
 export default function Home() {
-  const [user, setUser] = useState(null)
-  const [kat, setKat] = useState('Tümü')
+const [user, setUser] = useState<any>(null)  const [kat, setKat] = useState('Tümü')
   const [sepet, setSepet] = useState([])
 
   useEffect(() => {
