@@ -51,3 +51,150 @@ function renkFor(kat: string) {
   if (kat === 'Kare Waffle') return '#ffe4e6'
   return '#fff0d6'
 }
+export default function Home() {
+  const [user, setUser] = useState<any>(null)
+  const [kat, setKat] = useState('Tümü')
+  const [arama, setArama] = useState('')
+  const [sepet, setSepet] = useState<any[]>([])
+  const [sepetAcik, setSepetAcik] = useState(false)
+  useEffect(() => {
+    supabase.auth.getSession().then((res) => setUser(res.data.session?.user || null))
+  }, [])
+  const cikisYap = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+    window.location.reload()
+  }
+  const isim = user?.user_metadata?.full_name || user?.email?.split('@')[0] || ''
+  const adet = (id: number) => sepet.filter((s) => s.id === id).length
+  const ekle = (urun: any) => {
+    setSepet([...sepet, urun])
+  }
+  const azalt = (urun: any) => {
+    const idx = sepet.findIndex((s) => s.id === urun.id)
+    if (idx >= 0) {
+      const yeni = [...sepet]
+      yeni.splice(idx, 1)
+      setSepet(yeni)
+    }
+  }
+  const toplam = sepet.reduce((t, u) => t + u.fiyat, 0)
+  const aramali = URUNLER.filter((u) => u.ad.toLowerCase().includes(arama.toLowerCase()) || u.aciklama.toLowerCase().includes(arama.toLowerCase()))
+  const gosterilecekKats = kat === 'Tümü' ? KATS.slice(1) : [kat]
+  const oneCikanUrunler = URUNLER.filter((u) => ONE_CIKAN.includes(u.id))
+  return (
+    <div style={{ fontFamily: 'sans-serif', background: '#fff7ee', minHeight: '100vh', paddingBottom: '170px' }}>
+      <div style={{ background: '#3b1d0a', color: 'white', padding: '16px', textAlign: 'center' }}>
+        <div style={{ fontSize: '22px', fontWeight: '900' }}>WaffLia Sweet Kumpir</div>
+        <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '4px' }}>🔍 ♡ 👤</div>
+      </div>
+      <div style={{ background: '#3b1d0a', color: 'white', padding: '0 16px 24px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <div style={{ fontSize: '70px', lineHeight: '1.1' }}>🧇 🥔</div>
+          <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '6px' }}>Açık 17:00 - 05:00 • İstanbul</div>
+          <h1 style={{ fontSize: '28px', lineHeight: '1.2', margin: '12px 0' }}>En tatlı waffle ve kumpir burada</h1>
+          {user ? (
+            <div style={{ background: 'white', color: '#333', borderRadius: '14px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Hoş geldin, <b>{isim}!</b> 👋</span>
+              <button onClick={cikisYap} style={{ border: '1px solid #ddd', background: 'white', padding: '7px 14px', borderRadius: '20px', cursor: 'pointer' }}>Çıkış Yap</button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <a href="/kayit" style={{ background: '#b45309', color: 'white', padding: '12px 26px', borderRadius: '12px', textDecoration: 'none', fontWeight: 'bold', flex: 1, maxWidth: '180px' }}>Kayıt Ol</a>
+              <a href="/giris" style={{ background: 'transparent', color: 'white', padding: '12px 26px', borderRadius: '12px', border: '1px solid white', textDecoration: 'none', fontWeight: 'bold', flex: 1, maxWidth: '180px' }}>Giriş Yap</a>
+            </div>
+          )}
+          <input value={arama} onChange={(e) => setArama(e.target.value)} placeholder="Wafflia'da ara..." style={{ width: '100%', marginTop: '16px', padding: '12px 14px', borderRadius: '12px', border: 'none', outline: 'none', fontSize: '15px', boxSizing: 'border-box' }} />
+        </div>
+      </div>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 12px' }}>
+        <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Öne Çıkan Ürünler</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {oneCikanUrunler.map((u) => (
+            <div key={u.id} style={{ background: 'white', borderRadius: '16px', padding: '12px', display: 'flex', gap: '12px', alignItems: 'center', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
+              <div style={{ width: '88px', height: '88px', background: renkFor(u.kat), borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '42px', flexShrink: 0 }}>{emojiFor(u.kat)}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: '800', fontSize: '16px' }}>{u.ad}</div>
+                <div style={{ color: '#777', fontSize: '13px', margin: '4px 0', lineHeight: '1.4' }}>{u.aciklama}</div>
+                <div style={{ fontWeight: '900', fontSize: '16px' }}>{u.fiyat} TL</div>
+              </div>
+              {adet(u.id) === 0 ? (
+                <button onClick={() => ekle(u)} style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#5b2c0e', color: 'white', border: 'none', fontSize: '22px', cursor: 'pointer', flexShrink: 0 }}>+</button>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#f5f5f5', borderRadius: '20px', padding: '4px' }}>
+                  <button onClick={() => azalt(u)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: 'none', background: 'white', cursor: 'pointer' }}>-</button>
+                  <b>{adet(u.id)}</b>
+                  <button onClick={() => ekle(u)} style={{ width: '28px', height: '28px', borderRadius: '50%', border: 'none', background: '#5b2c0e', color: 'white', cursor: 'pointer' }}>+</button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <h2 id="menu" style={{ fontSize: '22px', margin: '24px 4px 10px' }}>Menü</h2>
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '6px' }}>
+          {KATS.map((k) => (
+            <button key={k} onClick={() => setKat(k)} style={{ padding: '9px 16px', borderRadius: '20px', border: kat === k ? '1px solid #5b2c0e' : '1px solid #ddd', background: kat === k ? '#5b2c0e' : 'white', color: kat === k ? 'white' : '#333', cursor: 'pointer', fontWeight: kat === k ? 'bold' : 'normal', flexShrink: 0 }}>{k}</button>
+          ))}
+        </div>
+        {gosterilecekKats.map((k) => {
+          const liste = aramali.filter((u) => u.kat === k)
+          if (liste.length === 0) return null
+          return (
+            <div key={k}>
+              <h3 style={{ fontSize: '18px', margin: '18px 4px 10px' }}>{k} <span style={{ color: '#999', fontSize: '13px', fontWeight: 'normal' }}>{liste.length} ürün</span></h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {liste.map((u) => (
+                  <div key={u.id} style={{ background: 'white', borderRadius: '16px', padding: '12px', display: 'flex', gap: '12px', alignItems: 'center', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: '800', fontSize: '16px' }}>{u.ad}</div>
+                      <div style={{ color: '#777', fontSize: '13px', margin: '5px 0', lineHeight: '1.4' }}>{u.aciklama}</div>
+                      <div style={{ fontWeight: '900', fontSize: '16px', marginTop: '6px' }}>{u.fiyat} TL</div>
+                    </div>
+                    <div style={{ width: '96px', height: '96px', background: renkFor(u.kat), borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '42px', flexShrink: 0, position: 'relative' }}>{emojiFor(u.kat)}
+                      {adet(u.id) === 0 ? (
+                        <button onClick={() => ekle(u)} style={{ position: 'absolute', right: '-4px', bottom: '-4px', width: '32px', height: '32px', borderRadius: '50%', background: '#5b2c0e', color: 'white', border: '2px solid white', fontSize: '20px', cursor: 'pointer' }}>+</button>
+                      ) : (
+                        <div style={{ position: 'absolute', right: '-4px', bottom: '-4px', display: 'flex', alignItems: 'center', gap: '4px', background: 'white', borderRadius: '20px', padding: '3px', boxShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
+                          <button onClick={() => azalt(u)} style={{ width: '24px', height: '24px', borderRadius: '50%', border: 'none', background: '#eee', cursor: 'pointer' }}>-</button>
+                          <b style={{ fontSize: '13px' }}>{adet(u.id)}</b>
+                          <button onClick={() => ekle(u)} style={{ width: '24px', height: '24px', borderRadius: '50%', border: 'none', background: '#5b2c0e', color: 'white', cursor: 'pointer' }}>+</button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })}
+        <div style={{ background: '#fef3e2', borderRadius: '16px', padding: '16px', marginTop: '24px' }}>
+          <h3 style={{ margin: '0 0 8px' }}>İletişim</h3>
+          <p style={{ margin: '4px 0', fontSize: '14px' }}>📞 0535 273 28 65 • 🕒 Her gün 17:00 - 05:00 • 📍 İstanbul</p>
+        </div>
+      </div>
+      {sepet.length > 0 && (
+        <div style={{ position: 'fixed', left: 0, right: 0, bottom: '68px', padding: '0 12px' }}>
+          <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
+            <span>🛒 Sepeti Görüntüle • {sepet.length} ürün</span>
+            <span>{toplam} TL →</span>
+          </button>
+          {sepetAcik && (
+            <div style={{ maxWidth: '900px', margin: '8px auto 0', background: 'white', borderRadius: '16px', padding: '14px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', color: '#333' }}>
+              {sepet.map((s, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #eee', fontSize: '14px' }}><span>{s.ad}</span><span>{s.fiyat} TL</span></div>
+              ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontWeight: 'bold' }}><span>Toplam</span><span>{toplam} TL</span></div>
+              <button onClick={() => setSepet([])} style={{ marginTop: '10px', width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ddd', background: 'white', cursor: 'pointer' }}>Sepeti Temizle</button>
+            </div>
+          )}
+        </div>
+      )}
+      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, background: 'white', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-around', padding: '10px 0 14px', zIndex: 20 }}>
+        <a href="#" style={{ textAlign: 'center', textDecoration: 'none', color: '#5b2c0e', fontSize: '12px', fontWeight: 'bold' }}><div style={{ fontSize: '20px' }}>🏠</div>Anasayfa</a>
+        <a href="#menu" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>☰</div>Menü</a>
+        <a href="#" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>🧾</div>Siparişler</a>
+        <a href="/giris" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>👤</div>Profil</a>
+      </div>
+    </div>
+  )
+}
