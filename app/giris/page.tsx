@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 export default function Giris() {
   const [email, setEmail] = useState('')
   const [kod, setKod] = useState('')
+  
   const [kodGonderildi, setKodGonderildi] = useState(false)
 
   async function kodGonder() {

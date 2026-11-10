@@ -47,10 +47,9 @@ export default function Kayit() {
     })
     if (error) alert('Kod yanlış!')
     else {
-      alert('Hoş geldin ' + data.user.user_metadata.full_name)
-      window.location.href = '/'
+    alert('Hoş geldin ' + (data.user?.user_metadata?.full_name || ''))
+    window.location.href = '/'  
     }
-  }
   if (girisYapildi) {
     return <div>Giriş Yapıldı</div>
   }
