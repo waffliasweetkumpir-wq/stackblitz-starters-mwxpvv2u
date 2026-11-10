@@ -2,55 +2,68 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-const BAKIMDA = true
+const BAKIMDA = false
 
 const URUNLER = [
-  { id: 1, kat: 'Bowl Waffle', ad: 'Bitter Bowl', fiyat: 495, resim: '/urunler/bitter-bowl.jpg', aciklama: 'Sütlü ve bitter çikolata soslu waffle hamuru, muz, bitter damla çikolata, 【entity-oreo¦canonical_name=Oreo】 tozu, antep fıstığı ve fındık içi ile.' },
-  { id: 2, kat: 'Bowl Waffle', ad: 'Choco Madness Bowl', fiyat: 512, resim: '/urunler/choco-bowl.jpg', aciklama: 'Frambuaz ve beyaz çikolata sosları, çilek, muz, frambuazlı damla çikolata, biskrep çıtır ve fındık içi ile.' },
-  { id: 3, kat: 'Bowl Waffle', ad: 'Pistachio Dream Bowl', fiyat: 560, resim: '/urunler/pistachio-bowl.jpg', aciklama: 'Antep fıstığı kreması, waffle hamuru, beyaz sos, muz, toz antep fıstığı, beyaz damla çikolata.' },
-  { id: 4, kat: 'Bowl Waffle', ad: 'Blast Bowl', fiyat: 504, resim: '/urunler/blast-bowl.jpg', aciklama: 'Karamel sos kremalı waffle hamuru, beyaz sos, çilek, kivi, muz, fındık tozu ve bonibon ile.' },
-  { id: 5, kat: 'Bowl Waffle', ad: 'Lotus Bomb Bowl', fiyat: 512, resim: '/urunler/lotus-bowl.jpg', aciklama: 'Karamelize bisküvili krema sosu ve karamel sos, lotus tozu, 【entity-oreo¦canonical_name=Oreo】 tozu, pirinç patlağı, muz ile.' },
-  { id: 6, kat: 'Bowl Waffle', ad: 'Ultimate Bowl Waffle', fiyat: 576, resim: '/urunler/ultimate-bowl.jpg', aciklama: 'Frambuaz, çilek, beyaz ve sütlü çikolata sosları, bonibon, damla çikolatalar, fındık tozu, lotus, çilek ve muz ile.' },
-  { id: 7, kat: 'Bowl Waffle', ad: 'Milk Chocolate Bowl', fiyat: 488, resim: '/urunler/milk-bowl.jpg', aciklama: 'Waffle hamuru, beyaz ve sütlü çikolata sosu, fındık, lotus, antep fıstığı tozu, pirinç patlağı, muz ile.' },
-  { id: 8, kat: 'Bowl Waffle', ad: 'Strawberry Bowl', fiyat: 544, resim: '/urunler/strawberry-bowl.jpg', aciklama: 'Waffle hamuru, çilek ve frambuaz sosu, taze çilek, muz, beyaz ve frambuazlı damla çikolata, fındık tozu ile.' },
-  { id: 9, kat: 'Bowl Waffle', ad: 'Coconut Bowl', fiyat: 496, resim: '/urunler/coconut-bowl.jpg', aciklama: 'Waffle hamuru, hindistan cevizi sosu ve sütlü çikolata sosu, hindistan cevizi tozu, muz, beyaz damla çikolata, fındık tozu ile.' },
-  { id: 10, kat: 'Kare Waffle', ad: 'Bitter Kare Waffle', fiyat: 416, resim: '/urunler/bitter-kare.jpg', aciklama: 'Tabanı bitter çikolata kreması, waffle hamuru, sütlü çikolata sosu, muz, bitter damla çikolata, oreo tozu, antep fıstığı, fındık içi ile.' },
-  { id: 11, kat: 'Kare Waffle', ad: 'Choco Madness Kare Waffle', fiyat: 408, resim: '/urunler/choco-kare.jpg', aciklama: 'Tabanı frambuaz sosu, çilek dilimleri, muz, frambuazlı damla çikolata ve fındık içi ile.' },
-  { id: 12, kat: 'Kare Waffle', ad: 'Pistachio Dream Kare Waffle', fiyat: 472, resim: '/urunler/pistachio-kare.jpg', aciklama: 'Tabanı antep fıstığı kreması, muz dilimleri ve antep fıstığı taneleri, beyaz damla çikolata ile.' },
-  { id: 13, kat: 'Kare Waffle', ad: 'Blast Kare Waffle', fiyat: 408, resim: '/urunler/blast-kare.jpg', aciklama: 'Tabanı beyaz çikolata kreması, taze çilek, kivi, muz, fındık tozu taneleri ve bonibon ile.' },
-  { id: 14, kat: 'Kare Waffle', ad: 'Lotus Bomb Kare Waffle', fiyat: 412, resim: '/urunler/lotus-kare.jpg', aciklama: 'Tabanı karamelize bisküvili krema sosu, lotus tozu, muz ve çilek ile.' },
-  { id: 15, kat: 'Kare Waffle', ad: 'Ultimate Kare Waffle', fiyat: 412, resim: '/urunler/ultimate-kare.jpg', aciklama: 'Tabanı sütlü çikolata sos, waffle hamuru, beyaz çikolata sos, frambuaz sos, renkli draje, frambuazlı damla çikolata, fındık tozu, lotus parçacıkları.' },
-  { id: 33, kat: 'Kare Waffle', ad: 'Milk Kare Waffle', fiyat: 398, resim: '/urunler/milk-bowl.jpg', aciklama: 'Tabanı beyaz ve sütlü çikolata sosu, fındık, lotus, antep fıstığı tozu, pirinç patlağı, muz ile.' },
-  { id: 34, kat: 'Kare Waffle', ad: 'Strawberry Kare Waffle', fiyat: 454, resim: '/urunler/strawberry-bowl.jpg', aciklama: 'Tabanı çilek ve frambuaz sosu, taze çilek, muz, beyaz ve frambuazlı damla çikolata, fındık tozu ile.' },
-  { id: 35, kat: 'Kare Waffle', ad: 'Coconut Kare Waffle', fiyat: 406, resim: '/urunler/coconut-bowl.jpg', aciklama: 'Tabanı hindistan cevizi sosu ve sütlü çikolata sosu, hindistan cevizi tozu, muz, beyaz damla çikolata, fındık tozu ile.' },
-  { id: 16, kat: 'Kumpir', ad: 'Saray Kumpir Menü', fiyat: 640, aciklama: 'Rus salatası, kaşar peyniri, mısır, yeşil zeytin + kutu içecek' },
-  { id: 17, kat: 'Kumpir', ad: 'Ege Kumpir Menü', fiyat: 640, aciklama: 'Haydari, sosis, siyah zeytin, turşu, mısır + kutu içecek' },
-  { id: 18, kat: 'Kumpir', ad: 'Gurme Kumpir Menü', fiyat: 640, aciklama: 'Kısır, rus salatası, jalapeno biber, mor lahana + kutu içecek' },
-  { id: 19, kat: 'Kumpir', ad: 'Aptit Kumpir Menü', fiyat: 640, aciklama: 'Ezme, kornişon turşu, siyah zeytin, mısır + kutu içecek' },
-  { id: 20, kat: 'Kumpir', ad: 'Doyuran Kumpir Menü', fiyat: 640, aciklama: 'Haydari, kısır, sosis, yeşil zeytin, turşu + kutu içecek' },
-  { id: 21, kat: 'Kumpir', ad: 'Fiesta Kumpir Menü', fiyat: 640, aciklama: 'Mor lahana, haydari, mısır, jalapeno, rus salatası + kutu içecek' },
-  { id: 22, kat: 'Kumpir', ad: '0-1 Malzemeli Kumpir', fiyat: 472, aciklama: 'Kaşar peyniri, tereyağı + seçeceğiniz 1 adet malzeme' },
-  { id: 23, kat: 'Kumpir', ad: '3 Malzemeli Kumpir', fiyat: 552, aciklama: 'Tereyağı, kaşar peyniri + seçeceğiniz 3 adet malzeme' },
-  { id: 24, kat: 'Kumpir', ad: '5 Malzemeli Kumpir', fiyat: 568, aciklama: 'Tereyağı, kaşar peyniri + seçeceğiniz 5 adet malzeme' },
-  { id: 25, kat: 'Kumpir', ad: '7 Malzemeli Kumpir', fiyat: 584, aciklama: 'Tereyağı, kaşar peyniri + seçeceğiniz 7 adet malzeme' },
-  { id: 26, kat: 'Künefe & Katmer', ad: 'Çikolatalı Fıstıklı Katmer & Dondurma', fiyat: 680, aciklama: 'Çikolatalı muska katmer 2 adet + Algida Maraş Dondurma Cup' },
-  { id: 27, kat: 'Künefe & Katmer', ad: 'Algida Maraş Dondurma Cup', fiyat: 112, aciklama: 'Algida Maraş Usulü Sade Dondurma Cup (100 Ml)' },
-  { id: 28, kat: 'Künefe & Katmer', ad: 'Fıstıklı Katmer + Dondurma', fiyat: 680, aciklama: 'Fıstıklı Katmer + Algida Maraş Dondurma Cup Tek Kişilik' },
-  { id: 29, kat: 'Künefe & Katmer', ad: 'Peynirli Fıstıklı Künefe + Dondurma', fiyat: 680, aciklama: 'Peynirli Fıstıklı Künefe + Algida Maraş Dondurma Cup' },
-  { id: 30, kat: 'Künefe & Katmer', ad: 'Hasır Künefe + Dondurma', fiyat: 680, aciklama: 'Hasır Künefe + Algida Maraş Dondurma Cup' },
-  { id: 31, kat: 'Sufle', ad: 'Çikolatalı Sufle + Dondurma', fiyat: 600, aciklama: 'Fırından akışkan, dışı kek kıvamında, 12 dakikada hazır. Oreo tozu ve biskrep parçaları ile + Dondurma Cup' },
-  { id: 32, kat: 'Sufle', ad: 'Beyaz Çikolatalı Tahinli Sufle', fiyat: 380, aciklama: 'Beyaz çikolata ve tahin girdaplı, akışkan iç dolgulu. Fındık tozu, lotus parçaları ve hindistan cevizi tozu ile.' },
+  { id: 1, kat: 'Bowl Waffle', ad: 'Bitter Bowl', fiyat: 495.20, populer: true, begeni: '', resim: '/urunler/bitter-bowl.jpg', aciklama: 'Sütlü çikolata ve bitter çikolata soslu waffle hamuru üzerine dizilmiş taze muz dilimleri; bitter damla çikolata, bitter pirinç patlağı, 【entity-oreo¦canonical_name=Oreo】 tozu, antep fıstığı ve fındık içi ile lezzetlendirilir.', malzemeler: ['Muz', 'Bitter Damla Çikolata', 'Bitter Pirinç Patlağı', ' 【entity-Oreo¦canonical_name=Oreo】 Tozu', 'Antep Fıstığı', 'Fındık İçi', 'Sütlü Çikolata Sosu', 'Bitter Çikolata Sosu'] },
+  { id: 2, kat: 'Bowl Waffle', ad: 'Choco Madness Bowl', fiyat: 512, populer: false, begeni: '', resim: '/urunler/choco-bowl.jpg', aciklama: 'Frambuaz ve beyaz çikolata sosları eşliğinde taze çilek dilimleri, muz, sütlü ve sedef pirinç patlağı, frambuazlı damla çikolata, biskrep çıtır kırıntı, fındık içi ile lezzetlendirilerek servis edilir.', malzemeler: ['Çilek', 'Muz', 'Sütlü Pirinç Patlağı', 'Sedef Pirinç Patlağı', 'Frambuazlı Damla Çikolata', 'Biskrep Çıtır Kırıntı', 'Fındık İçi', 'Frambuaz Sosu', 'Beyaz Çikolata Sosu'] },
+  { id: 3, kat: 'Bowl Waffle', ad: 'Pistachio Dream Bowl', fiyat: 560, populer: true, begeni: '', resim: '/urunler/pistachio-bowl.jpg', aciklama: 'Zengin antep fıstığı kreması ve nefis waffle hamuru üzerine gezdirilen beyaz sos; muz dilimleri, toz antep fıstığı taneleri, beyaz damla çikolata, karışık pirinç patlağı ile buluşuyor.', malzemeler: ['Muz', 'Toz Antep Fıstığı', 'Beyaz Damla Çikolata', 'Karışık Pirinç Patlağı', 'Antep Fıstığı Kreması', 'Beyaz Sos'] },
+  { id: 4, kat: 'Bowl Waffle', ad: 'Blast Bowl', fiyat: 504, populer: true, begeni: '', resim: '/urunler/blast-bowl.jpg', aciklama: 'Karamel sos kremalı waffle hamuru üzerinde beyaz sos, taze çilek dilimleri, kivi, muz, fındık tozu ve renkli bonibonlar ile hazırlanıp servis edilir.', malzemeler: ['Çilek', 'Kivi', 'Muz', 'Fındık Tozu', 'Renkli Bonibon', 'Karamel Sos Kreması', 'Beyaz Sos'] },
+  { id: 5, kat: 'Bowl Waffle', ad: 'Lotus Bomb Bowl Waffle', fiyat: 512, populer: true, begeni: '', resim: '/urunler/lotus-bowl.jpg', aciklama: 'Karamelize bisküvili krema sosu ve karamel sosla tatlandırılmış waffle hamuru; bonibon, lotus tozu, oreo tozu, beyaz, sütlü, bitter ve sedef pirinç patlağı, taze muz dilimleriyle sunulur.', malzemeler: ['Muz', 'Bonibon', 'Lotus Tozu', 'Oreo Tozu', 'Beyaz Pirinç Patlağı', 'Sütlü Pirinç Patlağı', 'Bitter Pirinç Patlağı', 'Sedef Pirinç Patlağı', 'Karamelize Bisküvili Krema Sosu', 'Karamel Sos'] },
+  { id: 6, kat: 'Bowl Waffle', ad: 'Ultimate Bowl Waffle', fiyat: 576, populer: true, begeni: '%81 Beğenildi (11 Değerlendirme)', resim: '/urunler/ultimate-bowl.jpg', aciklama: 'Waffle hamuruna eşlik eden frambuaz, çilek, beyaz ve sütlü çikolata sosları; bonibon, çakıl taşı, frambuazlı, beyaz ve sütlü damla çikolatalar, fındık tozu, lotus parçacıkları, taze çilek ve muz ile.', malzemeler: ['Çilek', 'Muz', 'Bonibon', 'Çakıl Taşı', 'Frambuazlı Damla Çikolata', 'Beyaz Damla Çikolata', 'Sütlü Damla Çikolata', 'Fındık Tozu', 'Lotus Parçacıkları', 'Frambuaz Sosu', 'Çilek Sosu', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
+  { id: 7, kat: 'Bowl Waffle', ad: 'Milk Chocolate Bowl', fiyat: 488, eskiFiyat: 528, populer: true, begeni: '%100 Beğenildi (8 Değerlendirme)', resim: '/urunler/milk-bowl.jpg', aciklama: 'Nefis waffle hamuru üzeri beyaz ve sütlü çikolata soslarıyla buluşuyor. Üzerinde fındık, lotus, antep fıstığı tozu, sütlü pirinç patlağı, sütlü damla çikolata muz dilimleriyle servis edilir.', malzemeler: ['Muz', 'Fındık', 'Lotus', 'Antep Fıstığı Tozu', 'Sütlü Pirinç Patlağı', 'Sütlü Damla Çikolata', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
+  { id: 8, kat: 'Bowl Waffle', ad: 'Strawberry Bowl', fiyat: 544, populer: true, begeni: '', resim: '/urunler/strawberry-bowl.jpg', aciklama: 'Nefis waffle hamuru üzeri yoğun çilek ve frambuaz soslarıyla buluşuyor. Üzerinde taze çilek dilimleri, muz dilimleri, beyaz ve frambuazlı damla çikolata, fındık tozu ile servis edilir.', malzemeler: ['Çilek', 'Muz', 'Beyaz Damla Çikolata', 'Frambuazlı Damla Çikolata', 'Fındık Tozu', 'Çilek Sosu', 'Frambuaz Sosu'] },
+  { id: 9, kat: 'Bowl Waffle', ad: 'Coconut Bowl', fiyat: 496, populer: true, begeni: '', resim: '/urunler/coconut-bowl.jpg', aciklama: 'Nefis waffle hamuru, hindistan cevizi sosu ve sütlü çikolata sosuyla buluşuyor. Üzerinde hindistan cevizi tozu, muz dilimleri, beyaz damla çikolata ve fındık tozu ile servis edilir.', malzemeler: ['Muz', 'Hindistan Cevizi Tozu', 'Beyaz Damla Çikolata', 'Fındık Tozu', 'Hindistan Cevizi Sosu', 'Sütlü Çikolata Sosu'] },
+  { id: 10, kat: 'Kare Waffle', ad: 'Bitter Kare', fiyat: 340, populer: false, begeni: '', resim: '/urunler/bitter-kare.jpg', aciklama: 'Bitter çikolatalı, meyveli ve fındıklı kare waffle.', malzemeler: ['Muz', 'Çilek', 'Fındık', 'Bitter Çikolata Sosu'] },
+  { id: 11, kat: 'Kare Waffle', ad: 'Choco Madness Kare', fiyat: 360, populer: false, begeni: '', resim: '/urunler/choco-kare.jpg', aciklama: 'Bol çikolatalı, brownie parçalı kare waffle.', malzemeler: ['Brownie', 'Çikolata Sosu', 'Fındık'] },
+  { id: 12, kat: 'Kare Waffle', ad: 'Pistachio Dream Kare', fiyat: 400, populer: false, begeni: '', resim: '/urunler/pistachio-kare.jpg', aciklama: 'Antep fıstığı kremalı kare waffle.', malzemeler: ['Antep Fıstığı Kreması', 'Antep Fıstığı'] },
+  { id: 13, kat: 'Kare Waffle', ad: 'Blast Kare', fiyat: 370, populer: false, begeni: '', resim: '/urunler/blast-kare.jpg', aciklama: 'Karamel ve çıtır parçalı kare waffle.', malzemeler: ['Karamel Sos', 'Çıtır Parça'] },
+  { id: 14, kat: 'Kare Waffle', ad: 'Lotus Bomb Kare', fiyat: 320, populer: false, begeni: '', resim: '/urunler/lotus-kare.jpg', aciklama: 'Lotus kremalı kare waffle.', malzemeler: ['Lotus Kreması', 'Lotus Bisküvi'] },
+  { id: 15, kat: 'Kare Waffle', ad: 'Ultimate Kare', fiyat: 350, populer: false, begeni: '', resim: '/urunler/ultimate-kare.jpg', aciklama: 'Her şeyden bol bol kare waffle.', malzemeler: ['Çikolata', 'Meyve', 'Fındık'] },
+  { id: 33, kat: 'Kare Waffle', ad: 'Milk Kare', fiyat: 330, populer: false, begeni: '', resim: '/urunler/milk-kare.jpg', aciklama: 'Sütlü çikolata, muz ve fındık ile klasik kare waffle.', malzemeler: ['Muz', 'Fındık', 'Lotus', 'Antep Fıstığı Tozu', 'Sütlü Pirinç Patlağı', 'Sütlü Damla Çikolata', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
+  { id: 34, kat: 'Kare Waffle', ad: 'Strawberry Kare', fiyat: 340, populer: false, begeni: '', resim: '/urunler/strawberry-kare.jpg', aciklama: 'Çilek, çikolata ve krema ile ferah kare waffle.', malzemeler: ['Çilek', 'Muz', 'Beyaz Damla Çikolata', 'Frambuazlı Damla Çikolata', 'Fındık Tozu', 'Çilek Sosu', 'Frambuaz Sosu'] },
+  { id: 35, kat: 'Kare Waffle', ad: 'Coconut Kare', fiyat: 340, populer: false, begeni: '', resim: '/urunler/coconut-kare.jpg', aciklama: 'Hindistan cevizi, beyaz çikolata ve meyveli kare waffle.', malzemeler: ['Muz', 'Hindistan Cevizi Tozu', 'Beyaz Damla Çikolata', 'Fındık Tozu', 'Hindistan Cevizi Sosu', 'Sütlü Çikolata Sosu'] },
+  { id: 36, kat: 'Bowl Waffle', ad: 'Waffle & Cola Fırsat Kovası', fiyat: 650, populer: true, begeni: '', resim: '/urunler/firsat-kovasi.jpg', aciklama: '2 kişilik waffle kovası + 2 adet 【entity-Coca-Cola¦canonical_name=Coca-Cola】. Paylaşmalık fırsat menüsü.', malzemeler: ['Waffle', 'Çikolata', 'Meyve', ' 【entity-Coca-Cola¦canonical_name=Coca-Cola】'] },
+  { id: 16, kat: 'Kumpir', ad: 'Saray Kumpir', fiyat: 300, populer: false, begeni: '', aciklama: 'Kaşar, mısır, bezelye, turşu ve soslarla saray kumpir.', malzemeler: ['Kaşar', 'Mısır', 'Bezelye', 'Turşu', 'Sos'] },
+  { id: 17, kat: 'Kumpir', ad: 'Ege Kumpir', fiyat: 320, populer: false, begeni: '', aciklama: 'Zeytin, beyaz peynir ve Ege otlarıyla hafif kumpir.', malzemeler: ['Zeytin', 'Beyaz Peynir', 'Ege Otları'] },
+  { id: 18, kat: 'Kumpir', ad: 'Gurme Kumpir', fiyat: 350, populer: false, begeni: '', aciklama: 'Özel soslar ve gurme malzemelerle kumpir.', malzemeler: ['Özel Sos', 'Gurme Malzeme'] },
+  { id: 19, kat: 'Kumpir', ad: 'Aptit Kumpir', fiyat: 280, populer: false, begeni: '', aciklama: 'Klasik malzemelerle doyurucu aptit kumpir.', malzemeler: ['Kaşar', 'Mısır', 'Sos'] },
+  { id: 20, kat: 'Kumpir', ad: 'Doyuran Kumpir', fiyat: 330, populer: false, begeni: '', aciklama: 'Bol malzemeli, iyice doyuran kumpir.', malzemeler: ['Kaşar', 'Mısır', 'Bezelye', 'Turşu'] },
+  { id: 21, kat: 'Kumpir', ad: 'Fiesta Menü', fiyat: 380, populer: false, begeni: '', aciklama: 'Kumpir + içecek ile fiesta menü.', malzemeler: ['Kumpir', 'İçecek'] },
+  { id: 22, kat: 'Kumpir', ad: '0-1 Malzemeli Kumpir', fiyat: 220, populer: false, begeni: '', aciklama: 'Sade, az malzemeli kumpir.', malzemeler: ['Kaşar', 'Tereyağı'] },
+  { id: 23, kat: 'Kumpir', ad: '3 Malzemeli Kumpir', fiyat: 260, populer: false, begeni: '', aciklama: '3 malzeme seçmeli kumpir.', malzemeler: ['Kaşar', 'Mısır', 'Bezelye'] },
+  { id: 24, kat: 'Kumpir', ad: '5 Malzemeli Kumpir', fiyat: 290, populer: false, begeni: '', aciklama: '5 malzeme seçmeli kumpir.', malzemeler: ['Kaşar', 'Mısır', 'Bezelye', 'Turşu', 'Zeytin'] },
+  { id: 25, kat: 'Kumpir', ad: '7 Malzemeli Kumpir', fiyat: 320, populer: false, begeni: '', aciklama: '7 malzeme seçmeli, dolu dolu kumpir.', malzemeler: ['Kaşar', 'Mısır', 'Bezelye', 'Turşu', 'Zeytin', 'Mantar', 'Sosis'] },
+  { id: 26, kat: 'Künefe & Katmer', ad: 'Katmer + Dondurma', fiyat: 300, populer: false, begeni: '', aciklama: 'Çıtır katmer, Antep fıstığı ve dondurma.', malzemeler: ['Katmer', 'Antep Fıstığı', 'Dondurma'] },
+  { id: 27, kat: 'Künefe & Katmer', ad: 'Künefe + Dondurma', fiyat: 320, populer: false, begeni: '', aciklama: 'Sıcak künefe, uzayan peynir ve dondurma.', malzemeler: ['Künefe', 'Peynir', 'Dondurma'] },
+  { id: 28, kat: 'Künefe & Katmer', ad: 'Künefe', fiyat: 280, populer: false, begeni: '', aciklama: 'Klasik sıcak künefe, fıstıklı.', malzemeler: ['Künefe', 'Antep Fıstığı'] },
+  { id: 29, kat: 'Künefe & Katmer', ad: 'Katmer', fiyat: 260, populer: false, begeni: '', aciklama: 'Klasik çıtır katmer, fıstıklı.', malzemeler: ['Katmer', 'Antep Fıstığı'] },
+  { id: 30, kat: 'Künefe & Katmer', ad: 'Fıstıklı Katmer + Dondurma', fiyat: 340, populer: false, begeni: '', aciklama: 'Bol fıstıklı katmer ve dondurma.', malzemeler: ['Katmer', 'Antep Fıstığı', 'Dondurma'] },
+  { id: 31, kat: 'Sufle', ad: 'Çikolatalı Sufle + Dondurma', fiyat: 600, populer: false, begeni: '', aciklama: 'Akışkan çikolatalı sufle ve dondurma.', malzemeler: ['Sufle', 'Çikolata', 'Dondurma'] },
+  { id: 32, kat: 'Sufle', ad: 'Beyaz Çikolatalı Tahinli Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Beyaz çikolata ve tahinli, akışkan sufle.', malzemeler: ['Sufle', 'Beyaz Çikolata', 'Tahin'] }
 ]
-
 const KATS = ['Tümü', 'Bowl Waffle', 'Kare Waffle', 'Kumpir', 'Künefe & Katmer', 'Sufle']
-
+const ONE_CIKAN = [5, 6, 16]
+function emojiFor(kat: string) {
+  if (kat === 'Kumpir') return '🥔'
+  if (kat === 'Künefe & Katmer') return '🍮'
+  if (kat === 'Sufle') return '🍫'
+  return '🧇'
+}
+function renkFor(kat: string) {
+  if (kat === 'Kumpir') return '#fef9c3'
+  if (kat === 'Künefe & Katmer') return '#ffedd5'
+  if (kat === 'Sufle') return '#f3e8ff'
+  if (kat === 'Kare Waffle') return '#ffe4e6'
+  return '#fff0d6'
+}
 export default function Home() {
   if (BAKIMDA) {
     return (
-      <div style={{ minHeight: '100vh', background: '#FFF6E9', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'sans-serif', textAlign: 'center' }}>
+      <div style={{ minHeight: '100vh', background: '#fff7ee', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'sans-serif', textAlign: 'center' }}>
         <div>
           <div style={{ fontSize: '60px' }}>🧇</div>
-          <h1>WaffLia Sweet Kumpir</h1>
+          <h1 style={{ fontSize: '26px' }}>WaffLia Sweet Kumpir</h1>
           <p style={{ color: '#666' }}>Şu an menümüzü güzelleştiriyoruz.</p>
           <p style={{ fontWeight: 'bold' }}>Birazdan tekrar buradayız 💛</p>
           <p style={{ fontSize: '13px', color: '#999' }}>Her gün 17:00 - 05:00 • İstanbul • 0535 273 28 65</p>
@@ -58,69 +71,186 @@ export default function Home() {
       </div>
     )
   }
-
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<any>(null)
   const [kat, setKat] = useState('Tümü')
-  const [sepet, setSepet] = useState([])
-
+  const [arama, setArama] = useState('')
+  const [sepet, setSepet] = useState<any[]>([])
+  const [sepetAcik, setSepetAcik] = useState(false)
+  const [modalUrun, setModalUrun] = useState<any>(null)
+  const [cikartilan, setCikartilan] = useState<string[]>([])
+  const [modalAdet, setModalAdet] = useState(1)
   useEffect(() => {
     supabase.auth.getSession().then((res) => setUser(res.data.session?.user || null))
   }, [])
-
-  const cikisYap = async () => { await supabase.auth.signOut(); setUser(null); window.location.href = '/' }
-  const isim = user?.user_metadata?.full_name || user?.email?.split('@')[0] || ''
-  const liste = kat === 'Tümü' ? URUNLER : URUNLER.filter((u) => u.kat === kat)
-  const toplam = sepet.reduce((s, u) => s + u.fiyat * u.adet, 0)
-
-  const ekle = (urun) => {
-    setSepet((prev) => {
-      const varMi = prev.find((p) => p.id === urun.id)
-      if (varMi) return prev.map((p) => p.id === urun.id ? { ...p, adet: p.adet + 1 } : p)
-      return [...prev, { ...urun, adet: 1 }]
-    })
+  const cikisYap = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+    window.location.reload()
   }
-
+  const isim = user?.user_metadata?.full_name || user?.email?.split('@')[0] || ''
+  const adet = (id: number) => sepet.filter((s) => s.id === id).length
+  const urunAc = (urun: any) => {
+    setModalUrun(urun)
+    setCikartilan([])
+    setModalAdet(1)
+  }
+  const toggleCikart = (m: string) => {
+    if (cikartilan.includes(m)) setCikartilan(cikartilan.filter((x) => x !== m))
+    else setCikartilan([...cikartilan, m])
+  }
+  const modalSepeteEkle = () => {
+    if (!modalUrun) return
+    const yeni = [...sepet]
+    for (let i = 0; i < modalAdet; i++) yeni.push({ ...modalUrun, cikartilan: [...cikartilan] })
+    setSepet(yeni)
+    setModalUrun(null)
+  }
+  const azalt = (urun: any) => {
+    const idx = sepet.findIndex((s) => s.id === urun.id)
+    if (idx >= 0) {
+      const yeni = [...sepet]
+      yeni.splice(idx, 1)
+      setSepet(yeni)
+    }
+  }
+  const toplam = sepet.reduce((t, u) => t + u.fiyat, 0)
+  const aramali = URUNLER.filter((u) => u.ad.toLowerCase().includes(arama.toLowerCase()) || u.aciklama.toLowerCase().includes(arama.toLowerCase()))
+  const gosterilecekKats = kat === 'Tümü' ? KATS.slice(1) : [kat]
+  const oneCikanUrunler = URUNLER.filter((u) => ONE_CIKAN.includes(u.id))
+  const UrunKarti = ({ u }: { u: any }) => (
+    <div style={{ background: 'white', borderRadius: '16px', padding: '12px', display: 'flex', gap: '12px', alignItems: 'flex-start', boxShadow: '0 1px 6px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+      <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => urunAc(u)}>
+        <div style={{ fontWeight: '800', fontSize: '16px' }}>{u.ad}</div>
+        <div style={{ color: '#777', fontSize: '13px', margin: '5px 0', lineHeight: '1.45' }}>{u.aciklama}</div>
+        {u.begeni ? <div style={{ color: '#16a34a', fontSize: '12px', fontWeight: 'bold', margin: '4px 0' }}>👍 {u.begeni}</div> : null}
+        <div style={{ marginTop: '6px' }}>
+          {u.eskiFiyat ? <span style={{ textDecoration: 'line-through', color: '#999', marginRight: '6px', fontSize: '13px' }}>{u.eskiFiyat} TL</span> : null}
+          <b style={{ fontSize: '16px' }}>{u.fiyat} TL</b>
+        </div>
+        <button onClick={(e) => { e.stopPropagation(); urunAc(u) }} style={{ marginTop: '8px', background: 'black', color: 'white', border: 'none', padding: '7px 14px', borderRadius: '8px', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer' }}>+ Sepete Ekle</button>
+      </div>
+      <div onClick={() => urunAc(u)} style={{ width: '104px', height: '104px', background: renkFor(u.kat), borderRadius: '14px', flexShrink: 0, position: 'relative', cursor: 'pointer', overflow: 'hidden' }}>
+        {u.resim ? (
+          <img src={u.resim} alt={u.ad} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '44px' }}>{emojiFor(u.kat)}</div>
+        )}
+        {u.populer ? <span style={{ position: 'absolute', bottom: '6px', right: '6px', background: '#e11d48', color: 'white', fontSize: '11px', padding: '3px 8px', borderRadius: '12px', fontWeight: 'bold' }}>🔥 Popüler</span> : null}
+      </div>
+    </div>
+  )
   return (
-    <main style={{ background: '#FFF6E9', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-      <header style={{ background: '#5C3A1A', color: 'white', padding: '15px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ margin: 0, fontSize: '26px' }}>WAFFLIA</h1>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          {user ? (<><span>Hoş geldin, {isim}!</span><button onClick={cikisYap} style={{ background: 'white', color: '#5C3A1A', border: 'none', padding: '8px 12px', borderRadius: '20px', cursor: 'pointer' }}>Çıkış</button></>) : (<><a href="/kayit" style={{ color: 'white', textDecoration: 'none' }}>Kayıt Ol</a><a href="/giris" style={{ color: 'white', textDecoration: 'none' }}>Giriş Yap</a></>)}
-          <span style={{ background: '#F97316', padding: '8px 12px', borderRadius: '20px' }}>Sepet {sepet.reduce((s, u) => s + u.adet, 0)} - {toplam} TL</span>
-        </div>
-      </header>
-      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '20px', textAlign: 'center' }}>
-        <h2 style={{ fontSize: '32px', margin: '10px 0 5px 0' }}>Menümüz</h2>
-        <p style={{ color: '#666' }}>Wafflia Sweet Kumpir - 35 Ürün</p>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', margin: '20px 0' }}>
-          {KATS.map((k) => (
-            <button key={k} onClick={() => setKat(k)} style={{ background: kat === k ? '#5C3A1A' : 'white', color: kat === k ? 'white' : '#5C3A1A', border: '1px solid #5C3A1A', padding: '10px 16px', borderRadius: '20px', cursor: 'pointer' }}>{k}</button>
-          ))}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '15px', textAlign: 'left' }}>
-          {liste.map((u) => (
-            <div key={u.id} style={{ background: 'white', borderRadius: '15px', overflow: 'hidden' }}>
-              <div style={{ background: '#FDEBD0', height: '180px', overflow: 'hidden' }}>
-                {u.resim ? (
-                  <img src={u.resim} alt={u.ad} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                ) : (
-                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '50px' }}>
-                    {u.kat === 'Kumpir' ? '🥔' : u.kat === 'Sufle' ? '🍫' : u.kat === 'Künefe & Katmer' ? '🍮' : '🧇'}
-                  </div>
-                )}
-              </div>
-              <div style={{ padding: '15px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
-                  <h3 style={{ margin: '0', fontSize: '17px' }}>{u.ad}</h3>
-                  <b style={{ color: '#F97316', whiteSpace: 'nowrap' }}>{u.fiyat} TL</b>
-                </div>
-                <p style={{ color: '#777', fontSize: '14px', lineHeight: '1.5' }}>{u.aciklama}</p>
-                <button onClick={() => ekle(u)} style={{ width: '100%', background: '#5C3A1A', color: 'white', border: 'none', padding: '10px', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}>+ Sepete Ekle</button>
-              </div>
+    <div style={{ fontFamily: 'sans-serif', background: '#fff7ee', minHeight: '100vh', paddingBottom: '170px' }}>
+      <div style={{ background: '#3b1d0a', color: 'white', padding: '16px', textAlign: 'center' }}>
+        <div style={{ fontSize: '22px', fontWeight: '900' }}>WaffLia Sweet Kumpir</div>
+        <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '4px' }}>🔍 ♡ 👤</div>
+      </div>
+      <div style={{ background: '#3b1d0a', color: 'white', padding: '0 16px 24px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <div style={{ fontSize: '70px', lineHeight: '1.1' }}>🧇 🥔</div>
+          <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '6px' }}>Açık 17:00 - 05:00 • İstanbul</div>
+          <h1 style={{ fontSize: '28px', lineHeight: '1.2', margin: '12px 0' }}>En tatlı waffle ve kumpir burada</h1>
+          {user ? (
+            <div style={{ background: 'white', color: '#333', borderRadius: '14px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Hoş geldin, <b>{isim}!</b> 👋</span>
+              <button onClick={cikisYap} style={{ border: '1px solid #ddd', background: 'white', padding: '7px 14px', borderRadius: '20px', cursor: 'pointer' }}>Çıkış Yap</button>
             </div>
-          ))}
+          ) : (
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <a href="/kayit" style={{ background: '#b45309', color: 'white', padding: '12px 26px', borderRadius: '12px', textDecoration: 'none', fontWeight: 'bold', flex: 1, maxWidth: '180px' }}>Kayıt Ol</a>
+              <a href="/giris" style={{ background: 'transparent', color: 'white', padding: '12px 26px', borderRadius: '12px', border: '1px solid white', textDecoration: 'none', fontWeight: 'bold', flex: 1, maxWidth: '180px' }}>Giriş Yap</a>
+            </div>
+          )}
+          <input value={arama} onChange={(e) => setArama(e.target.value)} placeholder="Wafflia'da ara..." style={{ width: '100%', marginTop: '16px', padding: '12px 14px', borderRadius: '12px', border: 'none', outline: 'none', fontSize: '15px', boxSizing: 'border-box' }} />
         </div>
       </div>
-    </main>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 12px' }}>
+        <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Öne Çıkan Ürünler</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {oneCikanUrunler.map((u) => <UrunKarti key={u.id} u={u} />)}
+        </div>
+        <h2 id="menu" style={{ fontSize: '22px', margin: '24px 4px 10px' }}>Menü</h2>
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '6px' }}>
+          {KATS.map((k) => (
+            <button key={k} onClick={() => setKat(k)} style={{ padding: '9px 16px', borderRadius: '20px', border: kat === k ? '1px solid #5b2c0e' : '1px solid #ddd', background: kat === k ? '#5b2c0e' : 'white', color: kat === k ? 'white' : '#333', cursor: 'pointer', fontWeight: kat === k ? 'bold' : 'normal', flexShrink: 0 }}>{k}</button>
+          ))}
+        </div>
+        {gosterilecekKats.map((k) => {
+          const liste = aramali.filter((u) => u.kat === k)
+          if (liste.length === 0) return null
+          return (
+            <div key={k}>
+              <h3 style={{ fontSize: '18px', margin: '18px 4px 10px' }}>{k} <span style={{ color: '#999', fontSize: '13px', fontWeight: 'normal' }}>{liste.length} ürün</span></h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {liste.map((u) => <UrunKarti key={u.id} u={u} />)}
+              </div>
+            </div>
+          )
+        })}
+        <div style={{ background: '#fef3e2', borderRadius: '16px', padding: '16px', marginTop: '24px' }}>
+          <h3 style={{ margin: '0 0 8px' }}>İletişim</h3>
+          <p style={{ margin: '4px 0', fontSize: '14px' }}>📞 0535 273 28 65 • 🕒 Her gün 17:00 - 05:00 • 📍 İstanbul</p>
+        </div>
+      </div>
+      {modalUrun && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 50 }}>
+          <div style={{ background: 'white', width: '100%', maxWidth: '600px', maxHeight: '88vh', overflowY: 'auto', borderRadius: '20px 20px 0 0', padding: '18px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <h2 style={{ margin: '0 0 6px', fontSize: '20px' }}>{modalUrun.ad}</h2>
+                <p style={{ color: '#666', fontSize: '13px', lineHeight: '1.5', margin: 0 }}>{modalUrun.aciklama}</p>
+              </div>
+              <button onClick={() => setModalUrun(null)} style={{ border: 'none', background: '#eee', width: '32px', height: '32px', borderRadius: '50%', fontSize: '18px', cursor: 'pointer', flexShrink: 0 }}>✕</button>
+            </div>
+            <h3 style={{ fontSize: '15px', margin: '16px 0 8px' }}>Çıkartmak istediklerini seç 👇</h3>
+            <p style={{ fontSize: '12px', color: '#888', margin: '0 0 10px' }}>İstemediğin malzemenin kutusunu işaretle, biz onu eklemeden hazırlayalım.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {modalUrun.malzemeler.map((m: string) => (
+                <label key={m} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: cikartilan.includes(m) ? '#fef2f2' : '#f9f9f9', padding: '10px 12px', borderRadius: '12px', border: cikartilan.includes(m) ? '1px solid #fecaca' : '1px solid #eee', cursor: 'pointer' }}>
+                  <span style={{ textDecoration: cikartilan.includes(m) ? 'line-through' : 'none', color: cikartilan.includes(m) ? '#999' : '#333' }}>{m} {cikartilan.includes(m) ? ' — Çıkartılacak' : ''}</span>
+                  <input type="checkbox" checked={cikartilan.includes(m)} onChange={() => toggleCikart(m)} style={{ width: '20px', height: '20px' }} />
+                </label>
+              ))}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button onClick={() => setModalAdet(Math.max(1, modalAdet - 1))} style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #ddd', background: 'white', fontSize: '20px', cursor: 'pointer' }}>-</button>
+                <b style={{ fontSize: '18px' }}>{modalAdet}</b>
+                <button onClick={() => setModalAdet(modalAdet + 1)} style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: '#5b2c0e', color: 'white', fontSize: '20px', cursor: 'pointer' }}>+</button>
+              </div>
+              <b style={{ fontSize: '18px' }}>{(modalUrun.fiyat * modalAdet).toFixed(2)} TL</b>
+            </div>
+            {cikartilan.length > 0 ? <p style={{ fontSize: '12px', color: '#e11d48', margin: '10px 0 0' }}>Çıkartılacak: {cikartilan.join(', ')}</p> : null}
+            <button onClick={modalSepeteEkle} style={{ width: '100%', marginTop: '14px', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px', borderRadius: '14px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>Sepete Ekle • {(modalUrun.fiyat * modalAdet).toFixed(2)} TL</button>
+          </div>
+        </div>
+      )}
+      {sepet.length > 0 && (
+        <div style={{ position: 'fixed', left: 0, right: 0, bottom: '68px', padding: '0 12px', zIndex: 30 }}>
+          <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
+            <span>🛒 Sepeti Görüntüle • {sepet.length} ürün</span>
+            <span>{toplam.toFixed(2)} TL →</span>
+          </button>
+          {sepetAcik && (
+            <div style={{ maxWidth: '900px', margin: '8px auto 0', background: 'white', borderRadius: '16px', padding: '14px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', color: '#333' }}>
+              {sepet.map((s, i) => (
+                <div key={i} style={{ padding: '6px 0', borderBottom: '1px solid #eee', fontSize: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{s.ad}</span><span>{s.fiyat} TL</span></div>
+                  {s.cikartilan && s.cikartilan.length > 0 ? <div style={{ fontSize: '12px', color: '#e11d48' }}>Çıkartılan: {s.cikartilan.join(', ')}</div> : <div style={{ fontSize: '12px', color: '#888' }}>Tüm malzemelerle</div>}
+                </div>
+              ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontWeight: 'bold' }}><span>Toplam</span><span>{toplam.toFixed(2)} TL</span></div>
+              <button onClick={() => setSepet([])} style={{ marginTop: '10px', width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ddd', background: 'white', cursor: 'pointer' }}>Sepeti Temizle</button>
+            </div>
+          )}
+        </div>
+      )}
+      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, background: 'white', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-around', padding: '10px 0 14px', zIndex: 20 }}>
+        <a href="#" style={{ textAlign: 'center', textDecoration: 'none', color: '#5b2c0e', fontSize: '12px', fontWeight: 'bold' }}><div style={{ fontSize: '20px' }}>🏠</div>Anasayfa</a>
+        <a href="#menu" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>☰</div>Menü</a>
+        <a href="#" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>🧾</div>Siparişler</a>
+        <a href="/giris" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>👤</div>Profil</a>
+      </div>
+    </div>
   )
 }
