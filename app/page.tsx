@@ -40,8 +40,7 @@ const KATS = ['Tümü', 'Bowl Waffle', 'Kare Waffle', 'Kumpir', 'Künefe & Katme
 
 export default function Home() {
 const [user, setUser] = useState<any>(null)  const [kat, setKat] = useState('Tümü')
-  const [sepet, setSepet] = useState([])
-
+const [sepet, setSepet] = useState<any[]>([])
   useEffect(() => {
     supabase.auth.getSession().then((res) => setUser(res.data.session?.user || null))
   }, [])
