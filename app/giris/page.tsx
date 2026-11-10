@@ -7,33 +7,32 @@ export default function Giris() {
   const [sifre, setSifre] = useState('')
   const [mesaj, setMesaj] = useState('')
 
-  async function girisYap(e: any) {
+  const girisYap = async (e: any) => {
     e.preventDefault()
-    setMesaj('Giris yapiliyor...')
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: sifre
-    })
+    setMesaj('')
+    const { error } = await supabase.auth.signInWithPassword({ email, password: sifre })
     if (error) {
       setMesaj('Hata: ' + error.message)
     } else {
-      setMesaj('Giris basarili! Anasayfaya gidiyorsun...')
-      setTimeout(() => { window.location.href = '/' }, 1200)
+      setMesaj('Giriş başarılı! Anasayfaya gidiyorsun...')
+      setTimeout(() => { window.location.href = '/' }, 1000)
     }
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'sans-serif' }}>
-      <form onSubmit={girisYap} style={{ background: 'white', padding: '32px', borderRadius: '16px', width: '100%', maxWidth: '400px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
-        <h1 style={{ textAlign: 'center', fontSize: '26px', color: '#111', marginBottom: '20px' }}>Wafflia&apos;ya Giris Yap</h1>
-        <label style={{ color: '#111', fontSize: '14px' }}>E-posta</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ornek@mail.com" required style={{ width: '100%', padding: '12px', margin: '6px 0 14px', border: '1px solid #ccc', borderRadius: '10px', background: 'white', color: 'black', boxSizing: 'border-box' }} />
-        <label style={{ color: '#111', fontSize: '14px' }}>Sifre</label>
-        <input type="password" value={sifre} onChange={(e) => setSifre(e.target.value)} placeholder="Sifren" required style={{ width: '100%', padding: '12px', margin: '6px 0 14px', border: '1px solid #ccc', borderRadius: '10px', background: 'white', color: 'black', boxSizing: 'border-box' }} />
-        <button type="submit" style={{ width: '100%', padding: '14px', background: '#111827', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>Giris Yap</button>
-        <p style={{ color: '#111', textAlign: 'center', marginTop: '14px', minHeight: '20px' }}>{mesaj}</p>
-        <p style={{ textAlign: 'center', marginTop: '10px' }}><a href="/kayit" style={{ color: '#ea580c' }}>Hesabin yok mu? Kayit Ol</a></p>
-      </form>
+    <main style={{ background: '#FFF6E9', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', fontFamily: 'sans-serif' }}>
+      <div style={{ background: 'white', padding: '30px', borderRadius: '20px', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '28px', marginBottom: '20px' }}>Wafflia&apos;ya Giriş Yap</h1>
+        <form onSubmit={girisYap} style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'left' }}>
+          <label>E-posta</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ padding: '12px', borderRadius: '10px', border: '1px solid #ccc', color: 'black' }} />
+          <label>Şifre</label>
+          <input type="password" value={sifre} onChange={(e) => setSifre(e.target.value)} required style={{ padding: '12px', borderRadius: '10px', border: '1px solid #ccc', color: 'black' }} />
+          <button type="submit" style={{ background: '#1F2937', color: 'white', padding: '14px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontSize: '16px' }}>Giriş Yap</button>
+        </form>
+        {mesaj && <p style={{ marginTop: '15px', color: 'black' }}>{mesaj}</p>}
+        <a href="/kayit" style={{ display: 'block', marginTop: '15px', color: '#F97316', textDecoration: 'none' }}>Hesabın yok mu? Kayıt Ol</a>
+      </div>
     </main>
   )
 }
