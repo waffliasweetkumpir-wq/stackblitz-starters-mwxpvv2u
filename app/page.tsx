@@ -92,8 +92,8 @@ export default function Home() {
     <div style={{ fontFamily: 'sans-serif', background: '#f8f5f2', minHeight: '100vh', paddingBottom: '90px' }}>
       <div style={{ background: '#5b2c0e', color: 'white', padding: '18px 16px 14px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '900px', margin: '0 auto' }}>
-          <div style={{ fontSize: '28px', fontWeight: '900', letterSpacing: '4px' }}>WAFFLIA</div>
-          <div style={{ fontSize: '13px', textAlign: 'right' }}>⭐ 4.9 • 17:00 - 05:00<br />İstanbul</div>
+          <div style={{ fontSize: '28px', fontWeight: '900', letterSpacing: 'px' }}>WaffLia Swett Kumpir</div>
+          <div style={{ fontSize: '13px', textAlign: 'right' }}>• 17:00 - 05:00<br />İstanbul</div>
         </div>
         <div style={{ maxWidth: '900px', margin: '10px auto 0', background: 'white', color: '#333', borderRadius: '12px', padding: '10px 12px' }}>
           {user ? (
