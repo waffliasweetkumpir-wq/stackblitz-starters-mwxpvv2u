@@ -17,7 +17,7 @@ const WAFFLE_MALZEMELER = [
   "Beyaz Damla Çikolata",
   "Çakıl Taşı",
   "Bonibon",
-  " 【entity-Oreo¦canonical_name=Oreo】 Tozu",
+  " Oreo Tozu",
   "Çilek",
   "Antep Fıstığı",
   "Sütlü Çikolata Sosu",
@@ -316,7 +316,7 @@ const URUNLER: Urun[] = [
     fiyat: 1000,
     populer: true,
     resim: "/public/urunler/firsat-kovasi.jpg",
-    aciklama: "2 adet enfes bowl waffle ve yanında 2 adet soğuk 【entity-Coca-Cola¦canonical_name=Coca-Cola】! Waffle içeriğinden çıkarmak istediğiniz malzemeleri sipariş notunda belirtebilirsiniz.",
+    aciklama: "2 adet enfes bowl waffle ve yanında 2 adet soğuk Coca-Cola! Waffle içeriğinden çıkarmak istediğiniz malzemeleri sipariş notunda belirtebilirsiniz.",
     malzemeler: WAFFLE_MALZEMELER,
   },
 ];
@@ -324,7 +324,7 @@ const URUNLER: Urun[] = [
 const EKSTRALAR = [
   { ad: "Sütlü Çikolata Sosu", fiyat: 72 },
   { ad: "Antep Fıstıklı Sosu", fiyat: 80 },
-  { ad: " 【entity-Oreo¦canonical_name=Oreo】 Tozu", fiyat: 64 },
+  { ad: " Oreo Tozu", fiyat: 64 },
   { ad: "Lotus Tozu", fiyat: 64 },
   { ad: "Beyaz Sos", fiyat: 60 },
   { ad: "Çilek", fiyat: 55 },
@@ -354,13 +354,30 @@ export default function Page() {
   const [puan, setPuan] = useState(0);
   const [puanKullan, setPuanKullan] = useState(false);
   const [kat, setKat] = useState("Tümü");
+  const [sayfa, setSayfa] = useState("Anasayfa");
+  const [kullanici, setKullanici] = useState("");
+  const [girisIsim, setGirisIsim] = useState("");
+  const [girisAcik, setGirisAcik] = useState(false);
+  const [kvkkAcik, setKvkkAcik] = useState(false);
+  const [alerjiAcik, setAlerjiAcik] = useState(false);
 
   useEffect(() => {
-    const s = Number(localStorage.getItem("wafflia_siparis") || "0");
-    const p = Number(localStorage.getItem("wafflia_puan") || "0");
-    setSiparisSayisi(s);
-    setPuan(p);
+    setSiparisSayisi(Number(localStorage.getItem("wafflia_siparis") || "0"));
+    setPuan(Number(localStorage.getItem("wafflia_puan") || "0"));
+    setKullanici(localStorage.getItem("wafflia_kullanici") || "");
   }, []);
+
+  function girisYap() {
+    if (!girisIsim) return;
+    localStorage.setItem("wafflia_kullanici", girisIsim);
+    setKullanici(girisIsim);
+    setGirisAcik(false);
+  }
+
+  function cikisYap() {
+    localStorage.removeItem("wafflia_kullanici");
+    setKullanici("");
+  }
 
   const kategoriler = [
     "Tümü",
@@ -372,9 +389,7 @@ export default function Page() {
   ];
 
   const liste =
-    kat === "Tümü"
-      ? URUNLER
-      : URUNLER.filter((u) => u.kat === kat);
+    kat === "Tümü" ? URUNLER : URUNLER.filter((u) => u.kat === kat);
 
   const opsiyonVar = (u: Urun) => {
     return (
@@ -433,8 +448,8 @@ export default function Page() {
   const araToplam = useMemo(() => {
     return sepet.reduce((t, i) => {
       const ek = i.ekstralar.reduce((s, ad) => {
-        const bulunan = EKSTRALAR.find((e) => e.ad === ad);
-        return s + (bulunan ? bulunan.fiyat : 0);
+        const b = EKSTRALAR.find((e) => e.ad === ad);
+        return s + (b ? b.fiyat : 0);
       }, 0);
       return t + (i.urun.fiyat + ek) * i.adet;
     }, 0);
@@ -451,10 +466,7 @@ export default function Page() {
   }
 
   let puanIndirim = 0;
-  if (puanKullan && puan >= 150) {
-    puanIndirim = 400;
-  }
-
+  if (puanKullan && puan >= 150) puanIndirim = 400;
   const toplam = Math.max(0, araToplam - indirim - puanIndirim);
 
   function siparisVer() {
@@ -464,17 +476,12 @@ export default function Page() {
     }
     const urunMetni = sepet
       .map((i) => {
-        let parca = i.adet + "x " + i.urun.ad;
-        if (i.cikarilan.length) {
-          parca += " (Çıkarılan: " + i.cikarilan.join(", ") + ")";
-        }
-        if (i.ekstralar.length) {
-          parca += " (Ekstra: " + i.ekstralar.join(", ") + ")";
-        }
-        return parca;
+        let p = i.adet + "x " + i.urun.ad;
+        if (i.cikarilan.length) p += " (Çıkarılan: " + i.cikarilan.join(", ") + ")";
+        if (i.ekstralar.length) p += " (Ekstra: " + i.ekstralar.join(", ") + ")";
+        return p;
       })
       .join(" | ");
-
     const mesaj =
       "WaffLia Sipariş - Toplam: " +
       toplam +
@@ -488,14 +495,11 @@ export default function Page() {
       odeme +
       " - Ürünler: " +
       urunMetni;
-
     localStorage.setItem("wafflia_siparis", String(siparisSayisi + 1));
-    if (puanKullan && puan >= 150) {
-      localStorage.setItem("wafflia_puan", String(puan - 150 + 10));
-    } else {
-      localStorage.setItem("wafflia_puan", String(puan + 10));
-    }
-
+    localStorage.setItem(
+      "wafflia_puan",
+      String(puanKullan && puan >= 150 ? puan - 150 + 10 : puan + 10)
+    );
     window.open(
       "https://wa.me/905352732865?text=" + encodeURIComponent(mesaj),
       "_blank"
@@ -511,7 +515,7 @@ export default function Page() {
         fontFamily: "sans-serif",
         background: "#fff7ee",
         minHeight: "100vh",
-        paddingBottom: 120,
+        paddingBottom: 130,
       }}
     >
       <header
@@ -544,98 +548,303 @@ export default function Page() {
         >
           ⭐ Puanın: {puan} | Sipariş Sayın: {siparisSayisi}
         </div>
-      </header>
-
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          overflowX: "auto",
-          padding: 12,
-        }}
-      >
-        {kategoriler.map((k) => (
-          <button
-            key={k}
-            onClick={() => setKat(k)}
-            style={{
-              whiteSpace: "nowrap",
-              padding: "8px 14px",
-              borderRadius: 20,
-              border: "none",
-              background: kat === k ? "#2b1708" : "#fff",
-              color: kat === k ? "#fff" : "#2b1708",
-              fontWeight: 700,
-            }}
-          >
-            {k}
-          </button>
-        ))}
-      </div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 12,
-          padding: 12,
-        }}
-      >
-        {liste.map((u) => (
-          <div
-            key={u.id}
-            onClick={() => urunAc(u)}
-            style={{
-              background: "#fff",
-              borderRadius: 16,
-              overflow: "hidden",
-              boxShadow: "0 1px 6px rgba(0,0,0,0.08)",
-              cursor: "pointer",
-            }}
-          >
-            <img
-              src={u.resim}
-              alt={u.ad}
-              style={{
-                width: "100%",
-                aspectRatio: "1/1",
-                objectFit: "cover",
-                display: "block",
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
-            />
-            <div style={{ padding: 10 }}>
-              <div style={{ fontWeight: 800, fontSize: 14 }}>{u.ad}</div>
-              <div style={{ fontSize: 12, color: "#666", marginTop: 4 }}>
-                {u.aciklama}
-              </div>
-              <div style={{ fontWeight: 900, marginTop: 8 }}>
-                {u.fiyat} TL {u.populer ? "🔥" : ""}
-              </div>
+        <div style={{ marginTop: 8 }}>
+          {kullanici ? (
+            <span style={{ fontSize: 13 }}>
+              Merhaba, {kullanici} 👋{" "}
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  urunAc(u);
-                }}
+                onClick={cikisYap}
                 style={{
-                  marginTop: 8,
-                  width: "100%",
-                  background: "#111",
-                  color: "#fff",
+                  background: "#fff",
+                  color: "#2b1708",
                   border: "none",
-                  padding: 10,
-                  borderRadius: 10,
+                  padding: "6px 12px",
+                  borderRadius: 20,
                   fontWeight: 800,
                 }}
               >
-                + Sepete Ekle
+                Çıkış Yap
               </button>
-            </div>
+            </span>
+          ) : (
+            <button
+              onClick={() => setGirisAcik(true)}
+              style={{
+                background: "#fff",
+                color: "#2b1708",
+                border: "none",
+                padding: "6px 14px",
+                borderRadius: 20,
+                fontWeight: 800,
+              }}
+            >
+              Giriş Yap
+            </button>
+          )}
+        </div>
+      </header>
+
+      {siparisSayisi === 0 && (
+        <div
+          style={{
+            background: "#ffcc00",
+            textAlign: "center",
+            padding: 10,
+            fontWeight: 900,
+            fontSize: 14,
+          }}
+        >
+          🎉 İlk siparişine özel %25 indirim!
+        </div>
+      )}
+      {(siparisSayisi + 1) % 5 === 0 && siparisSayisi !== 0 && (
+        <div
+          style={{
+            background: "#ffcc00",
+            textAlign: "center",
+            padding: 10,
+            fontWeight: 900,
+            fontSize: 14,
+          }}
+        >
+          🎉 Bu 5. siparişin, %40 indirim kazandın!
+        </div>
+      )}
+
+      {sayfa === "Profil" ? (
+        <div style={{ padding: 16 }}>
+          <h2>Profilim</h2>
+          <p>Adın: {kullanici || "Giriş yapmadın"}</p>
+          <p>Puanın: {puan} (150 puan = 400 TL indirim)</p>
+          <p>Sipariş Sayın: {siparisSayisi}</p>
+          {kullanici ? (
+            <button
+              onClick={cikisYap}
+              style={{
+                background: "#111",
+                color: "#fff",
+                border: "none",
+                padding: 12,
+                borderRadius: 10,
+                width: "100%",
+                fontWeight: 800,
+              }}
+            >
+              Çıkış Yap
+            </button>
+          ) : (
+            <button
+              onClick={() => setGirisAcik(true)}
+              style={{
+                background: "#111",
+                color: "#fff",
+                border: "none",
+                padding: 12,
+                borderRadius: 10,
+                width: "100%",
+                fontWeight: 800,
+              }}
+            >
+              Giriş Yap
+            </button>
+          )}
+        </div>
+      ) : sayfa === "Siparişler" ? (
+        <div style={{ padding: 16 }}>
+          <h2>Siparişlerim</h2>
+          <p>Toplam sipariş sayın: {siparisSayisi}</p>
+          <p>Şu an sepette: {sepet.length} ürün</p>
+          <p>İndirim: {siparisSayisi === 0 ? "İlk siparişe %25" : "Her 5. siparişe %40"}</p>
+        </div>
+      ) : (
+        <>
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: 12 }}>
+            {kategoriler.map((k) => (
+              <button
+                key={k}
+                onClick={() => setKat(k)}
+                style={{
+                  whiteSpace: "nowrap",
+                  padding: "8px 14px",
+                  borderRadius: 20,
+                  border: "none",
+                  background: kat === k ? "#2b1708" : "#fff",
+                  color: kat === k ? "#fff" : "#2b1708",
+                  fontWeight: 700,
+                }}
+              >
+                {k}
+              </button>
+            ))}
           </div>
-        ))}
-      </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 12,
+              padding: 12,
+            }}
+          >
+            {liste.map((u) => (
+              <div
+                key={u.id}
+                onClick={() => urunAc(u)}
+                style={{
+                  background: "#fff",
+                  borderRadius: 16,
+                  overflow: "hidden",
+                  boxShadow: "0 1px 6px rgba(0,0,0,0.08)",
+                  cursor: "pointer",
+                }}
+              >
+                <img
+                  src={u.resim}
+                  alt={u.ad}
+                  style={{
+                    width: "100%",
+                    aspectRatio: "1/1",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+                <div style={{ padding: 10 }}>
+                  <div style={{ fontWeight: 800, fontSize: 14 }}>{u.ad}</div>
+                  <div style={{ fontSize: 12, color: "#666", marginTop: 4 }}>
+                    {u.aciklama}
+                  </div>
+                  <div style={{ fontWeight: 900, marginTop: 8 }}>
+                    {u.fiyat} TL {u.populer ? "🔥" : ""}
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      urunAc(u);
+                    }}
+                    style={{
+                      marginTop: 8,
+                      width: "100%",
+                      background: "#111",
+                      color: "#fff",
+                      border: "none",
+                      padding: 10,
+                      borderRadius: 10,
+                      fontWeight: 800,
+                    }}
+                  >
+                    + Sepete Ekle
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ background: "#fff", margin: 12, borderRadius: 16, padding: 14 }}>
+            <div style={{ fontWeight: 900 }}>ℹ️ Bilgilendirme</div>
+            <button
+              onClick={() => setAlerjiAcik(!alerjiAcik)}
+              style={{
+                width: "100%",
+                textAlign: "left",
+                background: "none",
+                border: "none",
+                padding: "10px 0",
+                fontWeight: 700,
+              }}
+            >
+              ⚠️ Alerji Uyarısı {alerjiAcik ? "▲" : "▼"}
+            </button>
+            {alerjiAcik && (
+              <p style={{ fontSize: 13, color: "#555" }}>
+                Ürünlerimiz gluten, süt, yumurta, fındık, fıstık ve soya
+                içerebilir. Alerjiniz varsa sipariş notuna yazınız.
+              </p>
+            )}
+            <button
+              onClick={() => setKvkkAcik(!kvkkAcik)}
+              style={{
+                width: "100%",
+                textAlign: "left",
+                background: "none",
+                border: "none",
+                padding: "10px 0",
+                fontWeight: 700,
+              }}
+            >
+              🔒 KVKK Aydınlatma Metni {kvkkAcik ? "▲" : "▼"}
+            </button>
+            {kvkkAcik && (
+              <p style={{ fontSize: 13, color: "#555" }}>
+                WaffLia Sweet Kumpir olarak kişisel verileriniz yalnızca
+                siparişinizi hazırlamak ve size ulaştırmak için kullanılır.
+                Verileriniz üçüncü kişilerle paylaşılmaz. Detaylı bilgi için
+                bize ulaşabilirsiniz.
+              </p>
+            )}
+          </div>
+        </>
+      )}
+
+      {girisAcik && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.6)",
+            zIndex: 60,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div style={{ background: "#fff", padding: 20, borderRadius: 16, width: "85%" }}>
+            <h3>Giriş Yap</h3>
+            <input
+              value={girisIsim}
+              onChange={(e) => setGirisIsim(e.target.value)}
+              placeholder="Adını yaz"
+              style={{
+                width: "100%",
+                padding: 12,
+                borderRadius: 10,
+                border: "1px solid #ddd",
+                boxSizing: "border-box",
+              }}
+            />
+            <button
+              onClick={girisYap}
+              style={{
+                width: "100%",
+                marginTop: 10,
+                background: "#111",
+                color: "#fff",
+                border: "none",
+                padding: 12,
+                borderRadius: 10,
+                fontWeight: 900,
+              }}
+            >
+              Giriş Yap
+            </button>
+            <button
+              onClick={() => setGirisAcik(false)}
+              style={{
+                width: "100%",
+                marginTop: 8,
+                background: "#eee",
+                border: "none",
+                padding: 10,
+                borderRadius: 10,
+              }}
+            >
+              Vazgeç
+            </button>
+          </div>
+        </div>
+      )}
 
       {acikUrun && (
         <div
@@ -683,7 +892,6 @@ export default function Page() {
             <div style={{ fontWeight: 900, fontSize: 20 }}>
               {acikUrun.fiyat} TL
             </div>
-
             {opsiyonVar(acikUrun) && acikUrun.malzemeler && (
               <div style={{ marginTop: 14 }}>
                 <div style={{ fontWeight: 800 }}>
@@ -707,9 +915,7 @@ export default function Page() {
                         padding: "8px 10px",
                         borderRadius: 20,
                         border: "1px solid #ddd",
-                        background: seciliCikar.includes(m)
-                          ? "#2b1708"
-                          : "#fff",
+                        background: seciliCikar.includes(m) ? "#2b1708" : "#fff",
                         color: seciliCikar.includes(m) ? "#fff" : "#111",
                       }}
                     >
@@ -719,7 +925,6 @@ export default function Page() {
                 </div>
               </div>
             )}
-
             {opsiyonVar(acikUrun) && (
               <div style={{ marginTop: 14 }}>
                 <div style={{ fontWeight: 800 }}>Ekstra Malzeme Ekle</div>
@@ -739,9 +944,7 @@ export default function Page() {
                         padding: "8px 10px",
                         borderRadius: 20,
                         border: "1px solid #ddd",
-                        background: seciliEkstra.includes(e.ad)
-                          ? "#ffcc00"
-                          : "#fff",
+                        background: seciliEkstra.includes(e.ad) ? "#ffcc00" : "#fff",
                       }}
                     >
                       {e.ad} +{e.fiyat} TL
@@ -750,7 +953,6 @@ export default function Page() {
                 </div>
               </div>
             )}
-
             <button
               onClick={sepeteEkle}
               style={{
@@ -774,20 +976,18 @@ export default function Page() {
         <div
           style={{
             position: "fixed",
-            bottom: 0,
+            bottom: 70,
             left: 0,
             right: 0,
             background: "#fff",
             borderTop: "1px solid #eee",
             padding: 14,
             zIndex: 40,
-            maxHeight: "55vh",
+            maxHeight: "45vh",
             overflowY: "auto",
           }}
         >
-          <div style={{ fontWeight: 900 }}>
-            Sepetin ({sepet.length} ürün)
-          </div>
+          <div style={{ fontWeight: 900 }}>Sepetin ({sepet.length} ürün)</div>
           {sepet.map((i, idx) => (
             <div
               key={idx}
@@ -798,12 +998,8 @@ export default function Page() {
               }}
             >
               {i.adet}x {i.urun.ad} - {i.urun.fiyat} TL{" "}
-              {i.cikarilan.length
-                ? " | Çıkarılan: " + i.cikarilan.join(", ")
-                : ""}{" "}
-              {i.ekstralar.length
-                ? " | Ekstra: " + i.ekstralar.join(", ")
-                : ""}{" "}
+              {i.cikarilan.length ? " | Çıkarılan: " + i.cikarilan.join(", ") : ""}{" "}
+              {i.ekstralar.length ? " | Ekstra: " + i.ekstralar.join(", ") : ""}{" "}
               <button
                 onClick={() => setSepet(sepet.filter((_, j) => j !== idx))}
                 style={{
@@ -817,19 +1013,14 @@ export default function Page() {
               </button>
             </div>
           ))}
-
-          <div style={{ fontSize: 13, marginTop: 8 }}>
-            Ara Toplam: {araToplam} TL
-          </div>
+          <div style={{ fontSize: 13, marginTop: 8 }}>Ara Toplam: {araToplam} TL</div>
           {indirim > 0 && (
             <div style={{ fontSize: 13, color: "green" }}>
               {indirimAciklama}: -{Math.round(indirim)} TL
             </div>
           )}
           {puan >= 150 && (
-            <label
-              style={{ fontSize: 13, display: "block", marginTop: 6 }}
-            >
+            <label style={{ fontSize: 13, display: "block", marginTop: 6 }}>
               <input
                 type="checkbox"
                 checked={puanKullan}
@@ -838,10 +1029,7 @@ export default function Page() {
               150 puan kullan, 400 TL indirim al (Puanın: {puan})
             </label>
           )}
-          <div style={{ fontWeight: 900, marginTop: 6 }}>
-            Toplam: {toplam} TL
-          </div>
-
+          <div style={{ fontWeight: 900, marginTop: 6 }}>Toplam: {toplam} TL</div>
           <input
             value={adres}
             onChange={(e) => setAdres(e.target.value)}
@@ -855,7 +1043,6 @@ export default function Page() {
               boxSizing: "border-box",
             }}
           />
-
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
             <button
               onClick={() => setNotTipi("Kapıya Bırak")}
@@ -884,7 +1071,6 @@ export default function Page() {
               Zile Basma
             </button>
           </div>
-
           <input
             value={not}
             onChange={(e) => setNot(e.target.value)}
@@ -898,7 +1084,6 @@ export default function Page() {
               boxSizing: "border-box",
             }}
           />
-
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
             <button
               onClick={() => setOdeme("Kapıda Nakit")}
@@ -920,15 +1105,13 @@ export default function Page() {
                 padding: 8,
                 borderRadius: 10,
                 border: "1px solid #ddd",
-                background:
-                  odeme === "Kapıda Kredi Kartı" ? "#111" : "#fff",
+                background: odeme === "Kapıda Kredi Kartı" ? "#111" : "#fff",
                 color: odeme === "Kapıda Kredi Kartı" ? "#fff" : "#111",
               }}
             >
               Kapıda Kart
             </button>
           </div>
-
           <button
             onClick={siparisVer}
             style={{
@@ -947,6 +1130,46 @@ export default function Page() {
         </div>
       )}
 
+      <nav
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: "#fff",
+          borderTop: "1px solid #eee",
+          display: "flex",
+          justifyContent: "space-around",
+          padding: "10px 0",
+          zIndex: 45,
+        }}
+      >
+        <button
+          onClick={() => setSayfa("Anasayfa")}
+          style={{ background: "none", border: "none", fontWeight: sayfa === "Anasayfa" ? 900 : 400 }}
+        >
+          🏠<br />Anasayfa
+        </button>
+        <button
+          onClick={() => setSayfa("Anasayfa")}
+          style={{ background: "none", border: "none", fontWeight: sayfa === "Anasayfa" ? 900 : 400 }}
+        >
+          ☰<br />Menü
+        </button>
+        <button
+          onClick={() => setSayfa("Siparişler")}
+          style={{ background: "none", border: "none", fontWeight: sayfa === "Siparişler" ? 900 : 400 }}
+        >
+          🧾<br />Siparişler
+        </button>
+        <button
+          onClick={() => setSayfa("Profil")}
+          style={{ background: "none", border: "none", fontWeight: sayfa === "Profil" ? 900 : 400 }}
+        >
+          👤<br />Profil
+        </button>
+      </nav>
+
       <footer
         style={{
           textAlign: "center",
@@ -955,8 +1178,7 @@ export default function Page() {
           padding: 20,
         }}
       >
-        WaffLia Sweet Kumpir - Her sipariş 10 puan kazandırır. 150 puan =
-        400 TL indirim.
+        WaffLia Sweet Kumpir - Her sipariş 10 puan kazandırır. 150 puan = 400 TL indirim.
       </footer>
     </div>
   );
