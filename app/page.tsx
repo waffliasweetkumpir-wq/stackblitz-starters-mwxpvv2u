@@ -62,6 +62,13 @@ const URUNLER = [
 ]
 const KATS = ['Tümü', 'Bowl Waffle', 'Kare Waffle', 'Kumpir', 'Künefe & Katmer', 'Sufle']
 const ONE_CIKAN = [5, 6, 16]
+const KAT_BILGI: Record<string, { emoji: string; aciklama: string }> = { 'Bowl Waffle': { emoji: '🧇', aciklama: 'Kasede bol malzemeli waffle' }, 'Kare Waffle': { emoji: '🧇', aciklama: 'Klasik kare waffle' }, 'Kumpir': { emoji: '🥔', aciklama: 'İstediğin malzemeyle kumpir' }, 'Künefe & Katmer': { emoji: '🍮', aciklama: 'Sıcak künefe ve çıtır katmer' }, 'Sufle': { emoji: '🍫', aciklama: 'Akışkan çikolatalı sufle' } }
+  'Bowl Waffle': { emoji: '🧇', aciklama: 'Kasede bol malzemeli waffle' },
+  'Kare Waffle': { emoji: '🧇', aciklama: 'Klasik kare waffle' },
+  'Kumpir': { emoji: '🥔', aciklama: 'İstediğin malzemeyle kumpir' },
+  'Künefe & Katmer': { emoji: '🍮', aciklama: 'Sıcak künefe ve çıtır katmer' },
+  'Sufle': { emoji: '🍫', aciklama: 'Akışkan çikolatalı sufle' },
+}
 function emojiFor(kat: string) {
   if (kat === 'Kumpir') return '🥔'
   if (kat === 'Künefe & Katmer') return '🍮'
@@ -78,6 +85,7 @@ function renkFor(kat: string) {
 export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [kat, setKat] = useState('Tümü')
+  const [sayfa, setSayfa] = useState<'anasayfa' | 'menu'>('anasayfa')
   const [arama, setArama] = useState('')
   const [sepet, setSepet] = useState<any[]>([])
   const [sepetAcik, setSepetAcik] = useState(false)
@@ -203,54 +211,78 @@ export default function Home() {
     <div style={{ fontFamily: 'sans-serif', background: '#fff7ee', minHeight: '100vh', paddingBottom: '170px' }}>
       <div style={{ background: '#3b1d0a', color: 'white', padding: '16px', textAlign: 'center' }}>
         <div style={{ fontSize: '22px', fontWeight: '900' }}>WaffLia Sweet Kumpir</div>
-        <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '4px' }}>🔍 ♡ 👤</div>
+        <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '4px' }}>Açık 17:00 - 05:00 • İstanbul • 30-45 dk teslimat</div>
       </div>
       <div style={{ background: '#3b1d0a', color: 'white', padding: '0 16px 24px', textAlign: 'center' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '70px', lineHeight: '1.1' }}>🧇 🥔</div>
-          <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '6px' }}>Açık 17:00 - 05:00 • İstanbul</div>
-          <h1 style={{ fontSize: '28px', lineHeight: '1.2', margin: '12px 0' }}>En tatlı waffle ve kumpir burada</h1>
+          <h1 style={{ fontSize: '28px', lineHeight: '1.2', margin: '12px 0' }}>Ne canın çekiyor?</h1>
+          <p style={{ color: '#e8c99a', fontSize: '14px', margin: '0 0 14px' }}>Menüden birini seç, ürünler gelsin.</p>
           {user ? (
             <div style={{ background: 'white', color: '#333', borderRadius: '14px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>Hoş geldin, <b>{isim}!</b> 👋 • ⭐ {puan} Puan {siparisSayisi > 0 ? '• ' + siparisSayisi + ' sipariş verdin' : '• Henüz siparişin yok'}</span>
               <button onClick={cikisYap} style={{ border: '1px solid #ddd', background: 'white', padding: '7px 14px', borderRadius: '20px', cursor: 'pointer' }}>Çıkış Yap</button>
             </div>
-          ) : (
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-              <a href="/kayit" style={{ background: '#b45309', color: 'white', padding: '12px 26px', borderRadius: '12px', textDecoration: 'none', fontWeight: 'bold', flex: 1, maxWidth: '180px' }}>Kayıt Ol</a>
-              <a href="/giris" style={{ background: 'transparent', color: 'white', padding: '12px 26px', borderRadius: '12px', border: '1px solid white', textDecoration: 'none', fontWeight: 'bold', flex: 1, maxWidth: '180px' }}>Giriş Yap</a>
-            </div>
-          )}
-          <input value={arama} onChange={(e) => setArama(e.target.value)} placeholder="Wafflia'da ara..." style={{ width: '100%', marginTop: '16px', padding: '12px 14px', borderRadius: '12px', border: 'none', outline: 'none', fontSize: '15px', boxSizing: 'border-box' }} />
+          ) : null}
+          <button onClick={() => { setSayfa('menu'); setKat('Tümü'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: '#b45309', color: 'white', padding: '13px 28px', borderRadius: '12px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>Menüyü Gör →</button>
         </div>
       </div>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 12px' }}>
+        {sayfa === 'anasayfa' ? (
+          <div>
+            <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Menüler</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '14px' }}>
+              {KATS.slice(1).map((k) => {
+                const ilk = URUNLER.find((u) => u.kat === k)
+                const adet = URUNLER.filter((u) => u.kat === k).length
+                return (
+                  <button key={k} onClick={() => { setKat(k); setSayfa('menu'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ textAlign: 'left', background: 'white', border: '1px solid #eee', borderRadius: '16px', padding: 0, overflow: 'hidden', cursor: 'pointer', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
+                    <div style={{ height: '140px', background: renkFor(k), overflow: 'hidden', position: 'relative' }}>
+                      {ilk?.resim ? <img src={ilk.resim} alt={k} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px' }}>{KAT_BILGI[k]?.emoji || '🧇'}</div>}
+                    </div>
+                    <div style={{ padding: '14px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><b style={{ fontSize: '18px' }}>{k}</b><span style={{ fontSize: '18px' }}>→</span></div>
+                      <div style={{ color: '#777', fontSize: '13px', marginTop: '4px' }}>{KAT_BILGI[k]?.aciklama || ''}</div>
+                      <div style={{ color: '#b45309', fontSize: '13px', fontWeight: 'bold', marginTop: '6px' }}>{adet} çeşit • Görüntüle</div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+            <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Öne Çıkan Ürünler</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '14px' }}>{oneCikanUrunler.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
+          </div>
+        ) : null}
+        {sayfa === 'menu' ? (
+          <div>
+            <button onClick={() => { setSayfa('anasayfa'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'white', border: '1px solid #ddd', padding: '9px 14px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', margin: '20px 0 6px' }}>← Tüm Menüler</button>
+            <h2 style={{ fontSize: '22px', margin: '8px 4px 10px' }}>{kat === 'Tümü' ? 'Tüm Menü' : kat}</h2>
+            <input value={arama} onChange={(e) => setArama(e.target.value)} placeholder={kat === 'Tümü' ? 'Menüde ara...' : kat + ' içinde ara...'} style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1px solid #ddd', outline: 'none', fontSize: '15px', boxSizing: 'border-box', marginBottom: '12px' }} />
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '6px' }}>
+              {KATS.map((k) => (<button key={k} onClick={() => setKat(k)} style={{ padding: '9px 16px', borderRadius: '20px', border: kat === k ? '1px solid #5b2c0e' : '1px solid #ddd', background: kat === k ? '#5b2c0e' : 'white', color: kat === k ? 'white' : '#333', cursor: 'pointer', fontWeight: kat === k ? 'bold' : 'normal', flexShrink: 0 }}>{k}</button>))}
+            </div>
+            {gosterilecekKats.map((k) => {
+              const liste = aramali.filter((u) => u.kat === k)
+              if (liste.length === 0) return null
+              return (
+                <div key={k}>
+                  <h3 style={{ fontSize: '18px', margin: '18px 4px 10px' }}>{k} <span style={{ color: '#999', fontSize: '13px', fontWeight: 'normal' }}>{liste.length} ürün</span></h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '14px' }}>{liste.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
+                </div>
+              )
+            })}
+          </div>
+        ) : null}
         <div style={{ display: 'flex', gap: '10px', marginTop: '16px', overflowX: 'auto' }}>
           <div style={{ background: '#e11d48', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%25 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>1. Siparişine özel! İlk siparişinde %25 indirim sepette uygulanır.</div></div>
           <div style={{ background: '#5b2c0e', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%40 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>5. Siparişine özel! 5. siparişinde %40 indirim sepette uygulanır.</div></div>
-          <div style={{ background: '#f59e0b', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>150 PUAN = 400 TL</div><div style={{ fontSize: '13px', marginTop: '4px' }}>Her sipariş 10 puan. 0 puandan başlarsın, 150 puana ulaşınca 400 TL indirim kazan!</div></div>
+          <div style={{ background: '#f59e0b', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>150 PUAN = 400 TL</div><div style={{ fontSize: '13px', marginTop: '4px' }}>Her sipariş 10 puan. 150 puana ulaşınca 400 TL indirim kazan!</div></div>
         </div>
         <div style={{ background: 'white', borderRadius: '14px', padding: '12px', marginTop: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', fontSize: '13px' }}>
           <span style={{ fontWeight: 'bold' }}>⭐ Puanın: {puan} / 150</span>
           <span style={{ background: '#fef3c7', padding: '5px 10px', borderRadius: '12px' }}>Bu senin {siparisNo}. siparişin {indirimOrani > 0 ? '• %' + (indirimOrani * 100) + ' indirim uygulanacak' : ''}</span>
           {puan >= 150 ? <label style={{ cursor: 'pointer', fontWeight: 'bold', color: '#16a34a' }}><input type="checkbox" checked={puanKullan} onChange={(e) => setPuanKullan(e.target.checked)} /> 400 TL puan indirimi kullan</label> : <span style={{ color: '#888' }}>150 puana {150 - puan} puan kaldı</span>}
         </div>
-        <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Öne Çıkan Ürünler</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '14px' }}>{oneCikanUrunler.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
-        <h2 id="menu" style={{ fontSize: '22px', margin: '24px 4px 10px' }}>Menü</h2>
-        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '6px' }}>
-          {KATS.map((k) => (<button key={k} onClick={() => setKat(k)} style={{ padding: '9px 16px', borderRadius: '20px', border: kat === k ? '1px solid #5b2c0e' : '1px solid #ddd', background: kat === k ? '#5b2c0e' : 'white', color: kat === k ? 'white' : '#333', cursor: 'pointer', fontWeight: kat === k ? 'bold' : 'normal', flexShrink: 0 }}>{k}</button>))}
-        </div>
-        {gosterilecekKats.map((k) => {
-          const liste = aramali.filter((u) => u.kat === k)
-          if (liste.length === 0) return null
-          return (
-            <div key={k}>
-              <h3 style={{ fontSize: '18px', margin: '18px 4px 10px' }}>{k} <span style={{ color: '#999', fontSize: '13px', fontWeight: 'normal' }}>{liste.length} ürün</span></h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '14px' }}>{liste.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
-            </div>
-          )
-        })}
         <div style={{ background: 'white', borderRadius: '16px', padding: '16px', marginTop: '24px' }}>
           <h3 style={{ margin: '0 0 10px' }}>ℹ️ Bilgilendirme</h3>
           {[
@@ -395,8 +427,8 @@ export default function Home() {
         </div>
       )}
       <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, background: 'white', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-around', padding: '10px 0 14px', zIndex: 20 }}>
-        <a href="#" style={{ textAlign: 'center', textDecoration: 'none', color: '#5b2c0e', fontSize: '12px', fontWeight: 'bold' }}><div style={{ fontSize: '20px' }}>🏠</div>Anasayfa</a>
-        <a href="#menu" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>☰</div>Menü</a>
+        <button onClick={() => { setSayfa('anasayfa'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', color: sayfa === 'anasayfa' ? '#5b2c0e' : '#888', fontSize: '12px', fontWeight: 'bold' }}><div style={{ fontSize: '20px' }}>🏠</div>Anasayfa</button>
+        <button onClick={() => { setSayfa('menu'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', color: sayfa === 'menu' ? '#5b2c0e' : '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>☰</div>Menü</button>
         <a href="#" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>🧾</div>Siparişler</a>
         <a href="/giris" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>👤</div>Profil</a>
       </div>
