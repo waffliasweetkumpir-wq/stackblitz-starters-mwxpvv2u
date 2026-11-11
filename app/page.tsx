@@ -80,7 +80,7 @@ function renkFor(kat: string) {
 export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [kat, setKat] = useState('Tümü')
-  const [sayfa, setSayfa] = useState<'anasayfa' | 'menu'>('anasayfa')
+  const [sayfa, setSayfa] = useState<'anasayfa' | 'menu' | 'profil'>('anasayfa')
   const [gecmisAcik, setGecmisAcik] = useState(false)
   const [gecmisSiparisler, setGecmisSiparisler] = useState<any[]>([])
   const gecmisiGetir = () => {
@@ -89,6 +89,33 @@ export default function Home() {
       setGecmisSiparisler(kayitli)
     } catch (e) { setGecmisSiparisler([]) }
     setGecmisAcik(true)
+  }
+  const [profilModu, setProfilModu] = useState<'giris' | 'kayit'>('giris')
+  const [profilAd, setProfilAd] = useState('')
+  const [profilTelefon, setProfilTelefon] = useState('')
+  const [profilEmail, setProfilEmail] = useState('')
+  const kayitOl = async () => {
+    if (!profilAd || !profilTelefon) { alert('Lütfen ad ve telefon yaz'); return }
+    const yeniKullanici: any = { email: profilEmail || (profilTelefon + '@wafflia.local'), user_metadata: { full_name: profilAd } }
+    localStorage.setItem('wafflia_kullanici', JSON.stringify({ ad: profilAd, telefon: profilTelefon, email: profilEmail }))
+    localStorage.setItem('wafflia_telefon', profilTelefon)
+    try { if (GOOGLE_SHEETS_URL) { await fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'register', name: profilAd, phone: profilTelefon, email: profilEmail }) }) } } catch (e) {}
+    setUser(yeniKullanici)
+    setProfilModu('giris')
+    alert('Kaydın oluşturuldu, hoş geldin ' + profilAd)
+  }
+  const girisYapForm = () => {
+    if (!profilTelefon) { alert('Lütfen telefon yaz'); return }
+    try {
+      const k = JSON.parse(localStorage.getItem('wafflia_kullanici') || 'null')
+      if (k && k.telefon === profilTelefon) {
+        setUser({ email: k.email, user_metadata: { full_name: k.ad } })
+        alert('Hoş geldin ' + k.ad)
+        return
+      }
+    } catch (e) {}
+    if (!profilAd) { alert('İlk kez giriyorsan adını da yaz, kaydını oluşturalım'); return }
+    kayitOl()
   }
   const [hesapSilAcik, setHesapSilAcik] = useState(false)
   const [hesapSilindi, setHesapSilindi] = useState(false)
@@ -284,8 +311,8 @@ export default function Home() {
             </div>
           ) : (
             <div style={{ display: 'flex', gap: '8px' }}>
-              <a href="/giris" style={{ background: 'transparent', color: 'white', border: '1px solid white', padding: '9px 16px', borderRadius: '20px', fontWeight: 'bold', fontSize: '14px', textDecoration: 'none' }}>Giriş Yap</a>
-              <a href="/kayit" style={{ background: '#b45309', color: 'white', padding: '9px 16px', borderRadius: '20px', fontWeight: 'bold', fontSize: '14px', textDecoration: 'none' }}>Kayıt Ol</a>
+              <button onClick={() => { setProfilModu('giris'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'transparent', color: 'white', border: '1px solid white', padding: '9px 16px', borderRadius: '20px', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer' }}>Giriş Yap</button>
+              <button onClick={() => { setProfilModu('kayit'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: '#b45309', color: 'white', padding: '9px 16px', borderRadius: '20px', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', border: 'none' }}>Kayıt Ol</button>
             </div>
           )}
         </div>
@@ -305,8 +332,8 @@ export default function Home() {
           ) : null}
           {!user ? (
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '12px' }}>
-              <a href="/giris" style={{ background: 'white', color: '#5b2c0e', padding: '11px 22px', borderRadius: '12px', fontWeight: 'bold', fontSize: '15px', textDecoration: 'none' }}>Giriş Yap</a>
-              <a href="/kayit" style={{ background: '#b45309', color: 'white', padding: '11px 22px', borderRadius: '12px', fontWeight: 'bold', fontSize: '15px', textDecoration: 'none' }}>Kayıt Ol</a>
+              <button onClick={() => { setProfilModu('giris'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'white', color: '#5b2c0e', padding: '11px 22px', borderRadius: '12px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer', border: 'none' }}>Giriş Yap</button>
+              <button onClick={() => { setProfilModu('kayit'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: '#b45309', color: 'white', padding: '11px 22px', borderRadius: '12px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer', border: 'none' }}>Kayıt Ol</button>
             </div>
           ) : null}
           <button onClick={() => { setSayfa('menu'); setKat('Tümü'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: '#b45309', color: 'white', padding: '13px 28px', borderRadius: '12px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>Menüyü Gör →</button>
@@ -367,6 +394,33 @@ export default function Home() {
                 </div>
               )
             })}
+          </div>
+        ) : null}
+                {sayfa === 'profil' ? (
+          <div style={{ background: 'white', borderRadius: '16px', padding: '18px', marginTop: '20px' }}>
+            <h2 style={{ fontSize: '22px', margin: '0 0 6px' }}>Profil</h2>
+            {user ? (
+              <div>
+                <p style={{ color: '#333' }}>Hoş geldin, <b>{isim}!</b> 👋<br />⭐ {puan} Puan • {siparisSayisi} sipariş verdin</p>
+                <button onClick={gecmisiGetir} style={{ width: '100%', background: '#5b2c0e', color: 'white', border: 'none', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', marginBottom: '8px' }}>Siparişlerim</button>
+                <button onClick={cikisYap} style={{ width: '100%', background: 'white', border: '1px solid #ddd', padding: '13px', borderRadius: '12px', cursor: 'pointer', marginBottom: '8px' }}>Çıkış Yap</button>
+                <button onClick={() => setHesapSilAcik(true)} style={{ width: '100%', background: '#fef2f2', border: '1px solid #fecaca', color: '#e11d48', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Hesabımı Sil</button>
+              </div>
+            ) : (
+              <div>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                  <button onClick={() => setProfilModu('giris')} style={{ flex: 1, padding: '10px', borderRadius: '10px', border: 'none', background: profilModu === 'giris' ? '#5b2c0e' : '#eee', color: profilModu === 'giris' ? 'white' : '#333', fontWeight: 'bold', cursor: 'pointer' }}>Giriş Yap</button>
+                  <button onClick={() => setProfilModu('kayit')} style={{ flex: 1, padding: '10px', borderRadius: '10px', border: 'none', background: profilModu === 'kayit' ? '#5b2c0e' : '#eee', color: profilModu === 'kayit' ? 'white' : '#333', fontWeight: 'bold', cursor: 'pointer' }}>Kayıt Ol</button>
+                </div>
+                <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Ad Soyad</label>
+                <input value={profilAd} onChange={(e) => setProfilAd(e.target.value)} placeholder="Ad Soyad" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
+                <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Telefon</label>
+                <input value={profilTelefon} onChange={(e) => setProfilTelefon(e.target.value)} placeholder="05xx xxx xx xx" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
+                {profilModu === 'kayit' ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>E-posta (isteğe bağlı)</label><input value={profilEmail} onChange={(e) => setProfilEmail(e.target.value)} placeholder="mail@ornek.com" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
+                {profilModu === 'giris' ? <button onClick={girisYapForm} style={{ width: '100%', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Giriş Yap</button> : <button onClick={kayitOl} style={{ width: '100%', background: '#b45309', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Kayıt Ol</button>}
+                <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '10px' }}>Kayıt olunca adın ve telefonun Google Tablolar'daki üye listesine de eklenir.</p>
+              </div>
+            )}
           </div>
         ) : null}
         <div style={{ display: 'flex', gap: '10px', marginTop: '16px', overflowX: 'auto' }}>
@@ -574,7 +628,7 @@ export default function Home() {
         <button onClick={() => { setSayfa('anasayfa'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', color: sayfa === 'anasayfa' ? '#5b2c0e' : '#888', fontSize: '12px', fontWeight: 'bold' }}><div style={{ fontSize: '20px' }}>🏠</div>Anasayfa</button>
         <button onClick={() => { setSayfa('menu'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', color: sayfa === 'menu' ? '#5b2c0e' : '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>☰</div>Menü</button>
         <button onClick={gecmisiGetir} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>🧾</div>Siparişler</button>
-        <a href="/giris" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>👤</div>Profil</a>
+        <button onClick={() => { setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', color: sayfa === 'profil' ? '#5b2c0e' : '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>👤</div>Profil</button>
       </div>
     </div>
   )
