@@ -58,6 +58,17 @@ function renkFor(kat: string) {
   return '#fff0d6'
 }
 export default function Home() {
+  const [user, setUser] = useState<any>(null)
+  const [kat, setKat] = useState('Tümü')
+  const [arama, setArama] = useState('')
+  const [sepet, setSepet] = useState<any[]>([])
+  const [sepetAcik, setSepetAcik] = useState(false)
+  const [modalUrun, setModalUrun] = useState<any>(null)
+  const [cikartilan, setCikartilan] = useState<string[]>([])
+  const [modalAdet, setModalAdet] = useState(1)
+  useEffect(() => {
+    supabase.auth.getSession().then((res) => setUser(res.data.session?.user || null))
+  }, [])
   if (BAKIMDA) {
     return (
       <div style={{ minHeight: '100vh', background: '#fff7ee', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'sans-serif', textAlign: 'center' }}>
@@ -71,17 +82,6 @@ export default function Home() {
       </div>
     )
   }
-  const [user, setUser] = useState<any>(null)
-  const [kat, setKat] = useState('Tümü')
-  const [arama, setArama] = useState('')
-  const [sepet, setSepet] = useState<any[]>([])
-  const [sepetAcik, setSepetAcik] = useState(false)
-  const [modalUrun, setModalUrun] = useState<any>(null)
-  const [cikartilan, setCikartilan] = useState<string[]>([])
-  const [modalAdet, setModalAdet] = useState(1)
-  useEffect(() => {
-    supabase.auth.getSession().then((res) => setUser(res.data.session?.user || null))
-  }, [])
   const cikisYap = async () => {
     await supabase.auth.signOut()
     setUser(null)
