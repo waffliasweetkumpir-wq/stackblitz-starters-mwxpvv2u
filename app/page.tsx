@@ -2,9 +2,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-const BAKIMDA = false
-
-// WAFFLE EKSTRA MALZEMELER - attığın fotoğraftaki fiyatlar
 const EKSTRA_WAFFLE = [
   { ad: 'Sütlü Çikolata Sosu', fiyat: 72 },
   { ad: 'Frambuaz Sosu', fiyat: 72 },
@@ -30,10 +27,7 @@ const EKSTRA_WAFFLE = [
   { ad: 'Sütlü Pirinç Patlağı', fiyat: 60 },
   { ad: 'Frambuazlı Damla Çikolata', fiyat: 48 },
 ]
-
-// KUMPİR 11 MALZEME - listedeki gibi
 const KUMPIR_MALZEMELER = ['Amerikan Salatası', 'Mısır', 'Sosis', 'Turşu', 'Yeşil Zeytin', 'Siyah Zeytin', 'Haydari', 'Kapya Biber', 'Jalapeno Biber', 'Mor Lahana', 'Ezme']
-
 const URUNLER = [
   { id: 1, kat: 'Bowl Waffle', ad: 'Bitter Bowl', fiyat: 350, populer: true, begeni: '', resim: '/urunler/bitter-bowl.jpg', aciklama: 'Sütlü çikolata ve bitter çikolata soslu waffle hamuru üzerine dizilmiş taze muz dilimleri; bitter damla çikolata, bitter pirinç patlağı, bisküvi tozu, antep fıstığı ve fındık içi ile lezzetlendirilir.', malzemeler: ['Muz', 'Bitter Damla Çikolata', 'Bitter Pirinç Patlağı', 'Bisküvi Tozu', 'Antep Fıstığı', 'Fındık İçi', 'Sütlü Çikolata Sosu', 'Bitter Çikolata Sosu'] },
   { id: 2, kat: 'Bowl Waffle', ad: 'Choco Madness Bowl', fiyat: 345, populer: false, begeni: '', resim: '/urunler/choco-bowl.jpg', aciklama: 'Frambuaz ve beyaz çikolata sosları eşliğinde taze çilek dilimleri, muz, sütlü ve sedef pirinç patlağı, frambuazlı damla çikolata, biskrep çıtır kırıntı, fındık içi ile lezzetlendirilerek servis edilir.', malzemeler: ['Çilek', 'Muz', 'Sütlü Pirinç Patlağı', 'Sedef Pirinç Patlağı', 'Frambuazlı Damla Çikolata', 'Biskrep Çıtır Kırıntı', 'Fındık İçi', 'Frambuaz Sosu', 'Beyaz Çikolata Sosu'] },
@@ -54,11 +48,11 @@ const URUNLER = [
   { id: 34, kat: 'Kare Waffle', ad: 'Strawberry Kare', fiyat: 325, populer: false, begeni: '', resim: '/urunler/strawberry-kare.jpg', aciklama: 'Çilek, çikolata ve krema ile ferah kare waffle.', malzemeler: ['Çilek', 'Muz', 'Beyaz Damla Çikolata', 'Frambuazlı Damla Çikolata', 'Fındık Tozu', 'Çilek Sosu', 'Frambuaz Sosu'] },
   { id: 35, kat: 'Kare Waffle', ad: 'Coconut Kare', fiyat: 315, populer: false, begeni: '', resim: '/urunler/coconut-kare.jpg', aciklama: 'Hindistan cevizi, beyaz çikolata ve meyveli kare waffle.', malzemeler: ['Muz', 'Hindistan Cevizi Tozu', 'Beyaz Damla Çikolata', 'Fındık Tozu', 'Hindistan Cevizi Sosu', 'Sütlü Çikolata Sosu'] },
   { id: 36, kat: 'Bowl Waffle', ad: 'Waffle & Cola Fırsat Kovası', fiyat: 650, populer: true, begeni: '', resim: '/urunler/firsat-kovasi.jpg', aciklama: '2 kişilik waffle kovası + 2 adet 【entity-Coca-Cola¦canonical_name=Coca-Cola】. Paylaşmalık fırsat menüsü.', malzemeler: ['Waffle', 'Çikolata', 'Meyve', ' 【entity-Coca-Cola¦canonical_name=Coca-Cola】'] },
-  { id: 16, kat: 'Kumpir', ad: '0-1 Malzemeli Kumpir', fiyat: 340, limit: 1, populer: false, begeni: '', resim: '/urunler/0-1-malzemeli-kumpir.jpg', aciklama: '0 veya 1 malzeme seç. Malzemeler: Amerikan Salatası, Mısır, Sosis, Turşu, Yeşil Zeytin, Siyah Zeytin, Haydari, Kapya Biber, Jalapeno Biber, Mor Lahana, Ezme.', malzemeler: KUMPIR_MALZEMELER },
-  { id: 17, kat: 'Kumpir', ad: '3 Malzemeli Kumpir', fiyat: 360, limit: 3, populer: false, begeni: '', resim: '/urunler/3-malzemeli-kumpir.jpg', aciklama: '3 malzeme seç. Malzemeler: Amerikan Salatası, Mısır, Sosis, Turşu, Yeşil Zeytin, Siyah Zeytin, Haydari, Kapya Biber, Jalapeno Biber, Mor Lahana, Ezme.', malzemeler: KUMPIR_MALZEMELER },
-  { id: 18, kat: 'Kumpir', ad: '5 Malzemeli Kumpir', fiyat: 380, limit: 5, populer: false, begeni: '', resim: '/urunler/5-malzemeli-kumpir.jpg', aciklama: '5 malzeme seç. Malzemeler: Amerikan Salatası, Mısır, Sosis, Turşu, Yeşil Zeytin, Siyah Zeytin, Haydari, Kapya Biber, Jalapeno Biber, Mor Lahana, Ezme.', malzemeler: KUMPIR_MALZEMELER },
-  { id: 19, kat: 'Kumpir', ad: '7 Malzemeli Kumpir', fiyat: 400, limit: 7, populer: false, begeni: '', resim: '/urunler/7-malzemeli-kumpir.jpg', aciklama: '7 malzeme seç. Malzemeler: Amerikan Salatası, Mısır, Sosis, Turşu, Yeşil Zeytin, Siyah Zeytin, Haydari, Kapya Biber, Jalapeno Biber, Mor Lahana, Ezme.', malzemeler: KUMPIR_MALZEMELER },
-  { id: 20, kat: 'Kumpir', ad: '9 Malzemeli Kumpir', fiyat: 420, limit: 9, populer: false, begeni: '', resim: '/urunler/9-malzemeli-kumpir.jpg', aciklama: '9 malzeme seç. Malzemeler: Amerikan Salatası, Mısır, Sosis, Turşu, Yeşil Zeytin, Siyah Zeytin, Haydari, Kapya Biber, Jalapeno Biber, Mor Lahana, Ezme.', malzemeler: KUMPIR_MALZEMELER },
+  { id: 16, kat: 'Kumpir', ad: '0-1 Malzemeli Kumpir', fiyat: 340, limit: 1, populer: false, begeni: '', resim: '/urunler/0-1-malzemeli-kumpir.jpg', aciklama: '0 veya 1 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
+  { id: 17, kat: 'Kumpir', ad: '3 Malzemeli Kumpir', fiyat: 360, limit: 3, populer: false, begeni: '', resim: '/urunler/3-malzemeli-kumpir.jpg', aciklama: '3 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
+  { id: 18, kat: 'Kumpir', ad: '5 Malzemeli Kumpir', fiyat: 380, limit: 5, populer: false, begeni: '', resim: '/urunler/5-malzemeli-kumpir.jpg', aciklama: '5 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
+  { id: 19, kat: 'Kumpir', ad: '7 Malzemeli Kumpir', fiyat: 400, limit: 7, populer: false, begeni: '', resim: '/urunler/7-malzemeli-kumpir.jpg', aciklama: '7 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
+  { id: 20, kat: 'Kumpir', ad: '9 Malzemeli Kumpir', fiyat: 420, limit: 9, populer: false, begeni: '', resim: '/urunler/9-malzemeli-kumpir.jpg', aciklama: '9 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
   { id: 26, kat: 'Künefe & Katmer', ad: 'Peynirli Fıstıklı Künefe', fiyat: 520, populer: true, begeni: '', resim: '/urunler/kunefe.jpg', aciklama: 'Sıcak künefe, uzayan peynir ve bol Antep fıstığı.', malzemeler: ['Künefe', 'Peynir', 'Antep Fıstığı'] },
   { id: 27, kat: 'Künefe & Katmer', ad: 'Hasır Künefe', fiyat: 560, populer: false, begeni: '', resim: '/urunler/kunefe-dondurma.jpg', aciklama: 'Çıtır hasır künefe, peynir ve fıstık.', malzemeler: ['Künefe', 'Peynir', 'Antep Fıstığı'] },
   { id: 28, kat: 'Künefe & Katmer', ad: 'Fıstıklı Katmer', fiyat: 450, populer: false, begeni: '', resim: '/urunler/fistikli-katmer.jpg', aciklama: 'Çıtır katmer, bol Antep fıstığı.', malzemeler: ['Katmer', 'Antep Fıstığı'] },
@@ -92,32 +86,36 @@ export default function Home() {
   const [ekstraSecilen, setEkstraSecilen] = useState<any[]>([])
   const [kumpirSecilen, setKumpirSecilen] = useState<string[]>([])
   const [modalAdet, setModalAdet] = useState(1)
-  const [siparisNo, setSiparisNo] = useState(1)
-  const [puan, setPuan] = useState(150)
+  const [siparisSayisi, setSiparisSayisi] = useState(0)
+  const [puan, setPuan] = useState(0)
   const [puanKullan, setPuanKullan] = useState(false)
   const [footerAcik, setFooterAcik] = useState('')
+  const [odemeAcik, setOdemeAcik] = useState(false)
+  const [siparisTamam, setSiparisTamam] = useState(false)
+  const [adSoyad, setAdSoyad] = useState('')
+  const [telefon, setTelefon] = useState('')
+  const [adres, setAdres] = useState('')
+  const [siparisNotu, setSiparisNotu] = useState('')
+  const [kapiyaBirak, setKapiyaBirak] = useState(false)
+  const [zileBasma, setZileBasma] = useState(false)
+  const [odemeYontemi, setOdemeYontemi] = useState('Kapıda Nakit')
+  const [gonderiliyor, setGonderiliyor] = useState(false)
+
+  const siparisNo = siparisSayisi + 1
+
   useEffect(() => {
     supabase.auth.getSession().then((res) => setUser(res.data.session?.user || null))
+    const kayitliPuan = localStorage.getItem('wafflia_puan')
+    const kayitliSiparis = localStorage.getItem('wafflia_siparis')
+    if (kayitliPuan) setPuan(parseInt(kayitliPuan))
+    if (kayitliSiparis) setSiparisSayisi(parseInt(kayitliSiparis))
   }, [])
-  if (BAKIMDA) {
-    return (
-      <div style={{ minHeight: '100vh', background: '#fff7ee', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'sans-serif', textAlign: 'center' }}>
-        <div>
-          <div style={{ fontSize: '60px' }}>🧇</div>
-          <h1 style={{ fontSize: '26px' }}>WaffLia Sweet Kumpir</h1>
-          <p style={{ color: '#666' }}>Şu an menümüzü güzelleştiriyoruz.</p>
-          <p style={{ fontWeight: 'bold' }}>Birazdan tekrar buradayız 💛</p>
-          <p style={{ fontSize: '13px', color: '#999' }}>Her gün 17:00 - 05:00 • İstanbul • 0535 273 28 65</p>
-        </div>
-      </div>
-    )
-  }
   const cikisYap = async () => {
     await supabase.auth.signOut()
     setUser(null)
     window.location.reload()
   }
-  const isim = user?.user_metadata?.full_name || user?.email?.split('@')[0] || ''
+  const isim = user?.user_metadata?.full_name || user?.email?.split('@')[0] || adSoyad || ''
   const urunAc = (urun: any) => {
     setModalUrun(urun)
     setCikartilan([])
@@ -163,10 +161,33 @@ export default function Home() {
   const indirimTutari = Math.round(araToplam * indirimOrani)
   const puanIndirimi = puanKullan && puan >= 150 ? 400 : 0
   const odenecek = Math.max(0, araToplam - indirimTutari - puanIndirimi)
-  const kazanilacakPuan = sepet.length > 0 ? 10 : 0
   const aramali = URUNLER.filter((u) => u.ad.toLowerCase().includes(arama.toLowerCase()) || u.aciklama.toLowerCase().includes(arama.toLowerCase()))
   const gosterilecekKats = kat === 'Tümü' ? KATS.slice(1) : [kat]
   const oneCikanUrunler = URUNLER.filter((u) => ONE_CIKAN.includes(u.id))
+
+  const siparisiTamamla = async () => {
+    if (!adSoyad || !telefon || !adres) { alert('Lütfen ad, telefon ve adresi doldur'); return }
+    setGonderiliyor(true)
+    const notlar = [kapiyaBirak ? 'Kapıya Bırak' : '', zileBasma ? 'Zile Basma' : '', siparisNotu].filter(Boolean).join(' • ')
+    const urunOzeti = sepet.map((s) => ${s.ad} (${s.birimFiyat} TL) + (s.kumpirMalzemeler?.length ? ` [${s.kumpirMalzemeler.join(', ')}]` : '') + (s.ekstralar?.length ? ` +Ekstra: ${s.ekstralar.map((e: any) => e.ad).join(', ')}` : '') + (s.cikartilan?.length ? ` -Çıkar: ${s.cikartilan.join(', ')}` : '')).join('\n')
+    try {
+      await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon, adres, not_text: notlar, teslimat: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: 10 }])
+    } catch (e) {}
+    const yeniPuan = puanKullan ? puan - 150 + 10 : puan + 10
+    const yeniSiparisSayisi = siparisSayisi + 1
+    setPuan(yeniPuan)
+    setSiparisSayisi(yeniSiparisSayisi)
+    localStorage.setItem('wafflia_puan', String(yeniPuan))
+    localStorage.setItem('wafflia_siparis', String(yeniSiparisSayisi))
+    const waMesaj = encodeURIComponent(🧇 YENİ SİPARİŞ\n\n👤 ${adSoyad}\n📞 ${telefon}\n📍 ${adres}\n📝 Not: ${notlar || 'Yok'}\n💳 Ödeme: ${odemeYontemi}\n\n${urunOzeti}\n\nAra Toplam: ${araToplam} TL\nİndirim: -${indirimTutari + puanIndirimi} TL\nÖDENECEK: ${odenecek} TL\n⭐ Kazanılan Puan: +10 (Toplam: ${yeniPuan}))
+    window.open(https://wa.me/905352732865?text=${waMesaj}, '_blank')
+    setGonderiliyor(false)
+    setSepet([])
+    setOdemeAcik(false)
+    setSiparisTamam(true)
+    setPuanKullan(false)
+  }
+
   const UrunKarti = ({ u }: { u: any }) => (
     <div style={{ background: 'white', borderRadius: '16px', padding: '12px', display: 'flex', gap: '12px', alignItems: 'flex-start', boxShadow: '0 1px 6px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
       <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => urunAc(u)}>
@@ -195,7 +216,7 @@ export default function Home() {
           <h1 style={{ fontSize: '28px', lineHeight: '1.2', margin: '12px 0' }}>En tatlı waffle ve kumpir burada</h1>
           {user ? (
             <div style={{ background: 'white', color: '#333', borderRadius: '14px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>Hoş geldin, <b>{isim}!</b> 👋 • ⭐ {puan} Puan</span>
+              <span>Hoş geldin, <b>{isim}!</b> 👋 • ⭐ {puan} Puan {siparisSayisi > 0 ? • ${siparisSayisi} sipariş verdin : '• Henüz siparişin yok'}</span>
               <button onClick={cikisYap} style={{ border: '1px solid #ddd', background: 'white', padding: '7px 14px', borderRadius: '20px', cursor: 'pointer' }}>Çıkış Yap</button>
             </div>
           ) : (
@@ -212,15 +233,13 @@ export default function Home() {
         <div style={{ display: 'flex', gap: '10px', marginTop: '16px', overflowX: 'auto' }}>
           <div style={{ background: '#e11d48', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%25 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>1. Siparişine özel! İlk siparişinde %25 indirim sepette uygulanır.</div></div>
           <div style={{ background: '#5b2c0e', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%40 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>5. Siparişine özel! 5. siparişinde %40 indirim sepette uygulanır.</div></div>
-          <div style={{ background: '#f59e0b', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>150 PUAN = 400 TL</div><div style={{ fontSize: '13px', marginTop: '4px' }}>Her sipariş 10 puan. 150 puana ulaşınca 400 TL indirim kazan!</div></div>
+          <div style={{ background: '#f59e0b', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>150 PUAN = 400 TL</div><div style={{ fontSize: '13px', marginTop: '4px' }}>Her sipariş 10 puan. 0 puandan başlarsın, 150 puana ulaşınca 400 TL indirim kazan!</div></div>
         </div>
 
         <div style={{ background: 'white', borderRadius: '14px', padding: '12px', marginTop: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', fontSize: '13px' }}>
-          <span style={{ fontWeight: 'bold' }}>Bu kaçıncı siparişin?</span>
-          {[1, 2, 3, 4, 5].map((n) => (
-            <button key={n} onClick={() => setSiparisNo(n)} style={{ padding: '7px 14px', borderRadius: '20px', border: siparisNo === n ? '1px solid #5b2c0e' : '1px solid #ddd', background: siparisNo === n ? '#5b2c0e' : 'white', color: siparisNo === n ? 'white' : '#333', cursor: 'pointer', fontWeight: 'bold' }}>{n}. Sipariş</button>
-          ))}
-          <span style={{ marginLeft: '6px' }}>⭐ Puanın: <b>{puan}</b> {puan >= 150 ? <label style={{ cursor: 'pointer' }}><input type="checkbox" checked={puanKullan} onChange={(e) => setPuanKullan(e.target.checked)} /> 400 TL kullan</label> : '(150 olunca açılır)'}</span>
+          <span style={{ fontWeight: 'bold' }}>⭐ Puanın: {puan} / 150</span>
+          <span style={{ background: '#fef3c7', padding: '5px 10px', borderRadius: '12px' }}>Bu senin {siparisNo}. siparişin {indirimOrani > 0 ? • %{indirimOrani * 100} indirim uygulanacak : ''}</span>
+          {puan >= 150 ? <label style={{ cursor: 'pointer', fontWeight: 'bold', color: '#16a34a' }}><input type="checkbox" checked={puanKullan} onChange={(e) => setPuanKullan(e.target.checked)} /> 400 TL puan indirimi kullan</label> : <span style={{ color: '#888' }}>150 puana {150 - puan} puan kaldı</span>}
         </div>
 
         <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Öne Çıkan Ürünler</h2>
@@ -245,8 +264,8 @@ export default function Home() {
           {[
             { id: 'alerji', baslik: '⚠️ Alerji Uyarısı', icerik: 'Ürünlerimiz gluten, süt, yumurta, fındık, fıstık, susam, soya ve tahin içerebilir. Aynı tezgahta hazırlanır. Alerjiniz varsa sipariş öncesi 0535 273 28 65 numarasından bilgi alın. Alerjen malzemeyi üründen çıkartmak için ürün detayında Çıkart seçeneğini kullanın.' },
             { id: 'kvkk', baslik: '🔒 KVKK Aydınlatma Metni', icerik: 'WaffLia Sweet Kumpir olarak ad, telefon ve adres bilgileriniz yalnızca siparişinizi hazırlamak ve teslim etmek için kullanılır. Bilgileriniz 3. kişilerle paylaşılmaz, pazarlama için izniniz olmadan kullanılmaz. Bilgilerinizin silinmesini isterseniz 0535 273 28 65 üzerinden bize ulaşabilirsiniz.' },
-            { id: 'iade', baslik: '↩️ İade & İptal', icerik: 'Gıda ürünü olduğu için hijyen gereği iade kabul edilmez. Yanlış / eksik ürün gelirse 30 dakika içinde fotoğrafla 0535 273 28 65 e 【entity-WhatsApp¦canonical_name=WhatsApp】 üzerinden ulaşın, ürün değişimi veya iade yapılır. Sipariş hazırlanmadan önce iptal edebilirsiniz. Hazırlanmış siparişlerde iptal yapılamaz.' },
-            { id: 'kargo', baslik: '🛵 Teslimat & Çalışma Saatleri', icerik: 'Her gün 17:00 - 05:00 arası açığız. Ortalama teslimat 30-45 dakikadır. Yoğun saatlerde gecikme olabilir. Paket servis bölgemiz için bizi arayın.' },
+            { id: 'iade', baslik: '↩️ İade & İptal', icerik: 'Gıda ürünü olduğu için hijyen gereği iade kabul edilmez. Yanlış / eksik ürün gelirse 30 dakika içinde fotoğrafla 0535 273 28 65 e WhatsApp üzerinden ulaşın, ürün değişimi veya iade yapılır. Sipariş hazırlanmadan önce iptal edebilirsiniz. Hazırlanmış siparişlerde iptal yapılamaz.' },
+            { id: 'kargo', baslik: '🛵 Teslimat & Çalışma Saatleri', icerik: 'Her gün 17:00 - 05:00 arası açığız. Ortalama teslimat 30-45 dakikadır. Yoğun saatlerde gecikme olabilir.' },
             { id: 'iletisim', baslik: '📞 İletişim', icerik: 'Telefon / 【entity-WhatsApp¦canonical_name=WhatsApp】: 0535 273 28 65 • İstanbul • 【entity-Instagram¦canonical_name=Instagram】: @wafflia • Her gün 17:00 - 05:00' },
           ].map((b) => (
             <div key={b.id} style={{ borderBottom: '1px solid #eee' }}>
@@ -265,7 +284,6 @@ export default function Home() {
               <div><h2 style={{ margin: '0 0 6px', fontSize: '20px' }}>{modalUrun.ad}</h2><p style={{ color: '#666', fontSize: '13px', lineHeight: '1.5', margin: 0 }}>{modalUrun.aciklama}</p></div>
               <button onClick={() => setModalUrun(null)} style={{ border: 'none', background: '#eee', width: '32px', height: '32px', borderRadius: '50%', fontSize: '18px', cursor: 'pointer', flexShrink: 0 }}>✕</button>
             </div>
-
             {modalUrun.kat === 'Kumpir' ? (
               <div>
                 <h3 style={{ fontSize: '16px', margin: '16px 0 6px' }}>Malzemeni Seç 👇</h3>
@@ -282,7 +300,6 @@ export default function Home() {
                     )
                   })}
                 </div>
-                <p style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>11 malzeme: Amerikan Salatası, Mısır, Sosis, Turşu, Yeşil Zeytin, Siyah Zeytin, Haydari, Kapya Biber, Jalapeno Biber, Mor Lahana, Ezme</p>
               </div>
             ) : (
               <div>
@@ -296,7 +313,6 @@ export default function Home() {
                   ))}
                 </div>
                 <h3 style={{ fontSize: '15px', margin: '18px 0 8px' }}>Ekstra Malzeme Ekle ➕</h3>
-                <p style={{ fontSize: '12px', color: '#888', margin: '0 0 10px' }}>Eski sitedeki gibi, seçtiklerin fiyata eklenir.</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {EKSTRA_WAFFLE.map((e) => {
                     const secili = !!ekstraSecilen.find((x) => x.ad === e.ad)
@@ -310,7 +326,6 @@ export default function Home() {
                 </div>
               </div>
             )}
-
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <button onClick={() => setModalAdet(Math.max(1, modalAdet - 1))} style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #ddd', background: 'white', fontSize: '20px', cursor: 'pointer' }}>-</button>
@@ -319,9 +334,6 @@ export default function Home() {
               </div>
               <b style={{ fontSize: '18px' }}>{modalToplam.toFixed(2)} TL</b>
             </div>
-            {modalUrun.kat === 'Kumpir' && kumpirSecilen.length > 0 ? <p style={{ fontSize: '12px', color: '#16a34a', margin: '10px 0 0' }}>Seçilen: {kumpirSecilen.join(', ')}</p> : null}
-            {cikartilan.length > 0 ? <p style={{ fontSize: '12px', color: '#e11d48', margin: '10px 0 0' }}>Çıkartılacak: {cikartilan.join(', ')}</p> : null}
-            {ekstraSecilen.length > 0 ? <p style={{ fontSize: '12px', color: '#16a34a', margin: '6px 0 0' }}>Ekstra: {ekstraSecilen.map((e) => e.ad).join(', ')} (+{ekstraToplam} TL)</p> : null}
             <button onClick={modalSepeteEkle} style={{ width: '100%', marginTop: '14px', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px', borderRadius: '14px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>Sepete Ekle • {modalToplam.toFixed(2)} TL</button>
           </div>
         </div>
@@ -348,13 +360,53 @@ export default function Home() {
                 {indirimTutari > 0 ? <div style={{ display: 'flex', justifyContent: 'space-between', color: '#16a34a', fontWeight: 'bold' }}><span>{siparisNo}. Sipariş İndirimi (%{indirimOrani * 100})</span><span>-{indirimTutari} TL</span></div> : null}
                 {puanIndirimi > 0 ? <div style={{ display: 'flex', justifyContent: 'space-between', color: '#16a34a', fontWeight: 'bold' }}><span>150 Puan İndirimi</span><span>-{puanIndirimi} TL</span></div> : null}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '16px', borderTop: '1px solid #eee', paddingTop: '8px' }}><span>Ödenecek</span><span>{odenecek.toFixed(2)} TL</span></div>
-                <div style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '4px' }}>Bu siparişten +{kazanilacakPuan} puan kazanacaksın ⭐ • Toplam puanın {puan + kazanilacakPuan} olacak</div>
+                <div style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '4px' }}>Bu siparişten +10 puan kazanacaksın ⭐</div>
               </div>
-              <button onClick={() => setSepet([])} style={{ marginTop: '10px', width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ddd', background: 'white', cursor: 'pointer' }}>Sepeti Temizle</button>
+              <button onClick={() => { setSepetAcik(false); setOdemeAcik(true) }} style={{ marginTop: '12px', width: '100%', padding: '14px', borderRadius: '12px', border: 'none', background: '#16a34a', color: 'white', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>Siparişi Tamamla • {odenecek.toFixed(2)} TL →</button>
+              <button onClick={() => setSepet([])} style={{ marginTop: '8px', width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ddd', background: 'white', cursor: 'pointer' }}>Sepeti Temizle</button>
             </div>
           )}
         </div>
       )}
+
+      {odemeAcik && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 60 }}>
+          <div style={{ background: 'white', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', borderRadius: '20px 20px 0 0', padding: '18px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><h2 style={{ margin: 0 }}>Siparişi Tamamla</h2><button onClick={() => setOdemeAcik(false)} style={{ border: 'none', background: '#eee', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' }}>✕</button></div>
+            <p style={{ fontSize: '13px', color: '#666' }}>Toplam: <b>{odenecek.toFixed(2)} TL</b> • +10 puan kazanacaksın</p>
+            <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Ad Soyad *</label>
+            <input value={adSoyad} onChange={(e) => setAdSoyad(e.target.value)} placeholder="Ad Soyad" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
+            <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Telefon *</label>
+            <input value={telefon} onChange={(e) => setTelefon(e.target.value)} placeholder="05xx xxx xx xx" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
+            <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Adres *</label>
+            <textarea value={adres} onChange={(e) => setAdres(e.target.value)} placeholder="Mahalle, sokak, bina, daire..." rows={3} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
+            <h3 style={{ fontSize: '15px', margin: '6px 0' }}>Teslimat Notu</h3>
+            <label style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '10px', background: kapiyaBirak ? '#dcfce7' : '#f9f9f9', borderRadius: '10px', marginBottom: '8px', cursor: 'pointer' }}><input type="checkbox" checked={kapiyaBirak} onChange={(e) => setKapiyaBirak(e.target.checked)} /> 🚪 Kapıya Bırak</label>
+            <label style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '10px', background: zileBasma ? '#dcfce7' : '#f9f9f9', borderRadius: '10px', marginBottom: '8px', cursor: 'pointer' }}><input type="checkbox" checked={zileBasma} onChange={(e) => setZileBasma(e.target.checked)} /> 🔕 Zile Basma</label>
+            <textarea value={siparisNotu} onChange={(e) => setSiparisNotu(e.target.value)} placeholder="Diğer notun varsa yaz... Örn: Bebek uyuyor, aramadan bırakın" rows={2} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', marginBottom: '12px', boxSizing: 'border-box' }} />
+            <h3 style={{ fontSize: '15px', margin: '6px 0' }}>Ödeme Yöntemi</h3>
+            {['Kapıda Nakit', 'Kapıda Kredi Kartı'].map((y) => (
+              <label key={y} style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '12px', background: odemeYontemi === y ? '#dcfce7' : '#f9f9f9', borderRadius: '10px', marginBottom: '8px', cursor: 'pointer', border: odemeYontemi === y ? '1px solid #86efac' : '1px solid #eee' }}>
+                <input type="radio" name="odeme" checked={odemeYontemi === y} onChange={() => setOdemeYontemi(y)} /> {y === 'Kapıda Nakit' ? '💵 Kapıda Nakit' : '💳 Kapıda Kredi Kartı'}
+              </label>
+            ))}
+            <button onClick={siparisiTamamla} disabled={gonderiliyor} style={{ width: '100%', marginTop: '12px', background: '#16a34a', color: 'white', border: 'none', padding: '15px', borderRadius: '14px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>{gonderiliyor ? 'Gönderiliyor...' : Siparişi Onayla • ${odenecek.toFixed(2)} TL}</button>
+            <p style={{ fontSize: '11px', color: '#999', textAlign: 'center', marginTop: '8px' }}>Onaylayınca siparişin bize WhatsApp + Supabase tablosuna düşer.</p>
+          </div>
+        </div>
+      )}
+
+      {siparisTamam && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 70, padding: '20px' }}>
+          <div style={{ background: 'white', borderRadius: '20px', padding: '24px', textAlign: 'center', maxWidth: '400px', width: '100%' }}>
+            <div style={{ fontSize: '50px' }}>✅</div>
+            <h2 style={{ margin: '10px 0' }}>Siparişin Alındı!</h2>
+            <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.6' }}>Teşekkürler! Siparişin hazırlanıyor.<br />+10 puan kazandın ⭐<br />Toplam puanın: <b>{puan}</b></p>
+            <button onClick={() => setSiparisTamam(false)} style={{ width: '100%', marginTop: '12px', background: '#5b2c0e', color: 'white', border: 'none', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Tamam</button>
+          </div>
+        </div>
+      )}
+
       <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, background: 'white', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-around', padding: '10px 0 14px', zIndex: 20 }}>
         <a href="#" style={{ textAlign: 'center', textDecoration: 'none', color: '#5b2c0e', fontSize: '12px', fontWeight: 'bold' }}><div style={{ fontSize: '20px' }}>🏠</div>Anasayfa</a>
         <a href="#menu" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>☰</div>Menü</a>
