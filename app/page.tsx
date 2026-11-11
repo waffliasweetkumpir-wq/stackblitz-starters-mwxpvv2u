@@ -100,9 +100,7 @@ export default function Home() {
   const [zileBasma, setZileBasma] = useState(false)
   const [odemeYontemi, setOdemeYontemi] = useState('Kapıda Nakit')
   const [gonderiliyor, setGonderiliyor] = useState(false)
-
   const siparisNo = siparisSayisi + 1
-
   useEffect(() => {
     supabase.auth.getSession().then((res) => setUser(res.data.session?.user || null))
     const kayitliPuan = localStorage.getItem('wafflia_puan')
@@ -164,12 +162,11 @@ export default function Home() {
   const aramali = URUNLER.filter((u) => u.ad.toLowerCase().includes(arama.toLowerCase()) || u.aciklama.toLowerCase().includes(arama.toLowerCase()))
   const gosterilecekKats = kat === 'Tümü' ? KATS.slice(1) : [kat]
   const oneCikanUrunler = URUNLER.filter((u) => ONE_CIKAN.includes(u.id))
-
   const siparisiTamamla = async () => {
     if (!adSoyad || !telefon || !adres) { alert('Lütfen ad, telefon ve adresi doldur'); return }
     setGonderiliyor(true)
-    const notlar = [kapiyaBirak ? 'Kapıya Bırak' : '', zileBasma ? 'Zile Basma' : '', siparisNotu].filter(Boolean).join(' • ')
-    const urunOzeti = sepet.map((s) => ${s.ad} (${s.birimFiyat} TL) + (s.kumpirMalzemeler?.length ? ` [${s.kumpirMalzemeler.join(', ')}]` : '') + (s.ekstralar?.length ? ` +Ekstra: ${s.ekstralar.map((e: any) => e.ad).join(', ')}` : '') + (s.cikartilan?.length ? ` -Çıkar: ${s.cikartilan.join(', ')}` : '')).join('\n')
+    const notlar = [kapiyaBirak ? 'Kapıya Bırak' : '', zileBasma ? 'Zile Basma' : '', siparisNotu].filter(Boolean).join(' - ')
+    const urunOzeti = sepet.map((s) => s.ad + ' (' + (s.birimFiyat || s.fiyat) + ' TL)' + (s.kumpirMalzemeler && s.kumpirMalzemeler.length ? ' [' + s.kumpirMalzemeler.join(', ') + ']' : '') + (s.ekstralar && s.ekstralar.length ? ' +Ekstra: ' + s.ekstralar.map((e: any) => e.ad).join(', ') : '') + (s.cikartilan && s.cikartilan.length ? ' -Cikar: ' + s.cikartilan.join(', ') : '')).join('\n')
     try {
       await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon, adres, not_text: notlar, teslimat: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: 10 }])
     } catch (e) {}
@@ -179,15 +176,14 @@ export default function Home() {
     setSiparisSayisi(yeniSiparisSayisi)
     localStorage.setItem('wafflia_puan', String(yeniPuan))
     localStorage.setItem('wafflia_siparis', String(yeniSiparisSayisi))
-    const waMesaj = encodeURIComponent(🧇 YENİ SİPARİŞ\n\n👤 ${adSoyad}\n📞 ${telefon}\n📍 ${adres}\n📝 Not: ${notlar || 'Yok'}\n💳 Ödeme: ${odemeYontemi}\n\n${urunOzeti}\n\nAra Toplam: ${araToplam} TL\nİndirim: -${indirimTutari + puanIndirimi} TL\nÖDENECEK: ${odenecek} TL\n⭐ Kazanılan Puan: +10 (Toplam: ${yeniPuan}))
-    window.open(https://wa.me/905352732865?text=${waMesaj}, '_blank')
+    const waMesaj = encodeURIComponent('YENI SIPARIS - ' + adSoyad + ' - ' + telefon + ' - ' + adres + ' - Not: ' + (notlar || 'Yok') + ' - Odeme: ' + odemeYontemi + ' - ' + urunOzeti + ' - Ara Toplam: ' + araToplam + ' TL - Indirim: -' + (indirimTutari + puanIndirimi) + ' TL - ODENECEK: ' + odenecek + ' TL')
+    window.open('https://wa.me/905352732865?text=' + waMesaj, '_blank')
     setGonderiliyor(false)
     setSepet([])
     setOdemeAcik(false)
     setSiparisTamam(true)
     setPuanKullan(false)
   }
-
   const UrunKarti = ({ u }: { u: any }) => (
     <div style={{ background: 'white', borderRadius: '16px', padding: '12px', display: 'flex', gap: '12px', alignItems: 'flex-start', boxShadow: '0 1px 6px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
       <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => urunAc(u)}>
@@ -216,7 +212,7 @@ export default function Home() {
           <h1 style={{ fontSize: '28px', lineHeight: '1.2', margin: '12px 0' }}>En tatlı waffle ve kumpir burada</h1>
           {user ? (
             <div style={{ background: 'white', color: '#333', borderRadius: '14px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>Hoş geldin, <b>{isim}!</b> 👋 • ⭐ {puan} Puan {siparisSayisi > 0 ? • ${siparisSayisi} sipariş verdin : '• Henüz siparişin yok'}</span>
+              <span>Hoş geldin, <b>{isim}!</b> 👋 • ⭐ {puan} Puan {siparisSayisi > 0 ? '• ' + siparisSayisi + ' sipariş verdin' : '• Henüz siparişin yok'}</span>
               <button onClick={cikisYap} style={{ border: '1px solid #ddd', background: 'white', padding: '7px 14px', borderRadius: '20px', cursor: 'pointer' }}>Çıkış Yap</button>
             </div>
           ) : (
@@ -228,20 +224,17 @@ export default function Home() {
           <input value={arama} onChange={(e) => setArama(e.target.value)} placeholder="Wafflia'da ara..." style={{ width: '100%', marginTop: '16px', padding: '12px 14px', borderRadius: '12px', border: 'none', outline: 'none', fontSize: '15px', boxSizing: 'border-box' }} />
         </div>
       </div>
-
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 12px' }}>
         <div style={{ display: 'flex', gap: '10px', marginTop: '16px', overflowX: 'auto' }}>
           <div style={{ background: '#e11d48', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%25 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>1. Siparişine özel! İlk siparişinde %25 indirim sepette uygulanır.</div></div>
           <div style={{ background: '#5b2c0e', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%40 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>5. Siparişine özel! 5. siparişinde %40 indirim sepette uygulanır.</div></div>
           <div style={{ background: '#f59e0b', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>150 PUAN = 400 TL</div><div style={{ fontSize: '13px', marginTop: '4px' }}>Her sipariş 10 puan. 0 puandan başlarsın, 150 puana ulaşınca 400 TL indirim kazan!</div></div>
         </div>
-
         <div style={{ background: 'white', borderRadius: '14px', padding: '12px', marginTop: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', fontSize: '13px' }}>
           <span style={{ fontWeight: 'bold' }}>⭐ Puanın: {puan} / 150</span>
-          <span style={{ background: '#fef3c7', padding: '5px 10px', borderRadius: '12px' }}>Bu senin {siparisNo}. siparişin {indirimOrani > 0 ? • %{indirimOrani * 100} indirim uygulanacak : ''}</span>
+          <span style={{ background: '#fef3c7', padding: '5px 10px', borderRadius: '12px' }}>Bu senin {siparisNo}. siparişin {indirimOrani > 0 ? '• %' + (indirimOrani * 100) + ' indirim uygulanacak' : ''}</span>
           {puan >= 150 ? <label style={{ cursor: 'pointer', fontWeight: 'bold', color: '#16a34a' }}><input type="checkbox" checked={puanKullan} onChange={(e) => setPuanKullan(e.target.checked)} /> 400 TL puan indirimi kullan</label> : <span style={{ color: '#888' }}>150 puana {150 - puan} puan kaldı</span>}
         </div>
-
         <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Öne Çıkan Ürünler</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>{oneCikanUrunler.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
         <h2 id="menu" style={{ fontSize: '22px', margin: '24px 4px 10px' }}>Menü</h2>
@@ -258,15 +251,14 @@ export default function Home() {
             </div>
           )
         })}
-
         <div style={{ background: 'white', borderRadius: '16px', padding: '16px', marginTop: '24px' }}>
           <h3 style={{ margin: '0 0 10px' }}>ℹ️ Bilgilendirme</h3>
           {[
-            { id: 'alerji', baslik: '⚠️ Alerji Uyarısı', icerik: 'Ürünlerimiz gluten, süt, yumurta, fındık, fıstık, susam, soya ve tahin içerebilir. Aynı tezgahta hazırlanır. Alerjiniz varsa sipariş öncesi 0535 273 28 65 numarasından bilgi alın. Alerjen malzemeyi üründen çıkartmak için ürün detayında Çıkart seçeneğini kullanın.' },
-            { id: 'kvkk', baslik: '🔒 KVKK Aydınlatma Metni', icerik: 'WaffLia Sweet Kumpir olarak ad, telefon ve adres bilgileriniz yalnızca siparişinizi hazırlamak ve teslim etmek için kullanılır. Bilgileriniz 3. kişilerle paylaşılmaz, pazarlama için izniniz olmadan kullanılmaz. Bilgilerinizin silinmesini isterseniz 0535 273 28 65 üzerinden bize ulaşabilirsiniz.' },
-            { id: 'iade', baslik: '↩️ İade & İptal', icerik: 'Gıda ürünü olduğu için hijyen gereği iade kabul edilmez. Yanlış / eksik ürün gelirse 30 dakika içinde fotoğrafla 0535 273 28 65 e WhatsApp üzerinden ulaşın, ürün değişimi veya iade yapılır. Sipariş hazırlanmadan önce iptal edebilirsiniz. Hazırlanmış siparişlerde iptal yapılamaz.' },
-            { id: 'kargo', baslik: '🛵 Teslimat & Çalışma Saatleri', icerik: 'Her gün 17:00 - 05:00 arası açığız. Ortalama teslimat 30-45 dakikadır. Yoğun saatlerde gecikme olabilir.' },
-            { id: 'iletisim', baslik: '📞 İletişim', icerik: 'Telefon / 【entity-WhatsApp¦canonical_name=WhatsApp】: 0535 273 28 65 • İstanbul • 【entity-Instagram¦canonical_name=Instagram】: @wafflia • Her gün 17:00 - 05:00' },
+            { id: 'alerji', baslik: '⚠️ Alerji Uyarısı', icerik: 'Ürünlerimiz gluten, süt, yumurta, fındık, fıstık, susam, soya ve tahin içerebilir. Aynı tezgahta hazırlanır. Alerjiniz varsa sipariş öncesi 0535 273 28 65 numarasından bilgi alın.' },
+            { id: 'kvkk', baslik: '🔒 KVKK Aydınlatma Metni', icerik: 'WaffLia Sweet Kumpir olarak ad, telefon ve adres bilgileriniz yalnızca siparişinizi hazırlamak ve teslim etmek için kullanılır. Bilgileriniz 3. kişilerle paylaşılmaz.' },
+            { id: 'iade', baslik: '↩️ İade & İptal', icerik: 'Gıda ürünü olduğu için hijyen gereği iade kabul edilmez. Yanlış / eksik ürün gelirse 30 dakika içinde fotoğrafla 0535 273 28 65 e 【entity-WhatsApp¦canonical_name=WhatsApp】 üzerinden ulaşın.' },
+            { id: 'kargo', baslik: '🛵 Teslimat & Çalışma Saatleri', icerik: 'Her gün 17:00 - 05:00 arası açığız. Ortalama teslimat 30-45 dakikadır.' },
+            { id: 'iletisim', baslik: '📞 İletişim', icerik: 'Telefon / 【entity-WhatsApp¦canonical_name=WhatsApp】: 0535 273 28 65 • İstanbul • Instagram: @wafflia • Her gün 17:00 - 05:00' },
           ].map((b) => (
             <div key={b.id} style={{ borderBottom: '1px solid #eee' }}>
               <button onClick={() => setFooterAcik(footerAcik === b.id ? '' : b.id)} style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: '12px 0', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}>{b.baslik} <span>{footerAcik === b.id ? '▲' : '▼'}</span></button>
@@ -276,7 +268,6 @@ export default function Home() {
           <p style={{ fontSize: '11px', color: '#999', marginTop: '12px', textAlign: 'center' }}>© 2026 WaffLia Sweet Kumpir • Tüm hakları saklıdır • Fiyatlara KDV dahildir</p>
         </div>
       </div>
-
       {modalUrun && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 50 }}>
           <div style={{ background: 'white', width: '100%', maxWidth: '600px', maxHeight: '88vh', overflowY: 'auto', borderRadius: '20px 20px 0 0', padding: '18px' }}>
@@ -338,7 +329,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
       {sepet.length > 0 && (
         <div style={{ position: 'fixed', left: 0, right: 0, bottom: '68px', padding: '0 12px', zIndex: 30 }}>
           <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
@@ -368,7 +358,6 @@ export default function Home() {
           )}
         </div>
       )}
-
       {odemeAcik && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 60 }}>
           <div style={{ background: 'white', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', borderRadius: '20px 20px 0 0', padding: '18px' }}>
@@ -390,12 +379,11 @@ export default function Home() {
                 <input type="radio" name="odeme" checked={odemeYontemi === y} onChange={() => setOdemeYontemi(y)} /> {y === 'Kapıda Nakit' ? '💵 Kapıda Nakit' : '💳 Kapıda Kredi Kartı'}
               </label>
             ))}
-            <button onClick={siparisiTamamla} disabled={gonderiliyor} style={{ width: '100%', marginTop: '12px', background: '#16a34a', color: 'white', border: 'none', padding: '15px', borderRadius: '14px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>{gonderiliyor ? 'Gönderiliyor...' : Siparişi Onayla • ${odenecek.toFixed(2)} TL}</button>
+            <button onClick={siparisiTamamla} disabled={gonderiliyor} style={{ width: '100%', marginTop: '12px', background: '#16a34a', color: 'white', border: 'none', padding: '15px', borderRadius: '14px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>{gonderiliyor ? 'Gönderiliyor...' : 'Siparişi Onayla • ' + odenecek.toFixed(2) + ' TL'}</button>
             <p style={{ fontSize: '11px', color: '#999', textAlign: 'center', marginTop: '8px' }}>Onaylayınca siparişin bize WhatsApp + Supabase tablosuna düşer.</p>
           </div>
         </div>
       )}
-
       {siparisTamam && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 70, padding: '20px' }}>
           <div style={{ background: 'white', borderRadius: '20px', padding: '24px', textAlign: 'center', maxWidth: '400px', width: '100%' }}>
@@ -406,7 +394,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
       <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, background: 'white', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-around', padding: '10px 0 14px', zIndex: 20 }}>
         <a href="#" style={{ textAlign: 'center', textDecoration: 'none', color: '#5b2c0e', fontSize: '12px', fontWeight: 'bold' }}><div style={{ fontSize: '20px' }}>🏠</div>Anasayfa</a>
         <a href="#menu" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>☰</div>Menü</a>
