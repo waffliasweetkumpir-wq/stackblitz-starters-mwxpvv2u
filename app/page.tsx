@@ -63,12 +63,6 @@ const URUNLER = [
 const KATS = ['Tümü', 'Bowl Waffle', 'Kare Waffle', 'Kumpir', 'Künefe & Katmer', 'Sufle']
 const ONE_CIKAN = [5, 6, 16]
 const KAT_BILGI: Record<string, { emoji: string; aciklama: string }> = { 'Bowl Waffle': { emoji: '🧇', aciklama: 'Kasede bol malzemeli waffle' }, 'Kare Waffle': { emoji: '🧇', aciklama: 'Klasik kare waffle' }, 'Kumpir': { emoji: '🥔', aciklama: 'İstediğin malzemeyle kumpir' }, 'Künefe & Katmer': { emoji: '🍮', aciklama: 'Sıcak künefe ve çıtır katmer' }, 'Sufle': { emoji: '🍫', aciklama: 'Akışkan çikolatalı sufle' } }
-  'Bowl Waffle': { emoji: '🧇', aciklama: 'Kasede bol malzemeli waffle' },
-  'Kare Waffle': { emoji: '🧇', aciklama: 'Klasik kare waffle' },
-  'Kumpir': { emoji: '🥔', aciklama: 'İstediğin malzemeyle kumpir' },
-  'Künefe & Katmer': { emoji: '🍮', aciklama: 'Sıcak künefe ve çıtır katmer' },
-  'Sufle': { emoji: '🍫', aciklama: 'Akışkan çikolatalı sufle' },
-}
 function emojiFor(kat: string) {
   if (kat === 'Kumpir') return '🥔'
   if (kat === 'Künefe & Katmer') return '🍮'
