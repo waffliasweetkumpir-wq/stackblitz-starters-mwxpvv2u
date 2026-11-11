@@ -203,11 +203,12 @@ export default function Home() {
     <div style={{ fontFamily: 'sans-serif', background: '#fff7ee', minHeight: '100vh', paddingBottom: '170px', width: '100%', boxSizing: 'border-box' }}>
       <style>{`
         .urun-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        @media (min-width: 1400px) { .urun-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
         .urun-karti { background: white; border-radius: 16px; padding: 12px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; }
         .urun-karti-icerik { flex: 1; min-width: 0; cursor: pointer; }
         .urun-karti-img { width: 150px; height: 150px; border-radius: 14px; flex-shrink: 0; position: relative; cursor: pointer; overflow: hidden; }
         @media (min-width: 850px) {
-          .urun-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+          .urun-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
           .urun-karti { flex-direction: column; padding: 0; gap: 0; align-items: stretch; }
           .urun-karti-icerik { order: 2; padding: 18px 18px 20px; }
           .urun-karti-img { order: 1; width: 100% !important; height: 230px !important; border-radius: 16px 16px 0 0; }
@@ -218,7 +219,7 @@ export default function Home() {
         <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '4px' }}>🔍 ♡ 👤</div>
       </div>
       <div style={{ background: '#3b1d0a', color: 'white', padding: '0 16px 24px', textAlign: 'center' }}>
-        <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto' }}>
+        <div style={{ maxWidth: 'none', width: '100%', margin: '0 auto' }}>
           <div style={{ fontSize: '70px', lineHeight: '1.1' }}>🧇 🥔</div>
           <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '6px' }}>Açık 17:00 - 05:00 • İstanbul</div>
           <h1 style={{ fontSize: '28px', lineHeight: '1.2', margin: '12px 0' }}>En tatlı waffle ve kumpir burada</h1>
@@ -236,7 +237,7 @@ export default function Home() {
           <input value={arama} onChange={(e) => setArama(e.target.value)} placeholder="Wafflia'da ara..." style={{ width: '100%', marginTop: '16px', padding: '12px 14px', borderRadius: '12px', border: 'none', outline: 'none', fontSize: '15px', boxSizing: 'border-box' }} />
         </div>
       </div>
-      <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '0 24px', boxSizing: 'border-box' }}>
+      <div style={{ maxWidth: 'none', width: '100%', margin: '0 auto', padding: '0 32px', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', gap: '10px', marginTop: '16px', overflowX: 'auto' }}>
           <div style={{ background: '#e11d48', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%25 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>1. Siparişine özel! İlk siparişinde %25 indirim sepette uygulanır.</div></div>
           <div style={{ background: '#5b2c0e', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%40 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>5. Siparişine özel! 5. siparişinde %40 indirim sepette uygulanır.</div></div>
@@ -343,12 +344,12 @@ export default function Home() {
       )}
       {sepet.length > 0 && (
         <div style={{ position: 'fixed', left: 0, right: 0, bottom: '68px', padding: '0 12px', zIndex: 30 }}>
-          <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: '1280px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
+          <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: 'none', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
             <span>🛒 Sepeti Görüntüle • {sepet.length} ürün</span>
             <span>{odenecek.toFixed(2)} TL →</span>
           </button>
           {sepetAcik && (
-            <div style={{ maxWidth: '1280px', width: '100%', margin: '8px auto 0', background: 'white', borderRadius: '16px', padding: '14px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', color: '#333', maxHeight: '60vh', overflowY: 'auto' }}>
+            <div style={{ maxWidth: 'none', width: '100%', margin: '8px auto 0', background: 'white', borderRadius: '16px', padding: '14px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', color: '#333', maxHeight: '60vh', overflowY: 'auto' }}>
               {sepet.map((s, i) => (
                 <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid #eee', fontSize: '14px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{s.ad}</span><span>{(s.birimFiyat || s.fiyat)} TL <button onClick={() => azalt(s)} style={{ border: '1px solid #ddd', background: 'white', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', marginLeft: '6px' }}>−</button></span></div>
