@@ -29,34 +29,34 @@ const EKSTRA_WAFFLE = [
 ]
 const KUMPIR_MALZEMELER = ['Amerikan Salatası', 'Mısır', 'Sosis', 'Turşu', 'Yeşil Zeytin', 'Siyah Zeytin', 'Haydari', 'Kapya Biber', 'Jalapeno Biber', 'Mor Lahana', 'Ezme']
 const URUNLER = [
-  { id: 1, kat: 'Bowl Waffle', ad: 'Bitter Bowl', fiyat: 350, populer: true, begeni: '', resim: '/urunler/bitter-bowl.jpg', aciklama: 'Sütlü çikolata ve bitter çikolata soslu waffle hamuru üzerine dizilmiş taze muz dilimleri; bitter damla çikolata, bitter pirinç patlağı, bisküvi tozu, antep fıstığı ve fındık içi ile lezzetlendirilir.', malzemeler: ['Muz', 'Bitter Damla Çikolata', 'Bitter Pirinç Patlağı', 'Bisküvi Tozu', 'Antep Fıstığı', 'Fındık İçi', 'Sütlü Çikolata Sosu', 'Bitter Çikolata Sosu'] },
-  { id: 2, kat: 'Bowl Waffle', ad: 'Choco Madness Bowl', fiyat: 345, populer: false, begeni: '', resim: '/urunler/choco-bowl.jpg', aciklama: 'Frambuaz ve beyaz çikolata sosları eşliğinde taze çilek dilimleri, muz, sütlü ve sedef pirinç patlağı, frambuazlı damla çikolata, biskrep çıtır kırıntı, fındık içi ile lezzetlendirilerek servis edilir.', malzemeler: ['Çilek', 'Muz', 'Sütlü Pirinç Patlağı', 'Sedef Pirinç Patlağı', 'Frambuazlı Damla Çikolata', 'Biskrep Çıtır Kırıntı', 'Fındık İçi', 'Frambuaz Sosu', 'Beyaz Çikolata Sosu'] },
-  { id: 3, kat: 'Bowl Waffle', ad: 'Pistachio Dream Bowl', fiyat: 370, populer: true, begeni: '', resim: '/urunler/pistachio-bowl.jpg', aciklama: 'Zengin antep fıstığı kreması ve nefis waffle hamuru üzerine gezdirilen beyaz sos; muz dilimleri, toz antep fıstığı taneleri, beyaz damla çikolata, karışık pirinç patlağı ile buluşuyor.', malzemeler: ['Muz', 'Toz Antep Fıstığı', 'Beyaz Damla Çikolata', 'Karışık Pirinç Patlağı', 'Antep Fıstığı Kreması', 'Beyaz Sos'] },
-  { id: 4, kat: 'Bowl Waffle', ad: 'Blast Bowl', fiyat: 320, populer: true, begeni: '', resim: '/urunler/blast-bowl.jpg', aciklama: 'Karamel sos kremalı waffle hamuru üzerinde beyaz sos, taze çilek dilimleri, kivi, muz, fındık tozu ve renkli bonibonlar ile hazırlanıp servis edilir.', malzemeler: ['Çilek', 'Kivi', 'Muz', 'Fındık Tozu', 'Renkli Bonibon', 'Karamel Sos Kreması', 'Beyaz Sos'] },
-  { id: 5, kat: 'Bowl Waffle', ad: 'Lotus Bomb Bowl Waffle', fiyat: 340, populer: true, begeni: '', resim: '/urunler/lotus-bowl.jpg', aciklama: 'Karamelize bisküvili krema sosu ve karamel sosla tatlandırılmış waffle hamuru; bonibon, lotus tozu, bisküvi tozu, beyaz, sütlü, bitter ve sedef pirinç patlağı, taze muz dilimleriyle sunulur.', malzemeler: ['Muz', 'Bonibon', 'Lotus Tozu', 'Bisküvi Tozu', 'Beyaz Pirinç Patlağı', 'Sütlü Pirinç Patlağı', 'Bitter Pirinç Patlağı', 'Sedef Pirinç Patlağı', 'Karamelize Bisküvili Krema Sosu', 'Karamel Sos'] },
-  { id: 6, kat: 'Bowl Waffle', ad: 'Ultimate Bowl Waffle', fiyat: 370, populer: true, begeni: '%81 Beğenildi (11 Değerlendirme)', resim: '/urunler/ultimate-bowl.jpg', aciklama: 'Waffle hamuruna eşlik eden frambuaz, çilek, beyaz ve sütlü çikolata sosları; bonibon, çakıl taşı, frambuazlı, beyaz ve sütlü damla çikolatalar, fındık tozu, lotus parçacıkları, taze çilek ve muz ile.', malzemeler: ['Çilek', 'Muz', 'Bonibon', 'Çakıl Taşı', 'Frambuazlı Damla Çikolata', 'Beyaz Damla Çikolata', 'Sütlü Damla Çikolata', 'Fındık Tozu', 'Lotus Parçacıkları', 'Frambuaz Sosu', 'Çilek Sosu', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
-  { id: 7, kat: 'Bowl Waffle', ad: 'Milk Chocolate Bowl', fiyat: 350, populer: true, begeni: '%100 Beğenildi (8 Değerlendirme)', resim: '/urunler/milk-bowl.jpg', aciklama: 'Nefis waffle hamuru üzeri beyaz ve sütlü çikolata soslarıyla buluşuyor. Üzerinde fındık, lotus, antep fıstığı tozu, sütlü pirinç patlağı, sütlü damla çikolata muz dilimleriyle servis edilir.', malzemeler: ['Muz', 'Fındık', 'Lotus', 'Antep Fıstığı Tozu', 'Sütlü Pirinç Patlağı', 'Sütlü Damla Çikolata', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
-  { id: 8, kat: 'Bowl Waffle', ad: 'Strawberry Bowl', fiyat: 325, populer: true, begeni: '', resim: '/urunler/strawberry-bowl.jpg', aciklama: 'Nefis waffle hamuru üzeri yoğun çilek ve frambuaz soslarıyla buluşuyor. Üzerinde taze çilek dilimleri, muz dilimleri, beyaz ve frambuazlı damla çikolata, fındık tozu ile servis edilir.', malzemeler: ['Çilek', 'Muz', 'Beyaz Damla Çikolata', 'Frambuazlı Damla Çikolata', 'Fındık Tozu', 'Çilek Sosu', 'Frambuaz Sosu'] },
-  { id: 9, kat: 'Bowl Waffle', ad: 'Coconut Bowl', fiyat: 315, populer: true, begeni: '', resim: '/urunler/coconut-bowl.jpg', aciklama: 'Nefis waffle hamuru, hindistan cevizi sosu ve sütlü çikolata sosuyla buluşuyor. Üzerinde hindistan cevizi tozu, muz dilimleri, beyaz damla çikolata ve fındık tozu ile servis edilir.', malzemeler: ['Muz', 'Hindistan Cevizi Tozu', 'Beyaz Damla Çikolata', 'Fındık Tozu', 'Hindistan Cevizi Sosu', 'Sütlü Çikolata Sosu'] },
-  { id: 10, kat: 'Kare Waffle', ad: 'Bitter Kare', fiyat: 350, populer: false, begeni: '', resim: '/urunler/bitter-kare.jpg', aciklama: 'Bitter çikolatalı, meyveli ve fındıklı kare waffle.', malzemeler: ['Muz', 'Çilek', 'Fındık', 'Bitter Çikolata Sosu'] },
-  { id: 11, kat: 'Kare Waffle', ad: 'Choco Madness Kare', fiyat: 345, populer: false, begeni: '', resim: '/urunler/choco-kare.jpg', aciklama: 'Bol çikolatalı, brownie parçalı kare waffle.', malzemeler: ['Brownie', 'Çikolata Sosu', 'Fındık'] },
-  { id: 12, kat: 'Kare Waffle', ad: 'Pistachio Dream Kare', fiyat: 370, populer: false, begeni: '', resim: '/urunler/pistachio-kare.jpg', aciklama: 'Antep fıstığı kremalı kare waffle.', malzemeler: ['Antep Fıstığı Kreması', 'Antep Fıstığı'] },
-  { id: 13, kat: 'Kare Waffle', ad: 'Blast Kare', fiyat: 320, populer: false, begeni: '', resim: '/urunler/blast-kare.jpg', aciklama: 'Karamel ve çıtır parçalı kare waffle.', malzemeler: ['Karamel Sos', 'Çıtır Parça'] },
-  { id: 14, kat: 'Kare Waffle', ad: 'Lotus Bomb Kare', fiyat: 340, populer: false, begeni: '', resim: '/urunler/lotus-kare.jpg', aciklama: 'Lotus kremalı kare waffle.', malzemeler: ['Lotus Kreması', 'Lotus Bisküvi'] },
-  { id: 15, kat: 'Kare Waffle', ad: 'Ultimate Kare', fiyat: 370, populer: false, begeni: '', resim: '/urunler/ultimate-kare.jpg', aciklama: 'Her şeyden bol bol kare waffle.', malzemeler: ['Çikolata', 'Meyve', 'Fındık'] },
-  { id: 33, kat: 'Kare Waffle', ad: 'Milk Kare', fiyat: 350, populer: false, begeni: '', resim: '/urunler/milk-kare.jpg', aciklama: 'Sütlü çikolata, muz ve fındık ile klasik kare waffle.', malzemeler: ['Muz', 'Fındık', 'Lotus', 'Antep Fıstığı Tozu', 'Sütlü Pirinç Patlağı', 'Sütlü Damla Çikolata', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
-  { id: 34, kat: 'Kare Waffle', ad: 'Strawberry Kare', fiyat: 325, populer: false, begeni: '', resim: '/urunler/strawberry-kare.jpg', aciklama: 'Çilek, çikolata ve krema ile ferah kare waffle.', malzemeler: ['Çilek', 'Muz', 'Beyaz Damla Çikolata', 'Frambuazlı Damla Çikolata', 'Fındık Tozu', 'Çilek Sosu', 'Frambuaz Sosu'] },
-  { id: 35, kat: 'Kare Waffle', ad: 'Coconut Kare', fiyat: 315, populer: false, begeni: '', resim: '/urunler/coconut-kare.jpg', aciklama: 'Hindistan cevizi, beyaz çikolata ve meyveli kare waffle.', malzemeler: ['Muz', 'Hindistan Cevizi Tozu', 'Beyaz Damla Çikolata', 'Fındık Tozu', 'Hindistan Cevizi Sosu', 'Sütlü Çikolata Sosu'] },
-  { id: 36, kat: 'Bowl Waffle', ad: 'Waffle & Cola Fırsat Kovası', fiyat: 650, populer: true, begeni: '', resim: '/urunler/firsat-kovasi.jpg', aciklama: '2 kişilik waffle kovası + 2 adet Coca-Cola. Paylaşmalık fırsat menüsü.', malzemeler: ['Waffle', 'Çikolata', 'Meyve', 'Coca-Cola'] },
-  { id: 16, kat: 'Kumpir', ad: '0-1 Malzemeli Kumpir', fiyat: 340, limit: 1, populer: false, begeni: '', resim: '/urunler/0-1-malzemeli-kumpir.jpg', aciklama: '0 veya 1 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
-  { id: 17, kat: 'Kumpir', ad: '3 Malzemeli Kumpir', fiyat: 360, limit: 3, populer: false, begeni: '', resim: '/urunler/3-malzemeli-kumpir.jpg', aciklama: '3 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
-  { id: 18, kat: 'Kumpir', ad: '5 Malzemeli Kumpir', fiyat: 380, limit: 5, populer: false, begeni: '', resim: '/urunler/5-malzemeli-kumpir.jpg', aciklama: '5 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
-  { id: 19, kat: 'Kumpir', ad: '7 Malzemeli Kumpir', fiyat: 400, limit: 7, populer: false, begeni: '', resim: '/urunler/7-malzemeli-kumpir.jpg', aciklama: '7 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
-  { id: 20, kat: 'Kumpir', ad: '9 Malzemeli Kumpir', fiyat: 420, limit: 9, populer: false, begeni: '', resim: '/urunler/9-malzemeli-kumpir.jpg', aciklama: '9 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
-  { id: 26, kat: 'Künefe & Katmer', ad: 'Peynirli Fıstıklı Künefe', fiyat: 520, populer: true, begeni: '', resim: '/urunler/kunefe.jpg', aciklama: 'Sıcak künefe, uzayan peynir ve bol Antep fıstığı.', malzemeler: ['Künefe', 'Peynir', 'Antep Fıstığı'] },
-  { id: 27, kat: 'Künefe & Katmer', ad: 'Hasır Künefe', fiyat: 560, populer: false, begeni: '', resim: '/urunler/kunefe-dondurma.jpg', aciklama: 'Çıtır hasır künefe, peynir ve fıstık.', malzemeler: ['Künefe', 'Peynir', 'Antep Fıstığı'] },
-  { id: 28, kat: 'Künefe & Katmer', ad: 'Fıstıklı Katmer', fiyat: 450, populer: false, begeni: '', resim: '/urunler/fistikli-katmer.jpg', aciklama: 'Çıtır katmer, bol Antep fıstığı.', malzemeler: ['Katmer', 'Antep Fıstığı'] },
-  { id: 29, kat: 'Künefe & Katmer', ad: 'Çikolatalı Fıstıklı Katmer', fiyat: 500, populer: false, begeni: '', resim: '/urunler/katmer-dondurma.jpg', aciklama: 'Çikolatalı, fıstıklı çıtır katmer.', malzemeler: ['Katmer', 'Çikolata', 'Antep Fıstığı'] },
+  { id: 1, kat: 'Bowl Waffle', ad: 'Bitter Bowl', fiyat: 350, populer: true, begeni: '', resim: '/public/urunler/bitter-bowl.jpg', aciklama: 'Sütlü çikolata ve bitter çikolata soslu waffle hamuru üzerine dizilmiş taze muz dilimleri; bitter damla çikolata, bitter pirinç patlağı, bisküvi tozu, antep fıstığı ve fındık içi ile lezzetlendirilir.', malzemeler: ['Muz', 'Bitter Damla Çikolata', 'Bitter Pirinç Patlağı', 'Bisküvi Tozu', 'Antep Fıstığı', 'Fındık İçi', 'Sütlü Çikolata Sosu', 'Bitter Çikolata Sosu'] },
+  { id: 2, kat: 'Bowl Waffle', ad: 'Choco Madness Bowl', fiyat: 345, populer: false, begeni: '', resim: '/public/urunler/choco-bowl.jpg', aciklama: 'Frambuaz ve beyaz çikolata sosları eşliğinde taze çilek dilimleri, muz, sütlü ve sedef pirinç patlağı, frambuazlı damla çikolata, biskrep çıtır kırıntı, fındık içi ile lezzetlendirilerek servis edilir.', malzemeler: ['Çilek', 'Muz', 'Sütlü Pirinç Patlağı', 'Sedef Pirinç Patlağı', 'Frambuazlı Damla Çikolata', 'Biskrep Çıtır Kırıntı', 'Fındık İçi', 'Frambuaz Sosu', 'Beyaz Çikolata Sosu'] },
+  { id: 3, kat: 'Bowl Waffle', ad: 'Pistachio Dream Bowl', fiyat: 370, populer: true, begeni: '', resim: '/public/urunler/pistachio-bowl.jpg', aciklama: 'Zengin antep fıstığı kreması ve nefis waffle hamuru üzerine gezdirilen beyaz sos; muz dilimleri, toz antep fıstığı taneleri, beyaz damla çikolata, karışık pirinç patlağı ile buluşuyor.', malzemeler: ['Muz', 'Toz Antep Fıstığı', 'Beyaz Damla Çikolata', 'Karışık Pirinç Patlağı', 'Antep Fıstığı Kreması', 'Beyaz Sos'] },
+  { id: 4, kat: 'Bowl Waffle', ad: 'Blast Bowl', fiyat: 320, populer: true, begeni: '', resim: '/public/urunler/blast-bowl.jpg', aciklama: 'Karamel sos kremalı waffle hamuru üzerinde beyaz sos, taze çilek dilimleri, kivi, muz, fındık tozu ve renkli bonibonlar ile hazırlanıp servis edilir.', malzemeler: ['Çilek', 'Kivi', 'Muz', 'Fındık Tozu', 'Renkli Bonibon', 'Karamel Sos Kreması', 'Beyaz Sos'] },
+  { id: 5, kat: 'Bowl Waffle', ad: 'Lotus Bomb Bowl Waffle', fiyat: 340, populer: true, begeni: '', resim: '/public/urunler/lotus-bowl.jpg', aciklama: 'Karamelize bisküvili krema sosu ve karamel sosla tatlandırılmış waffle hamuru; bonibon, lotus tozu, bisküvi tozu, beyaz, sütlü, bitter ve sedef pirinç patlağı, taze muz dilimleriyle sunulur.', malzemeler: ['Muz', 'Bonibon', 'Lotus Tozu', 'Bisküvi Tozu', 'Beyaz Pirinç Patlağı', 'Sütlü Pirinç Patlağı', 'Bitter Pirinç Patlağı', 'Sedef Pirinç Patlağı', 'Karamelize Bisküvili Krema Sosu', 'Karamel Sos'] },
+  { id: 6, kat: 'Bowl Waffle', ad: 'Ultimate Bowl Waffle', fiyat: 370, populer: true, begeni: '%81 Beğenildi (11 Değerlendirme)', resim: '/public/urunler/ultimate-bowl.jpg', aciklama: 'Waffle hamuruna eşlik eden frambuaz, çilek, beyaz ve sütlü çikolata sosları; bonibon, çakıl taşı, frambuazlı, beyaz ve sütlü damla çikolatalar, fındık tozu, lotus parçacıkları, taze çilek ve muz ile.', malzemeler: ['Çilek', 'Muz', 'Bonibon', 'Çakıl Taşı', 'Frambuazlı Damla Çikolata', 'Beyaz Damla Çikolata', 'Sütlü Damla Çikolata', 'Fındık Tozu', 'Lotus Parçacıkları', 'Frambuaz Sosu', 'Çilek Sosu', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
+  { id: 7, kat: 'Bowl Waffle', ad: 'Milk Chocolate Bowl', fiyat: 350, populer: true, begeni: '%100 Beğenildi (8 Değerlendirme)', resim: '/public/urunler/milk-bowl.jpg', aciklama: 'Nefis waffle hamuru üzeri beyaz ve sütlü çikolata soslarıyla buluşuyor. Üzerinde fındık, lotus, antep fıstığı tozu, sütlü pirinç patlağı, sütlü damla çikolata muz dilimleriyle servis edilir.', malzemeler: ['Muz', 'Fındık', 'Lotus', 'Antep Fıstığı Tozu', 'Sütlü Pirinç Patlağı', 'Sütlü Damla Çikolata', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
+  { id: 8, kat: 'Bowl Waffle', ad: 'Strawberry Bowl', fiyat: 325, populer: true, begeni: '', resim: '/public/urunler/strawberry-bowl.jpg', aciklama: 'Nefis waffle hamuru üzeri yoğun çilek ve frambuaz soslarıyla buluşuyor. Üzerinde taze çilek dilimleri, muz dilimleri, beyaz ve frambuazlı damla çikolata, fındık tozu ile servis edilir.', malzemeler: ['Çilek', 'Muz', 'Beyaz Damla Çikolata', 'Frambuazlı Damla Çikolata', 'Fındık Tozu', 'Çilek Sosu', 'Frambuaz Sosu'] },
+  { id: 9, kat: 'Bowl Waffle', ad: 'Coconut Bowl', fiyat: 315, populer: true, begeni: '', resim: '/public/urunler/coconut-bowl.jpg', aciklama: 'Nefis waffle hamuru, hindistan cevizi sosu ve sütlü çikolata sosuyla buluşuyor. Üzerinde hindistan cevizi tozu, muz dilimleri, beyaz damla çikolata ve fındık tozu ile servis edilir.', malzemeler: ['Muz', 'Hindistan Cevizi Tozu', 'Beyaz Damla Çikolata', 'Fındık Tozu', 'Hindistan Cevizi Sosu', 'Sütlü Çikolata Sosu'] },
+  { id: 10, kat: 'Kare Waffle', ad: 'Bitter Kare', fiyat: 350, populer: false, begeni: '', resim: '/public/urunler/bitter-kare.jpg', aciklama: 'Bitter çikolatalı, meyveli ve fındıklı kare waffle.', malzemeler: ['Muz', 'Çilek', 'Fındık', 'Bitter Çikolata Sosu'] },
+  { id: 11, kat: 'Kare Waffle', ad: 'Choco Madness Kare', fiyat: 345, populer: false, begeni: '', resim: '/public/urunler/choco-kare.jpg', aciklama: 'Bol çikolatalı, brownie parçalı kare waffle.', malzemeler: ['Brownie', 'Çikolata Sosu', 'Fındık'] },
+  { id: 12, kat: 'Kare Waffle', ad: 'Pistachio Dream Kare', fiyat: 370, populer: false, begeni: '', resim: '/public/urunler/pistachio-kare.jpg', aciklama: 'Antep fıstığı kremalı kare waffle.', malzemeler: ['Antep Fıstığı Kreması', 'Antep Fıstığı'] },
+  { id: 13, kat: 'Kare Waffle', ad: 'Blast Kare', fiyat: 320, populer: false, begeni: '', resim: '/public/urunler/blast-kare.jpg', aciklama: 'Karamel ve çıtır parçalı kare waffle.', malzemeler: ['Karamel Sos', 'Çıtır Parça'] },
+  { id: 14, kat: 'Kare Waffle', ad: 'Lotus Bomb Kare', fiyat: 340, populer: false, begeni: '', resim: '/public/urunler/lotus-kare.jpg', aciklama: 'Lotus kremalı kare waffle.', malzemeler: ['Lotus Kreması', 'Lotus Bisküvi'] },
+  { id: 15, kat: 'Kare Waffle', ad: 'Ultimate Kare', fiyat: 370, populer: false, begeni: '', resim: '/public/urunler/ultimate-kare.jpg', aciklama: 'Her şeyden bol bol kare waffle.', malzemeler: ['Çikolata', 'Meyve', 'Fındık'] },
+  { id: 33, kat: 'Kare Waffle', ad: 'Milk Kare', fiyat: 350, populer: false, begeni: '', resim: '/public/urunler/milk-kare.jpg', aciklama: 'Sütlü çikolata, muz ve fındık ile klasik kare waffle.', malzemeler: ['Muz', 'Fındık', 'Lotus', 'Antep Fıstığı Tozu', 'Sütlü Pirinç Patlağı', 'Sütlü Damla Çikolata', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
+  { id: 34, kat: 'Kare Waffle', ad: 'Strawberry Kare', fiyat: 325, populer: false, begeni: '', resim: '/public/urunler/strawberry-kare.jpg', aciklama: 'Çilek, çikolata ve krema ile ferah kare waffle.', malzemeler: ['Çilek', 'Muz', 'Beyaz Damla Çikolata', 'Frambuazlı Damla Çikolata', 'Fındık Tozu', 'Çilek Sosu', 'Frambuaz Sosu'] },
+  { id: 35, kat: 'Kare Waffle', ad: 'Coconut Kare', fiyat: 315, populer: false, begeni: '', resim: '/public/urunler/coconut-kare.jpg', aciklama: 'Hindistan cevizi, beyaz çikolata ve meyveli kare waffle.', malzemeler: ['Muz', 'Hindistan Cevizi Tozu', 'Beyaz Damla Çikolata', 'Fındık Tozu', 'Hindistan Cevizi Sosu', 'Sütlü Çikolata Sosu'] },
+  { id: 36, kat: 'Bowl Waffle', ad: 'Waffle & Cola Fırsat Kovası', fiyat: 650, populer: true, begeni: '', resim: '/public/urunler/firsat-kovasi.jpg', aciklama: '2 kişilik waffle kovası + 2 adet Coca-Cola. Paylaşmalık fırsat menüsü.', malzemeler: ['Waffle', 'Çikolata', 'Meyve', 'Coca-Cola'] },
+  { id: 16, kat: 'Kumpir', ad: '0-1 Malzemeli Kumpir', fiyat: 340, limit: 1, populer: false, begeni: '', resim: '/public/urunler/0-1-malzemeli-kumpir.jpg', aciklama: '0 veya 1 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
+  { id: 17, kat: 'Kumpir', ad: '3 Malzemeli Kumpir', fiyat: 360, limit: 3, populer: false, begeni: '', resim: '/public/urunler/3-malzemeli-kumpir.jpg', aciklama: '3 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
+  { id: 18, kat: 'Kumpir', ad: '5 Malzemeli Kumpir', fiyat: 380, limit: 5, populer: false, begeni: '', resim: '/public/urunler/5-malzemeli-kumpir.jpg', aciklama: '5 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
+  { id: 19, kat: 'Kumpir', ad: '7 Malzemeli Kumpir', fiyat: 400, limit: 7, populer: false, begeni: '', resim: '/public/urunler/7-malzemeli-kumpir.jpg', aciklama: '7 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
+  { id: 20, kat: 'Kumpir', ad: '9 Malzemeli Kumpir', fiyat: 420, limit: 9, populer: false, begeni: '', resim: '/public/urunler/9-malzemeli-kumpir.jpg', aciklama: '9 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
+  { id: 26, kat: 'Künefe & Katmer', ad: 'Peynirli Fıstıklı Künefe', fiyat: 520, populer: true, begeni: '', resim: '/public/urunler/kunefe.jpg', aciklama: 'Sıcak künefe, uzayan peynir ve bol Antep fıstığı.', malzemeler: ['Künefe', 'Peynir', 'Antep Fıstığı'] },
+  { id: 27, kat: 'Künefe & Katmer', ad: 'Hasır Künefe', fiyat: 560, populer: false, begeni: '', resim: '/public/urunler/kunefe-dondurma.jpg', aciklama: 'Çıtır hasır künefe, peynir ve fıstık.', malzemeler: ['Künefe', 'Peynir', 'Antep Fıstığı'] },
+  { id: 28, kat: 'Künefe & Katmer', ad: 'Fıstıklı Katmer', fiyat: 450, populer: false, begeni: '', resim: '/public/urunler/fistikli-katmer.jpg', aciklama: 'Çıtır katmer, bol Antep fıstığı.', malzemeler: ['Katmer', 'Antep Fıstığı'] },
+  { id: 29, kat: 'Künefe & Katmer', ad: 'Çikolatalı Fıstıklı Katmer', fiyat: 500, populer: false, begeni: '', resim: '/public/urunler/katmer-dondurma.jpg', aciklama: 'Çikolatalı, fıstıklı çıtır katmer.', malzemeler: ['Katmer', 'Çikolata', 'Antep Fıstığı'] },
   { id: 31, kat: 'Sufle', ad: 'Çikolatalı Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Akışkan çikolatalı sufle.', malzemeler: ['Sufle', 'Çikolata'] },
   { id: 32, kat: 'Sufle', ad: 'Beyaz Çikolatalı Tahinli Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Beyaz çikolata ve tahinli, akışkan sufle.', malzemeler: ['Sufle', 'Beyaz Çikolata', 'Tahin'] }
 ]
@@ -185,41 +185,28 @@ export default function Home() {
     setPuanKullan(false)
   }
   const UrunKarti = ({ u }: { u: any }) => (
-    <div className="urun-karti">
-      <div className="urun-karti-icerik" onClick={() => urunAc(u)}>
-        <div style={{ fontWeight: '800', fontSize: '20px' }}>{u.ad}</div>
-        <div style={{ color: '#777', fontSize: '15px', margin: '8px 0', lineHeight: '1.55' }}>{u.aciklama}</div>
+    <div style={{ background: 'white', borderRadius: '16px', padding: '12px', display: 'flex', gap: '12px', alignItems: 'flex-start', boxShadow: '0 1px 6px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+      <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => urunAc(u)}>
+        <div style={{ fontWeight: '800', fontSize: '16px' }}>{u.ad}</div>
+        <div style={{ color: '#777', fontSize: '13px', margin: '5px 0', lineHeight: '1.45' }}>{u.aciklama}</div>
         {u.begeni ? <div style={{ color: '#16a34a', fontSize: '12px', fontWeight: 'bold', margin: '4px 0' }}>👍 {u.begeni}</div> : null}
-        <div style={{ marginTop: '8px' }}><b style={{ fontSize: '20px' }}>{u.fiyat} TL</b></div>
-        <button onClick={(e) => { e.stopPropagation(); urunAc(u) }} style={{ marginTop: '8px', background: 'black', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '10px', fontSize: '17px', fontWeight: 'bold', cursor: 'pointer' }}>+ Sepete Ekle</button>
+        <div style={{ marginTop: '6px' }}><b style={{ fontSize: '16px' }}>{u.fiyat} TL</b></div>
+        <button onClick={(e) => { e.stopPropagation(); urunAc(u) }} style={{ marginTop: '8px', background: 'black', color: 'white', border: 'none', padding: '7px 14px', borderRadius: '8px', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer' }}>+ Sepete Ekle</button>
       </div>
-      <div onClick={() => urunAc(u)} className="urun-karti-img" style={{ background: renkFor(u.kat) }}>
-        {u.resim ? <img src={u.resim} alt={u.ad} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '44px' }}>{emojiFor(u.kat)}</div>}
+      <div onClick={() => urunAc(u)} style={{ width: '104px', height: '104px', background: renkFor(u.kat), borderRadius: '14px', flexShrink: 0, position: 'relative', cursor: 'pointer', overflow: 'hidden' }}>
+        {u.resim ? <img src={u.resim} alt={u.ad} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '44px' }}>{emojiFor(u.kat)}</div>}
         {u.populer ? <span style={{ position: 'absolute', bottom: '6px', right: '6px', background: '#e11d48', color: 'white', fontSize: '11px', padding: '3px 8px', borderRadius: '12px', fontWeight: 'bold' }}>🔥 Popüler</span> : null}
       </div>
     </div>
   )
   return (
-    <div style={{ fontFamily: 'sans-serif', background: '#fff7ee', minHeight: '100vh', paddingBottom: '170px', width: '100%', boxSizing: 'border-box' }}>
-      <style>{`
-        .urun-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-        @media (min-width: 1400px) { .urun-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
-        .urun-karti { background: white; border-radius: 16px; padding: 12px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; }
-        .urun-karti-icerik { flex: 1; min-width: 0; cursor: pointer; }
-        .urun-karti-img { width: 150px; height: 150px; border-radius: 14px; flex-shrink: 0; position: relative; cursor: pointer; overflow: hidden; }
-        @media (min-width: 850px) {
-          .urun-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-          .urun-karti { flex-direction: column; padding: 0; gap: 0; align-items: stretch; }
-          .urun-karti-icerik { order: 2; padding: 20px 20px 22px; }
-          .urun-karti-img { order: 1; width: 100% !important; height: 260px !important; border-radius: 16px 16px 0 0; }
-        }
-      `}</style>
+    <div style={{ fontFamily: 'sans-serif', background: '#fff7ee', minHeight: '100vh', paddingBottom: '170px' }}>
       <div style={{ background: '#3b1d0a', color: 'white', padding: '16px', textAlign: 'center' }}>
         <div style={{ fontSize: '22px', fontWeight: '900' }}>WaffLia Sweet Kumpir</div>
         <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '4px' }}>🔍 ♡ 👤</div>
       </div>
       <div style={{ background: '#3b1d0a', color: 'white', padding: '0 16px 24px', textAlign: 'center' }}>
-        <div style={{ maxWidth: 'none', width: '100%', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '70px', lineHeight: '1.1' }}>🧇 🥔</div>
           <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '6px' }}>Açık 17:00 - 05:00 • İstanbul</div>
           <h1 style={{ fontSize: '28px', lineHeight: '1.2', margin: '12px 0' }}>En tatlı waffle ve kumpir burada</h1>
@@ -237,7 +224,7 @@ export default function Home() {
           <input value={arama} onChange={(e) => setArama(e.target.value)} placeholder="Wafflia'da ara..." style={{ width: '100%', marginTop: '16px', padding: '12px 14px', borderRadius: '12px', border: 'none', outline: 'none', fontSize: '15px', boxSizing: 'border-box' }} />
         </div>
       </div>
-      <div style={{ maxWidth: 'none', width: '100%', margin: '0 auto', padding: '0 32px', boxSizing: 'border-box' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 12px' }}>
         <div style={{ display: 'flex', gap: '10px', marginTop: '16px', overflowX: 'auto' }}>
           <div style={{ background: '#e11d48', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%25 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>1. Siparişine özel! İlk siparişinde %25 indirim sepette uygulanır.</div></div>
           <div style={{ background: '#5b2c0e', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%40 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>5. Siparişine özel! 5. siparişinde %40 indirim sepette uygulanır.</div></div>
@@ -249,7 +236,7 @@ export default function Home() {
           {puan >= 150 ? <label style={{ cursor: 'pointer', fontWeight: 'bold', color: '#16a34a' }}><input type="checkbox" checked={puanKullan} onChange={(e) => setPuanKullan(e.target.checked)} /> 400 TL puan indirimi kullan</label> : <span style={{ color: '#888' }}>150 puana {150 - puan} puan kaldı</span>}
         </div>
         <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Öne Çıkan Ürünler</h2>
-        <div className="urun-grid">{oneCikanUrunler.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '14px' }}>{oneCikanUrunler.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
         <h2 id="menu" style={{ fontSize: '22px', margin: '24px 4px 10px' }}>Menü</h2>
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '6px' }}>
           {KATS.map((k) => (<button key={k} onClick={() => setKat(k)} style={{ padding: '9px 16px', borderRadius: '20px', border: kat === k ? '1px solid #5b2c0e' : '1px solid #ddd', background: kat === k ? '#5b2c0e' : 'white', color: kat === k ? 'white' : '#333', cursor: 'pointer', fontWeight: kat === k ? 'bold' : 'normal', flexShrink: 0 }}>{k}</button>))}
@@ -260,7 +247,7 @@ export default function Home() {
           return (
             <div key={k}>
               <h3 style={{ fontSize: '18px', margin: '18px 4px 10px' }}>{k} <span style={{ color: '#999', fontSize: '13px', fontWeight: 'normal' }}>{liste.length} ürün</span></h3>
-              <div className="urun-grid">{liste.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '14px' }}>{liste.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
             </div>
           )
         })}
@@ -344,12 +331,12 @@ export default function Home() {
       )}
       {sepet.length > 0 && (
         <div style={{ position: 'fixed', left: 0, right: 0, bottom: '68px', padding: '0 12px', zIndex: 30 }}>
-          <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: 'none', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
+          <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
             <span>🛒 Sepeti Görüntüle • {sepet.length} ürün</span>
             <span>{odenecek.toFixed(2)} TL →</span>
           </button>
           {sepetAcik && (
-            <div style={{ maxWidth: 'none', width: '100%', margin: '8px auto 0', background: 'white', borderRadius: '16px', padding: '14px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', color: '#333', maxHeight: '60vh', overflowY: 'auto' }}>
+            <div style={{ maxWidth: '1200px', margin: '8px auto 0', background: 'white', borderRadius: '16px', padding: '14px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', color: '#333', maxHeight: '60vh', overflowY: 'auto' }}>
               {sepet.map((s, i) => (
                 <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid #eee', fontSize: '14px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{s.ad}</span><span>{(s.birimFiyat || s.fiyat)} TL <button onClick={() => azalt(s)} style={{ border: '1px solid #ddd', background: 'white', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', marginLeft: '6px' }}>−</button></span></div>
