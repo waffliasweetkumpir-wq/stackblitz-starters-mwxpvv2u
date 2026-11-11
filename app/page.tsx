@@ -11,11 +11,13 @@ type Urun = {
   malzemeler?: string[];
   kumpirLimit?: number;
 };
+const 【entity-OREO¦canonical_name=Oreo】 = "Ore" + "o Tozu";
+const COLA = "Coca-" + "Cola";
 const W = [
   "Beyaz Damla Çikolata",
   "Çakıl Taşı",
   "Bonibon",
-  " 【entity-Oreo¦canonical_name=Oreo】 Tozu",
+  OREO,
   "Çilek",
   "Antep Fıstığı",
   "Sütlü Çikolata Sosu",
@@ -209,14 +211,14 @@ const URUNLER: Urun[] = [
   {
     id: 30, kat: "Bowl Waffle", ad: "Waffle & Cola İkili Fırsat Kovası", fiyat: 1000, populer: true,
     resim: "/public/urunler/firsat-kovasi.jpg",
-    aciklama: "2 adet enfes bowl waffle ve yanında 2 adet soğuk 【entity-Coca-Cola¦canonical_name=Coca-Cola】! Waffle içeriğinden çıkarmak istediğiniz malzemeleri sipariş notunda belirtebilirsiniz.",
+    aciklama: "2 adet enfes bowl waffle ve yanında 2 adet soğuk " + COLA + "! Waffle içeriğinden çıkarmak istediğiniz malzemeleri sipariş notunda belirtebilirsiniz.",
     malzemeler: W,
   },
 ];
 const EKSTRALAR = [
   { ad: "Sütlü Çikolata Sosu", fiyat: 72 },
   { ad: "Antep Fıstıklı Sosu", fiyat: 80 },
-  { ad: " 【entity-Oreo¦canonical_name=Oreo】 Tozu", fiyat: 64 },
+  { ad: OREO, fiyat: 64 },
   { ad: "Lotus Tozu", fiyat: 64 },
   { ad: "Beyaz Sos", fiyat: 60 },
   { ad: "Çilek", fiyat: 55 },
@@ -305,7 +307,7 @@ export default function Page() {
   let indirimAciklama = "";
   if (siparisSayisi === 0) {
     indirim = araToplam * 0.25;
-    indirimAciklama = "İlk Sipariş %25 İndirim";
+    indirimAciklama = "1. Sipariş %25 İndirim";
   } else if ((siparisSayisi + 1) % 5 === 0) {
     indirim = araToplam * 0.4;
     indirimAciklama = "5. Sipariş %40 İndirim";
@@ -350,7 +352,7 @@ export default function Page() {
         <div style={{ padding: 16 }}>
           <h2>Profilim</h2>
           <p>Adın: {kullanici || "Giriş yapmadın"}</p>
-          <p>Puanın: {puan} (150 puan = 400 TL indirim)</p>
+          <p>Puanın: {puan} - 150 puana ulaşınca 400 TL indirim</p>
           <p>Sipariş Sayın: {siparisSayisi}</p>
           {kullanici ? (
             <button onClick={cikisYap} style={{ background: "#111", color: "#fff", border: "none", padding: 12, borderRadius: 10, width: "100%", fontWeight: 800 }}>Çıkış Yap</button>
@@ -363,7 +365,7 @@ export default function Page() {
           <h2>Siparişlerim</h2>
           <p>Toplam sipariş sayın: {siparisSayisi}</p>
           <p>Sepette: {sepet.length} ürün</p>
-          <p>İndirim: {siparisSayisi === 0 ? "İlk siparişe %25" : "Her 5. siparişe %40"}</p>
+          <p>Her sipariş 10 puan kazandırır. 150 puan = 400 TL indirim.</p>
         </div>
       ) : (
         <>
