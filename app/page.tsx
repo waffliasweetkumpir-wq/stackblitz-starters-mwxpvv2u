@@ -60,7 +60,7 @@ const URUNLER = [
   { id: 31, kat: 'Sufle', ad: 'Çikolatalı Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Akışkan çikolatalı sufle.', malzemeler: ['Sufle', 'Çikolata'] },
   { id: 32, kat: 'Sufle', ad: 'Beyaz Çikolatalı Tahinli Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Beyaz çikolata ve tahinli, akışkan sufle.', malzemeler: ['Sufle', 'Beyaz Çikolata', 'Tahin'] }
 ]
-const GOOGLE_SHEETS_URL = '' // Buraya Google Apps Script Web App URL'ini yapistir, ornek: https://script.google.com/macros/s/XXXX/exec
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxA5VbOhwM0i5ee1smJddWnE9T1NNWYPcXdjKqva7JupSMyy-loEmmcroFW3yhhgZ0/exec' // Buraya Google Apps Script Web App URL'ini yapistir, ornek: https://script.google.com/macros/s/XXXX/exec
 const KATS = ['Tümü', 'Bowl Waffle', 'Kare Waffle', 'Kumpir', 'Künefe & Katmer', 'Sufle']
 const ONE_CIKAN = [5, 6, 16]
 const KAT_BILGI: Record<string, { emoji: string; aciklama: string }> = { 'Bowl Waffle': { emoji: '🧇', aciklama: 'Kasede bol malzemeli waffle' }, 'Kare Waffle': { emoji: '🧇', aciklama: 'Klasik kare waffle' }, 'Kumpir': { emoji: '🥔', aciklama: 'İstediğin malzemeyle kumpir' }, 'Künefe & Katmer': { emoji: '🍮', aciklama: 'Sıcak künefe ve çıtır katmer' }, 'Sufle': { emoji: '🍫', aciklama: 'Akışkan çikolatalı sufle' } }
@@ -231,7 +231,7 @@ export default function Home() {
     } catch (e) {}
     try {
       if (GOOGLE_SHEETS_URL) {
-        await fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tarih: new Date().toLocaleString('tr-TR'), musteri_adi: adSoyad, telefon, adres, not: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: 10 }) })
+        await fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'order', tarih: new Date().toLocaleString('tr-TR'), musteri_adi: adSoyad, telefon, adres, not: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: 10 }) })
       }
     } catch (e) {}
     const yeniPuan = puanKullan ? puan - 150 + 10 : puan + 10
