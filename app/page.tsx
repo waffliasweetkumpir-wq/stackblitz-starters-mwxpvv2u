@@ -185,15 +185,15 @@ export default function Home() {
     setPuanKullan(false)
   }
   const UrunKarti = ({ u }: { u: any }) => (
-    <div style={{ background: 'white', borderRadius: '16px', padding: '18px', display: 'flex', gap: '16px', alignItems: 'flex-start', boxShadow: '0 1px 6px rgba(0,0,0,0.06)', overflow: 'hidden', minHeight: '190px' }}>
-      <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => urunAc(u)}>
+    <div className="urun-karti">
+      <div className="urun-karti-icerik" onClick={() => urunAc(u)}>
         <div style={{ fontWeight: '800', fontSize: '20px' }}>{u.ad}</div>
         <div style={{ color: '#777', fontSize: '15px', margin: '8px 0', lineHeight: '1.55' }}>{u.aciklama}</div>
         {u.begeni ? <div style={{ color: '#16a34a', fontSize: '12px', fontWeight: 'bold', margin: '4px 0' }}>👍 {u.begeni}</div> : null}
         <div style={{ marginTop: '8px' }}><b style={{ fontSize: '20px' }}>{u.fiyat} TL</b></div>
         <button onClick={(e) => { e.stopPropagation(); urunAc(u) }} style={{ marginTop: '8px', background: 'black', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '10px', fontSize: '17px', fontWeight: 'bold', cursor: 'pointer' }}>+ Sepete Ekle</button>
       </div>
-      <div onClick={() => urunAc(u)} style={{ width: '150px', height: '150px', background: renkFor(u.kat), borderRadius: '14px', flexShrink: 0, position: 'relative', cursor: 'pointer', overflow: 'hidden' }}>
+      <div onClick={() => urunAc(u)} className="urun-karti-img" style={{ background: renkFor(u.kat) }}>
         {u.resim ? <img src={u.resim} alt={u.ad} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '44px' }}>{emojiFor(u.kat)}</div>}
         {u.populer ? <span style={{ position: 'absolute', bottom: '6px', right: '6px', background: '#e11d48', color: 'white', fontSize: '11px', padding: '3px 8px', borderRadius: '12px', fontWeight: 'bold' }}>🔥 Popüler</span> : null}
       </div>
@@ -203,7 +203,15 @@ export default function Home() {
     <div style={{ fontFamily: 'sans-serif', background: '#fff7ee', minHeight: '100vh', paddingBottom: '170px', width: '100%', boxSizing: 'border-box' }}>
       <style>{`
         .urun-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-        @media (min-width: 850px) { .urun-grid { grid-template-columns: repeat(2, 1fr); } }
+        .urun-karti { background: white; border-radius: 16px; padding: 12px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; }
+        .urun-karti-icerik { flex: 1; min-width: 0; cursor: pointer; }
+        .urun-karti-img { width: 150px; height: 150px; border-radius: 14px; flex-shrink: 0; position: relative; cursor: pointer; overflow: hidden; }
+        @media (min-width: 850px) {
+          .urun-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+          .urun-karti { flex-direction: column; padding: 0; gap: 0; align-items: stretch; }
+          .urun-karti-icerik { order: 2; padding: 18px 18px 20px; }
+          .urun-karti-img { order: 1; width: 100% !important; height: 230px !important; border-radius: 16px 16px 0 0; }
+        }
       `}</style>
       <div style={{ background: '#3b1d0a', color: 'white', padding: '16px', textAlign: 'center' }}>
         <div style={{ fontSize: '22px', fontWeight: '900' }}>WaffLia Sweet Kumpir</div>
