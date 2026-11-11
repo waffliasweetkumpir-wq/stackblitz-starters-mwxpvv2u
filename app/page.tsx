@@ -60,6 +60,7 @@ const URUNLER = [
   { id: 31, kat: 'Sufle', ad: 'Çikolatalı Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Akışkan çikolatalı sufle.', malzemeler: ['Sufle', 'Çikolata'] },
   { id: 32, kat: 'Sufle', ad: 'Beyaz Çikolatalı Tahinli Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Beyaz çikolata ve tahinli, akışkan sufle.', malzemeler: ['Sufle', 'Beyaz Çikolata', 'Tahin'] }
 ]
+const GOOGLE_SHEETS_URL = '' // Buraya Google Apps Script Web App URL'ini yapistir, ornek: https://script.google.com/macros/s/XXXX/exec
 const KATS = ['Tümü', 'Bowl Waffle', 'Kare Waffle', 'Kumpir', 'Künefe & Katmer', 'Sufle']
 const ONE_CIKAN = [5, 6, 16]
 const KAT_BILGI: Record<string, { emoji: string; aciklama: string }> = { 'Bowl Waffle': { emoji: '🧇', aciklama: 'Kasede bol malzemeli waffle' }, 'Kare Waffle': { emoji: '🧇', aciklama: 'Klasik kare waffle' }, 'Kumpir': { emoji: '🥔', aciklama: 'İstediğin malzemeyle kumpir' }, 'Künefe & Katmer': { emoji: '🍮', aciklama: 'Sıcak künefe ve çıtır katmer' }, 'Sufle': { emoji: '🍫', aciklama: 'Akışkan çikolatalı sufle' } }
@@ -80,6 +81,50 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [kat, setKat] = useState('Tümü')
   const [sayfa, setSayfa] = useState<'anasayfa' | 'menu'>('anasayfa')
+  const [gecmisAcik, setGecmisAcik] = useState(false)
+  const [gecmisSiparisler, setGecmisSiparisler] = useState<any[]>([])
+  const gecmisiGetir = () => {
+    try {
+      const kayitli = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]')
+      setGecmisSiparisler(kayitli)
+    } catch (e) { setGecmisSiparisler([]) }
+    setGecmisAcik(true)
+  }
+  const [hesapSilAcik, setHesapSilAcik] = useState(false)
+  const [hesapSilindi, setHesapSilindi] = useState(false)
+  const [carkAci, setCarkAci] = useState(0)
+  const [carkDonuyor, setCarkDonuyor] = useState(false)
+  const [carkOdul, setCarkOdul] = useState('')
+  const CARK_ODULLER = ['%10 İndirim', '%25 İndirim', 'Ücretsiz Cola', '10 Puan', 'Tekrar Dene', '%15 İndirim', 'Bedava Ekstra Sos', '5 Puan']
+  const bugun = new Date().toISOString().slice(0, 10)
+  const carkBugunCevrildi = typeof window !== 'undefined' && localStorage.getItem('wafflia_cark_tarih') === bugun
+  const carkCevir = () => {
+    if (carkDonuyor || carkBugunCevrildi) return
+    setCarkDonuyor(true)
+    setCarkOdul('')
+    const secilen = CARK_ODULLER[Math.floor(Math.random() * CARK_ODULLER.length)]
+    const yeniAci = carkAci + 1440 + Math.floor(Math.random() * 360)
+    setCarkAci(yeniAci)
+    setTimeout(() => {
+      setCarkDonuyor(false)
+      setCarkOdul(secilen)
+      localStorage.setItem('wafflia_cark_tarih', bugun)
+      localStorage.setItem('wafflia_cark_odul', secilen)
+    }, 1800)
+  }
+  const hesabiSil = async () => {
+    try { await supabase.from('hesap_silme_talepleri').insert([{ email: user?.email || '', isim: isim, tarih: new Date().toISOString() }]) } catch (e) {}
+    try { await supabase.auth.signOut() } catch (e) {}
+    localStorage.removeItem('wafflia_puan')
+    localStorage.removeItem('wafflia_siparis')
+    localStorage.removeItem('wafflia_cark_tarih')
+    localStorage.removeItem('wafflia_cark_odul')
+    setUser(null)
+    setPuan(0)
+    setSiparisSayisi(0)
+    setHesapSilAcik(false)
+    setHesapSilindi(true)
+  }
   const [arama, setArama] = useState('')
   const [sepet, setSepet] = useState<any[]>([])
   const [sepetAcik, setSepetAcik] = useState(false)
@@ -94,6 +139,9 @@ export default function Home() {
   const [footerAcik, setFooterAcik] = useState('')
   const [odemeAcik, setOdemeAcik] = useState(false)
   const [siparisTamam, setSiparisTamam] = useState(false)
+  const [hazirlanmaBaslangic, setHazirlanmaBaslangic] = useState(0)
+  const [gecenDakika, setGecenDakika] = useState(0)
+  const [gecenSaniye, setGecenSaniye] = useState(0)
   const [adSoyad, setAdSoyad] = useState('')
   const [telefon, setTelefon] = useState('')
   const [adres, setAdres] = useState('')
@@ -103,6 +151,15 @@ export default function Home() {
   const [odemeYontemi, setOdemeYontemi] = useState('Kapıda Nakit')
   const [gonderiliyor, setGonderiliyor] = useState(false)
   const siparisNo = siparisSayisi + 1
+  useEffect(() => {
+    if (!siparisTamam || !hazirlanmaBaslangic) return
+    const id = setInterval(() => {
+      const fark = Math.floor((Date.now() - hazirlanmaBaslangic) / 1000)
+      setGecenDakika(Math.floor(fark / 60))
+      setGecenSaniye(fark % 60)
+    }, 1000)
+    return () => clearInterval(id)
+  }, [siparisTamam, hazirlanmaBaslangic])
   useEffect(() => {
     supabase.auth.getSession().then((res) => setUser(res.data.session?.user || null))
     const kayitliPuan = localStorage.getItem('wafflia_puan')
@@ -172,10 +229,21 @@ export default function Home() {
     try {
       await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon, adres, not_text: notlar, teslimat: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: 10 }])
     } catch (e) {}
+    try {
+      if (GOOGLE_SHEETS_URL) {
+        await fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tarih: new Date().toLocaleString('tr-TR'), musteri_adi: adSoyad, telefon, adres, not: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: 10 }) })
+      }
+    } catch (e) {}
     const yeniPuan = puanKullan ? puan - 150 + 10 : puan + 10
     const yeniSiparisSayisi = siparisSayisi + 1
     setPuan(yeniPuan)
     setSiparisSayisi(yeniSiparisSayisi)
+    try {
+      const eski = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]')
+      eski.unshift({ tarih: new Date().toLocaleString('tr-TR'), ad: adSoyad, telefon, adres, urunler: urunOzeti, odenecek, odeme: odemeYontemi, puan: 10 })
+      localStorage.setItem('wafflia_gecmis_siparisler', JSON.stringify(eski.slice(0, 20)))
+      localStorage.setItem('wafflia_telefon', telefon)
+    } catch (e) {}
     localStorage.setItem('wafflia_puan', String(yeniPuan))
     localStorage.setItem('wafflia_siparis', String(yeniSiparisSayisi))
     const waMesaj = encodeURIComponent('YENI SIPARIS - ' + adSoyad + ' - ' + telefon + ' - ' + adres + ' - Not: ' + (notlar || 'Yok') + ' - Odeme: ' + odemeYontemi + ' - ' + urunOzeti + ' - Ara Toplam: ' + araToplam + ' TL - Indirim: -' + (indirimTutari + puanIndirimi) + ' TL - ODENECEK: ' + odenecek + ' TL')
@@ -183,6 +251,9 @@ export default function Home() {
     setGonderiliyor(false)
     setSepet([])
     setOdemeAcik(false)
+    setHazirlanmaBaslangic(Date.now())
+    setGecenDakika(0)
+    setGecenSaniye(0)
     setSiparisTamam(true)
     setPuanKullan(false)
   }
@@ -204,7 +275,21 @@ export default function Home() {
   return (
     <div style={{ fontFamily: 'sans-serif', background: '#fff7ee', minHeight: '100vh', paddingBottom: '170px' }}>
       <div style={{ background: '#3b1d0a', color: 'white', padding: '16px', textAlign: 'center' }}>
-        <div style={{ fontSize: '22px', fontWeight: '900' }}>WaffLia Sweet Kumpir</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ fontSize: '12px', color: '#e8c99a', fontWeight: 'bold' }}>17:00 - 05:00 • İstanbul</div>
+          {user ? (
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Merhaba, {isim}</span>
+              <button onClick={gecmisiGetir} style={{ background: 'white', color: '#5b2c0e', border: 'none', padding: '7px 12px', borderRadius: '20px', fontWeight: 'bold', fontSize: '12px', cursor: 'pointer' }}>Siparişlerim</button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <a href="/giris" style={{ background: 'transparent', color: 'white', border: '1px solid white', padding: '7px 12px', borderRadius: '20px', fontWeight: 'bold', fontSize: '12px', textDecoration: 'none' }}>Giriş Yap</a>
+              <a href="/kayit" style={{ background: '#b45309', color: 'white', padding: '7px 12px', borderRadius: '20px', fontWeight: 'bold', fontSize: '12px', textDecoration: 'none' }}>Üye Ol</a>
+            </div>
+          )}
+        </div>
+        <div style={{ fontSize: '22px', fontWeight: '900', marginTop: '8px' }}>WaffLia Sweet Kumpir</div>
         <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '4px' }}>Açık 17:00 - 05:00 • İstanbul • 30-45 dk teslimat</div>
       </div>
       <div style={{ background: '#3b1d0a', color: 'white', padding: '0 16px 24px', textAlign: 'center' }}>
@@ -215,7 +300,7 @@ export default function Home() {
           {user ? (
             <div style={{ background: 'white', color: '#333', borderRadius: '14px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>Hoş geldin, <b>{isim}!</b> 👋 • ⭐ {puan} Puan {siparisSayisi > 0 ? '• ' + siparisSayisi + ' sipariş verdin' : '• Henüz siparişin yok'}</span>
-              <button onClick={cikisYap} style={{ border: '1px solid #ddd', background: 'white', padding: '7px 14px', borderRadius: '20px', cursor: 'pointer' }}>Çıkış Yap</button>
+              <button onClick={cikisYap} style={{ border: '1px solid #ddd', background: 'white', padding: '7px 14px', borderRadius: '20px', cursor: 'pointer' }}>Çıkış Yap</button><button onClick={() => setHesapSilAcik(true)} style={{ border: '1px solid #fecaca', background: '#fef2f2', color: '#e11d48', padding: '7px 14px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>Hesabımı Sil</button>
             </div>
           ) : null}
           <button onClick={() => { setSayfa('menu'); setKat('Tümü'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: '#b45309', color: 'white', padding: '13px 28px', borderRadius: '12px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>Menüyü Gör →</button>
@@ -242,6 +327,17 @@ export default function Home() {
                   </button>
                 )
               })}
+            </div>
+            <div style={{ background: 'white', borderRadius: '16px', padding: '18px', marginTop: '20px', textAlign: 'center', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
+              <h2 style={{ fontSize: '20px', margin: '0 0 4px' }}>🎡 Çarkıfelek</h2>
+              <p style={{ color: '#666', fontSize: '13px', margin: '0 0 14px' }}>Günde 1 kere çevir, ödülünü kazan. {carkBugunCevrildi ? 'Bugünkü hakkını kullandın, yarın tekrar dene.' : 'Bugünkü hakkın duruyor.'}</p>
+              <div style={{ width: '200px', height: '200px', margin: '0 auto', borderRadius: '50%', border: '6px solid #5b2c0e', overflow: 'hidden', transform: 'rotate(' + carkAci + 'deg)', transition: 'transform 1.8s ease-out', background: 'conic-gradient(#e11d48 0 45deg, #f59e0b 45deg 90deg, #16a34a 90deg 135deg, #5b2c0e 135deg 180deg, #e11d48 180deg 225deg, #f59e0b 225deg 270deg, #16a34a 270deg 315deg, #5b2c0e 315deg 360deg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ background: 'white', width: '70px', height: '70px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: '900', transform: 'rotate(-' + carkAci + 'deg)' }}>🎡</div>
+              </div>
+              <div style={{ fontSize: '20px', marginTop: '8px' }}>▼</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', marginTop: '8px' }}>{CARK_ODULLER.map((o) => (<span key={o} style={{ background: '#fff7ee', border: '1px solid #eee', padding: '5px 10px', borderRadius: '16px', fontSize: '12px', fontWeight: 'bold' }}>{o}</span>))}</div>
+              <button onClick={carkCevir} disabled={carkDonuyor || carkBugunCevrildi} style={{ marginTop: '14px', background: carkBugunCevrildi ? '#ddd' : '#e11d48', color: 'white', border: 'none', padding: '13px 28px', borderRadius: '12px', fontWeight: 'bold', fontSize: '16px', cursor: carkBugunCevrildi ? 'not-allowed' : 'pointer' }}>{carkDonuyor ? 'Çark Dönüyor...' : carkBugunCevrildi ? 'Bugünkü Hakkın Bitti' : 'Çarkı Çevir'}</button>
+              {carkOdul ? <div style={{ marginTop: '12px', background: '#dcfce7', padding: '12px', borderRadius: '12px', fontWeight: 'bold', color: '#166534' }}>🎉 Kazandın: {carkOdul} {carkOdul.includes('İndirim') ? '• Sipariş notuna yazman yeterli.' : carkOdul.includes('Puan') ? '• Puanın siparişinde eklenecek.' : ''}</div> : null}
             </div>
             <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Öne Çıkan Ürünler</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '14px' }}>{oneCikanUrunler.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
@@ -304,6 +400,44 @@ export default function Home() {
         </div>
       </div>
             <a href="https://wa.me/905352732865?text=Merhaba%2C%20sipari%C5%9F%20vermek%20istiyorum" target="_blank" rel="noopener noreferrer" style={{ position: 'fixed', right: '16px', bottom: '92px', zIndex: 30, background: '#25D366', color: 'white', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', textDecoration: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.3)' }} aria-label="WhatsApp ile sipariş ver">💬</a>
+            {hesapSilAcik && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 70, padding: '20px' }}>
+          <div style={{ background: 'white', borderRadius: '20px', padding: '24px', textAlign: 'center', maxWidth: '400px', width: '100%' }}>
+            <div style={{ fontSize: '50px' }}>⚠️</div>
+            <h2 style={{ margin: '10px 0' }}>Hesabını silmek istiyor musun?</h2>
+            <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.6' }}>Hesabın ve puanların silinecek. Bu işlem geri alınamaz. Emin misin?</p>
+            <button onClick={hesabiSil} style={{ width: '100%', marginTop: '12px', background: '#e11d48', color: 'white', border: 'none', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Evet, Hesabımı Sil</button>
+            <button onClick={() => setHesapSilAcik(false)} style={{ width: '100%', marginTop: '8px', background: 'white', border: '1px solid #ddd', padding: '13px', borderRadius: '12px', cursor: 'pointer' }}>Vazgeç</button>
+          </div>
+        </div>
+      )}
+      {hesapSilindi && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 70, padding: '20px' }}>
+          <div style={{ background: 'white', borderRadius: '20px', padding: '24px', textAlign: 'center', maxWidth: '400px', width: '100%' }}>
+            <div style={{ fontSize: '50px' }}>✅</div>
+            <h2 style={{ margin: '10px 0' }}>Hesabın Silindi</h2>
+            <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.6' }}>Hesabın ve kayıtlı verilerin silindi. Tekrar görüşmek üzere.</p>
+            <button onClick={() => setHesapSilindi(false)} style={{ width: '100%', marginTop: '12px', background: '#5b2c0e', color: 'white', border: 'none', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Tamam</button>
+          </div>
+        </div>
+      )}
+            {gecmisAcik && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 70 }}>
+          <div style={{ background: 'white', width: '100%', maxWidth: '600px', maxHeight: '88vh', overflowY: 'auto', borderRadius: '20px 20px 0 0', padding: '18px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><h2 style={{ margin: 0 }}>Siparişlerim</h2><button onClick={() => setGecmisAcik(false)} style={{ border: 'none', background: '#eee', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' }}>✕</button></div>
+            <p style={{ fontSize: '13px', color: '#666' }}>{user ? isim + ' hesabının geçmiş siparişleri' : 'Geçmiş siparişlerin bu telefonda saklanıyor.'}</p>
+            {gecmisSiparisler.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '30px 0', color: '#888' }}>Henüz siparişin yok.<br />İlk siparişini verince burada görünecek.</div>
+            ) : gecmisSiparisler.map((s: any, i: number) => (
+              <div key={i} style={{ border: '1px solid #eee', borderRadius: '14px', padding: '12px', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}><span>{s.tarih}</span><span>{s.odenecek} TL</span></div>
+                <div style={{ fontSize: '13px', color: '#555', marginTop: '6px', whiteSpace: 'pre-line' }}>{s.urunler}</div>
+                <div style={{ fontSize: '12px', color: '#888', marginTop: '6px' }}>{s.odeme} • +{s.puan} puan • {s.adres}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {modalUrun && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 50 }}>
           <div style={{ background: 'white', width: '100%', maxWidth: '600px', maxHeight: '88vh', overflowY: 'auto', borderRadius: '20px 20px 0 0', padding: '18px' }}>
@@ -424,8 +558,8 @@ export default function Home() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 70, padding: '20px' }}>
           <div style={{ background: 'white', borderRadius: '20px', padding: '24px', textAlign: 'center', maxWidth: '400px', width: '100%' }}>
             <div style={{ fontSize: '50px' }}>✅</div>
-            <h2 style={{ margin: '10px 0' }}>Siparişin Alındı!</h2>
-            <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.6' }}>Teşekkürler! Siparişin hazırlanıyor.<br />+10 puan kazandın ⭐<br />Toplam puanın: <b>{puan}</b></p>
+            <h2 style={{ margin: '10px 0' }}>Siparişiniz Hazırlanıyor...</h2>
+            <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.6' }}>Teşekkürler! Siparişin mutfağa düştü, hazırlanıyor.<br />Geçen süre: <b>{gecenDakika} dk {gecenSaniye} sn</b><br />Tahmini teslimat: <b>30-45 dakika</b><br />+10 puan kazandın ⭐<br />Toplam puanın: <b>{puan}</b></p>
             <button onClick={() => setSiparisTamam(false)} style={{ width: '100%', marginTop: '12px', background: '#5b2c0e', color: 'white', border: 'none', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Tamam</button>
           </div>
         </div>
@@ -433,7 +567,7 @@ export default function Home() {
       <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, background: 'white', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-around', padding: '10px 0 14px', zIndex: 20 }}>
         <button onClick={() => { setSayfa('anasayfa'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', color: sayfa === 'anasayfa' ? '#5b2c0e' : '#888', fontSize: '12px', fontWeight: 'bold' }}><div style={{ fontSize: '20px' }}>🏠</div>Anasayfa</button>
         <button onClick={() => { setSayfa('menu'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', color: sayfa === 'menu' ? '#5b2c0e' : '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>☰</div>Menü</button>
-        <a href="#" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>🧾</div>Siparişler</a>
+        <button onClick={gecmisiGetir} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>🧾</div>Siparişler</button>
         <a href="/giris" style={{ textAlign: 'center', textDecoration: 'none', color: '#888', fontSize: '12px' }}><div style={{ fontSize: '20px' }}>👤</div>Profil</a>
       </div>
     </div>
