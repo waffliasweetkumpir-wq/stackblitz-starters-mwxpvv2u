@@ -281,8 +281,11 @@ export default function Home() {
           <h3 style={{ margin: '0 0 10px' }}>ℹ️ Bilgilendirme</h3>
           {[
             { id: 'alerji', baslik: '⚠️ Alerji Uyarısı', icerik: 'Ürünlerimiz gluten, süt, yumurta, fındık, fıstık, susam, soya ve tahin içerebilir. Aynı tezgahta hazırlanır. Alerjiniz varsa sipariş öncesi 0535 273 28 65 numarasından bilgi alın.' },
-            { id: 'kvkk', baslik: '🔒 KVKK Aydınlatma Metni', icerik: 'WaffLia Sweet Kumpir olarak ad, telefon ve adres bilgileriniz yalnızca siparişinizi hazırlamak ve teslim etmek için kullanılır. Bilgileriniz 3. kişilerle paylaşılmaz.' },
-            { id: 'iade', baslik: '↩️ İade & İptal', icerik: 'Gıda ürünü olduğu için hijyen gereği iade kabul edilmez. Yanlış / eksik ürün gelirse 30 dakika içinde fotoğrafla 0535 273 28 65 e WhatsApp üzerinden ulaşın.' },
+            { id: 'kvkk', baslik: '🔒 KVKK Aydınlatma Metni', icerik: 'Veri Sorumlusu: WaffLia Sweet Kumpir (İstanbul). Topladığımız veriler: ad soyad, telefon, adres, sipariş notu ve sipariş içeriği. Amaç: siparişinizi hazırlamak, teslim etmek ve sizinle iletişim kurmak. Hukuki sebep: sözleşmenin kurulması ve ifası. Verileriniz pazarlama amacıyla kullanılmaz, 3. kişilerle paylaşılmaz ve satılmaz. Sipariş bilgileriniz yalnızca siparişin hazırlanması için gerekli süre boyunca saklanır. Haklarınız: verilerinize erişme, düzeltme, silinmesini isteme ve itiraz etme hakkınız vardır. Başvuru için: 0535 273 28 65 (WhatsApp) üzerinden bize ulaşabilirsiniz.' },
+            { id: 'gizlilik', baslik: '🛡️ Gizlilik Politikası', icerik: 'Sitemizde paylaştığınız ad, telefon ve adres bilgileriniz yalnızca sipariş işlemleri için kullanılır. Bilgileriniz şifrelenerek iletilir ve yetkisiz kişilerle paylaşılmaz. Üye olmadan da sipariş verebilirsiniz. Hesap oluşturursanız bilgileriniz yalnızca hesabınıza giriş yapmanız için kullanılır.' },
+            { id: 'mesafeli', baslik: '📄 Mesafeli Satış Sözleşmesi', icerik: 'Satıcı: WaffLia Sweet Kumpir - İstanbul. Alıcı: sipariş formunda bilgileri bulunan kişi. Ürünler: menüde listelenen gıda ürünleri. Fiyatlar: menüde yazan fiyatlar KDV dahildir, teslimat ücreti ayrıca alınmaz. Ödeme: kapıda nakit veya kapıda kredi kartı ile yapılır. Teslimat: sipariş onaylandıktan sonra ortalama 30-45 dakika içinde belirtilen adrese yapılır. Siparişi onayladığınızda bu sözleşmeyi kabul etmiş sayılırsınız.' },
+            { id: 'cerez', baslik: '🍪 Çerez Politikası', icerik: 'Sitemiz, sepetinizin ve puanınızın kaybolmaması için cihazınızda küçük çerezler / yerel depolama kullanır. Bu bilgiler yalnızca sitedeki deneyiminizi iyileştirmek içindir. Reklam takibi yapılmaz, bilgileriniz reklam amacıyla satılmaz. Tarayıcınızdan çerezleri silebilirsiniz, bu durumda sepetiniz sıfırlanabilir.' },
+            { id: 'iade', baslik: '↩️ İade & İptal', icerik: 'Gıda ürünleri hijyen gereği iade edilemez. Siparişiniz henüz hazırlanmadıysa iptal için hemen 0535 273 28 65 numarasından WhatsApp ile bize ulaşın. Yanlış / eksik ürün gelirse 30 dakika içinde ürünün fotoğrafı ile bize ulaşmanız halinde ürününüz yeniden gönderilir veya ücretiniz iade edilir.' },
             { id: 'kargo', baslik: '🛵 Teslimat & Çalışma Saatleri', icerik: 'Her gün 17:00 - 05:00 arası açığız. Ortalama teslimat 30-45 dakikadır.' },
             { id: 'iletisim', baslik: '📞 İletişim', icerik: 'Telefon / WhatsApp: 0535 273 28 65 • İstanbul • Instagram: @wafflia • Her gün 17:00 - 05:00' },
           ].map((b) => (
@@ -291,9 +294,16 @@ export default function Home() {
               {footerAcik === b.id ? <p style={{ fontSize: '13px', color: '#555', lineHeight: '1.6', margin: '0 0 12px' }}>{b.icerik}</p> : null}
             </div>
           ))}
+          <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid #eee', textAlign: 'center' }}>
+            <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#16a34a' }}>🔒 SSL ile Güvenli Bağlantı • Bilgileriniz şifrelenerek iletilir</div>
+            <div style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>💳 Kapıda Nakit • 💳 Kapıda Kredi Kartı • Fiyatlara KDV dahildir</div>
+            <div style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>WaffLia Sweet Kumpir • İstanbul • Telefon / WhatsApp: 0535 273 28 65 • Instagram: @wafflia</div>
+            <div style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>Her gün 17:00 - 05:00 • Ortalama teslimat 30-45 dakika</div>
+          </div>
           <p style={{ fontSize: '11px', color: '#999', marginTop: '12px', textAlign: 'center' }}>© 2026 WaffLia Sweet Kumpir • Tüm hakları saklıdır • Fiyatlara KDV dahildir</p>
         </div>
       </div>
+            <a href="https://wa.me/905352732865?text=Merhaba%2C%20sipari%C5%9F%20vermek%20istiyorum" target="_blank" rel="noopener noreferrer" style={{ position: 'fixed', right: '16px', bottom: '92px', zIndex: 30, background: '#25D366', color: 'white', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', textDecoration: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.3)' }} aria-label="WhatsApp ile sipariş ver">💬</a>
       {modalUrun && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 50 }}>
           <div style={{ background: 'white', width: '100%', maxWidth: '600px', maxHeight: '88vh', overflowY: 'auto', borderRadius: '20px 20px 0 0', padding: '18px' }}>
