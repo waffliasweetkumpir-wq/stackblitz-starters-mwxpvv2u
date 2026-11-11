@@ -337,7 +337,7 @@ export default function Home() {
       )}
       {sepet.length > 0 && (
         <div style={{ position: 'fixed', left: 0, right: 0, bottom: '68px', padding: '0 12px', zIndex: 30 }}>
-          <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: 'none', width: '100%', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
+          <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: 'none', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
             <span>🛒 Sepeti Görüntüle • {sepet.length} ürün</span>
             <span>{odenecek.toFixed(2)} TL →</span>
           </button>
