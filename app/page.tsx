@@ -47,7 +47,7 @@ const URUNLER = [
   { id: 33, kat: 'Kare Waffle', ad: 'Milk Kare', fiyat: 350, populer: false, begeni: '', resim: '/public/urunler/milk-kare.jpg', aciklama: 'Sütlü çikolata, muz ve fındık ile klasik kare waffle.', malzemeler: ['Muz', 'Fındık', 'Lotus', 'Antep Fıstığı Tozu', 'Sütlü Pirinç Patlağı', 'Sütlü Damla Çikolata', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
   { id: 34, kat: 'Kare Waffle', ad: 'Strawberry Kare', fiyat: 325, populer: false, begeni: '', resim: '/public/urunler/strawberry-kare.jpg', aciklama: 'Çilek, çikolata ve krema ile ferah kare waffle.', malzemeler: ['Çilek', 'Muz', 'Beyaz Damla Çikolata', 'Frambuazlı Damla Çikolata', 'Fındık Tozu', 'Çilek Sosu', 'Frambuaz Sosu'] },
   { id: 35, kat: 'Kare Waffle', ad: 'Coconut Kare', fiyat: 315, populer: false, begeni: '', resim: '/public/urunler/coconut-kare.jpg', aciklama: 'Hindistan cevizi, beyaz çikolata ve meyveli kare waffle.', malzemeler: ['Muz', 'Hindistan Cevizi Tozu', 'Beyaz Damla Çikolata', 'Fındık Tozu', 'Hindistan Cevizi Sosu', 'Sütlü Çikolata Sosu'] },
-  { id: 36, kat: 'Bowl Waffle', ad: 'Waffle & Cola Fırsat Kovası', fiyat: 650, populer: true, begeni: '', resim: '/public/urunler/firsat-kovasi.jpg', aciklama: '2 kişilik waffle kovası + 2 adet 【entity-Coca-Cola¦canonical_name=Coca-Cola】. Paylaşmalık fırsat menüsü.', malzemeler: ['Waffle', 'Çikolata', 'Meyve', ' 【entity-Coca-Cola¦canonical_name=Coca-Cola】'] },
+  { id: 36, kat: 'Bowl Waffle', ad: 'Waffle & Cola Fırsat Kovası', fiyat: 650, populer: true, begeni: '', resim: '/public/urunler/firsat-kovasi.jpg', aciklama: '2 kişilik waffle kovası + 2 adet Coca-Cola. Paylaşmalık fırsat menüsü.', malzemeler: ['Waffle', 'Çikolata', 'Meyve', 'Coca-Cola'] },
   { id: 16, kat: 'Kumpir', ad: '0-1 Malzemeli Kumpir', fiyat: 340, limit: 1, populer: false, begeni: '', resim: '/public/urunler/0-1-malzemeli-kumpir.jpg', aciklama: '0 veya 1 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
   { id: 17, kat: 'Kumpir', ad: '3 Malzemeli Kumpir', fiyat: 360, limit: 3, populer: false, begeni: '', resim: '/public/urunler/3-malzemeli-kumpir.jpg', aciklama: '3 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
   { id: 18, kat: 'Kumpir', ad: '5 Malzemeli Kumpir', fiyat: 380, limit: 5, populer: false, begeni: '', resim: '/public/urunler/5-malzemeli-kumpir.jpg', aciklama: '5 malzeme seç.', malzemeler: KUMPIR_MALZEMELER },
@@ -206,7 +206,7 @@ export default function Home() {
         <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '4px' }}>🔍 ♡ 👤</div>
       </div>
       <div style={{ background: '#3b1d0a', color: 'white', padding: '0 16px 24px', textAlign: 'center' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '70px', lineHeight: '1.1' }}>🧇 🥔</div>
           <div style={{ fontSize: '12px', color: '#e8c99a', marginTop: '6px' }}>Açık 17:00 - 05:00 • İstanbul</div>
           <h1 style={{ fontSize: '28px', lineHeight: '1.2', margin: '12px 0' }}>En tatlı waffle ve kumpir burada</h1>
@@ -224,7 +224,7 @@ export default function Home() {
           <input value={arama} onChange={(e) => setArama(e.target.value)} placeholder="Wafflia'da ara..." style={{ width: '100%', marginTop: '16px', padding: '12px 14px', borderRadius: '12px', border: 'none', outline: 'none', fontSize: '15px', boxSizing: 'border-box' }} />
         </div>
       </div>
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 12px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 12px' }}>
         <div style={{ display: 'flex', gap: '10px', marginTop: '16px', overflowX: 'auto' }}>
           <div style={{ background: '#e11d48', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%25 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>1. Siparişine özel! İlk siparişinde %25 indirim sepette uygulanır.</div></div>
           <div style={{ background: '#5b2c0e', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%40 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>5. Siparişine özel! 5. siparişinde %40 indirim sepette uygulanır.</div></div>
@@ -236,7 +236,7 @@ export default function Home() {
           {puan >= 150 ? <label style={{ cursor: 'pointer', fontWeight: 'bold', color: '#16a34a' }}><input type="checkbox" checked={puanKullan} onChange={(e) => setPuanKullan(e.target.checked)} /> 400 TL puan indirimi kullan</label> : <span style={{ color: '#888' }}>150 puana {150 - puan} puan kaldı</span>}
         </div>
         <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Öne Çıkan Ürünler</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>{oneCikanUrunler.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '14px' }}>{oneCikanUrunler.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
         <h2 id="menu" style={{ fontSize: '22px', margin: '24px 4px 10px' }}>Menü</h2>
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '6px' }}>
           {KATS.map((k) => (<button key={k} onClick={() => setKat(k)} style={{ padding: '9px 16px', borderRadius: '20px', border: kat === k ? '1px solid #5b2c0e' : '1px solid #ddd', background: kat === k ? '#5b2c0e' : 'white', color: kat === k ? 'white' : '#333', cursor: 'pointer', fontWeight: kat === k ? 'bold' : 'normal', flexShrink: 0 }}>{k}</button>))}
@@ -247,7 +247,7 @@ export default function Home() {
           return (
             <div key={k}>
               <h3 style={{ fontSize: '18px', margin: '18px 4px 10px' }}>{k} <span style={{ color: '#999', fontSize: '13px', fontWeight: 'normal' }}>{liste.length} ürün</span></h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>{liste.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '14px' }}>{liste.map((u) => <UrunKarti key={u.id} u={u} />)}</div>
             </div>
           )
         })}
@@ -256,9 +256,9 @@ export default function Home() {
           {[
             { id: 'alerji', baslik: '⚠️ Alerji Uyarısı', icerik: 'Ürünlerimiz gluten, süt, yumurta, fındık, fıstık, susam, soya ve tahin içerebilir. Aynı tezgahta hazırlanır. Alerjiniz varsa sipariş öncesi 0535 273 28 65 numarasından bilgi alın.' },
             { id: 'kvkk', baslik: '🔒 KVKK Aydınlatma Metni', icerik: 'WaffLia Sweet Kumpir olarak ad, telefon ve adres bilgileriniz yalnızca siparişinizi hazırlamak ve teslim etmek için kullanılır. Bilgileriniz 3. kişilerle paylaşılmaz.' },
-            { id: 'iade', baslik: '↩️ İade & İptal', icerik: 'Gıda ürünü olduğu için hijyen gereği iade kabul edilmez. Yanlış / eksik ürün gelirse 30 dakika içinde fotoğrafla 0535 273 28 65 e 【entity-WhatsApp¦canonical_name=WhatsApp】 üzerinden ulaşın.' },
+            { id: 'iade', baslik: '↩️ İade & İptal', icerik: 'Gıda ürünü olduğu için hijyen gereği iade kabul edilmez. Yanlış / eksik ürün gelirse 30 dakika içinde fotoğrafla 0535 273 28 65 e WhatsApp üzerinden ulaşın.' },
             { id: 'kargo', baslik: '🛵 Teslimat & Çalışma Saatleri', icerik: 'Her gün 17:00 - 05:00 arası açığız. Ortalama teslimat 30-45 dakikadır.' },
-            { id: 'iletisim', baslik: '📞 İletişim', icerik: 'Telefon / 【entity-WhatsApp¦canonical_name=WhatsApp】: 0535 273 28 65 • İstanbul • 【entity-Instagram¦canonical_name=Instagram】: @wafflia • Her gün 17:00 - 05:00' },
+            { id: 'iletisim', baslik: '📞 İletişim', icerik: 'Telefon / WhatsApp: 0535 273 28 65 • İstanbul • Instagram: @wafflia • Her gün 17:00 - 05:00' },
           ].map((b) => (
             <div key={b.id} style={{ borderBottom: '1px solid #eee' }}>
               <button onClick={() => setFooterAcik(footerAcik === b.id ? '' : b.id)} style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: '12px 0', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}>{b.baslik} <span>{footerAcik === b.id ? '▲' : '▼'}</span></button>
@@ -331,12 +331,12 @@ export default function Home() {
       )}
       {sepet.length > 0 && (
         <div style={{ position: 'fixed', left: 0, right: 0, bottom: '68px', padding: '0 12px', zIndex: 30 }}>
-          <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
+          <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
             <span>🛒 Sepeti Görüntüle • {sepet.length} ürün</span>
             <span>{odenecek.toFixed(2)} TL →</span>
           </button>
           {sepetAcik && (
-            <div style={{ maxWidth: '900px', margin: '8px auto 0', background: 'white', borderRadius: '16px', padding: '14px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', color: '#333', maxHeight: '60vh', overflowY: 'auto' }}>
+            <div style={{ maxWidth: '1200px', margin: '8px auto 0', background: 'white', borderRadius: '16px', padding: '14px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', color: '#333', maxHeight: '60vh', overflowY: 'auto' }}>
               {sepet.map((s, i) => (
                 <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid #eee', fontSize: '14px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{s.ad}</span><span>{(s.birimFiyat || s.fiyat)} TL <button onClick={() => azalt(s)} style={{ border: '1px solid #ddd', background: 'white', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', marginLeft: '6px' }}>−</button></span></div>
