@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-const BAKIMDA = false
+const BAKIMDA = true
 
 const URUNLER = [
   { id: 1, kat: 'Bowl Waffle', ad: 'Bitter Bowl', fiyat: 495.20, populer: true, begeni: '', resim: '/urunler/bitter-bowl.jpg', aciklama: 'Sütlü çikolata ve bitter çikolata soslu waffle hamuru üzerine dizilmiş taze muz dilimleri; bitter damla çikolata, bitter pirinç patlağı, bisküvi tozu, antep fıstığı ve fındık içi ile lezzetlendirilir.', malzemeler: ['Muz', 'Bitter Damla Çikolata', 'Bitter Pirinç Patlağı', 'Bisküvi Tozu', 'Antep Fıstığı', 'Fındık İçi', 'Sütlü Çikolata Sosu', 'Bitter Çikolata Sosu'] },
@@ -23,7 +23,7 @@ const URUNLER = [
   { id: 33, kat: 'Kare Waffle', ad: 'Milk Kare', fiyat: 330, populer: false, begeni: '', resim: '/urunler/milk-kare.jpg', aciklama: 'Sütlü çikolata, muz ve fındık ile klasik kare waffle.', malzemeler: ['Muz', 'Fındık', 'Lotus', 'Antep Fıstığı Tozu', 'Sütlü Pirinç Patlağı', 'Sütlü Damla Çikolata', 'Beyaz Çikolata Sosu', 'Sütlü Çikolata Sosu'] },
   { id: 34, kat: 'Kare Waffle', ad: 'Strawberry Kare', fiyat: 340, populer: false, begeni: '', resim: '/urunler/strawberry-kare.jpg', aciklama: 'Çilek, çikolata ve krema ile ferah kare waffle.', malzemeler: ['Çilek', 'Muz', 'Beyaz Damla Çikolata', 'Frambuazlı Damla Çikolata', 'Fındık Tozu', 'Çilek Sosu', 'Frambuaz Sosu'] },
   { id: 35, kat: 'Kare Waffle', ad: 'Coconut Kare', fiyat: 340, populer: false, begeni: '', resim: '/urunler/coconut-kare.jpg', aciklama: 'Hindistan cevizi, beyaz çikolata ve meyveli kare waffle.', malzemeler: ['Muz', 'Hindistan Cevizi Tozu', 'Beyaz Damla Çikolata', 'Fındık Tozu', 'Hindistan Cevizi Sosu', 'Sütlü Çikolata Sosu'] },
-  { id: 36, kat: 'Bowl Waffle', ad: 'Waffle & Cola Fırsat Kovası', fiyat: 650, populer: true, begeni: '', resim: '/urunler/firsat-kovasi.jpg', aciklama: '2 kişilik waffle kovası + 2 adet 【entity-Coca-Cola¦canonical_name=Coca-Cola】. Paylaşmalık fırsat menüsü.', malzemeler: ['Waffle', 'Çikolata', 'Meyve', '【entity-Coca-Cola¦canonical_name=Coca-Cola】'] },
+  { id: 36, kat: 'Bowl Waffle', ad: 'Waffle & Cola Fırsat Kovası', fiyat: 650, populer: true, begeni: '', resim: '/urunler/firsat-kovasi.jpg', aciklama: '2 kişilik waffle kovası + 2 adet 【entity-Coca-Cola¦canonical_name=Coca-Cola】. Paylaşmalık fırsat menüsü.', malzemeler: ['Waffle', 'Çikolata', 'Meyve', ' 【entity-Coca-Cola¦canonical_name=Coca-Cola】'] },
   { id: 16, kat: 'Kumpir', ad: 'Saray Kumpir', fiyat: 300, populer: false, begeni: '', resim: '/urunler/saray-kumpir.jpg', aciklama: 'Kaşar, mısır, bezelye, turşu ve soslarla saray kumpir.', malzemeler: ['Kaşar', 'Mısır', 'Bezelye', 'Turşu', 'Sos'] },
   { id: 17, kat: 'Kumpir', ad: 'Ege Kumpir', fiyat: 320, populer: false, begeni: '', resim: '/urunler/ege-kumpir.jpg', aciklama: 'Zeytin, beyaz peynir ve Ege otlarıyla hafif kumpir.', malzemeler: ['Zeytin', 'Beyaz Peynir', 'Ege Otları'] },
   { id: 18, kat: 'Kumpir', ad: 'Gurme Kumpir', fiyat: 350, populer: false, begeni: '', resim: '/urunler/gurme-kumpir.jpg', aciklama: 'Özel soslar ve gurme malzemelerle kumpir.', malzemeler: ['Özel Sos', 'Gurme Malzeme'] },
