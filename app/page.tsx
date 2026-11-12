@@ -107,7 +107,7 @@ export default function Home() {
   const girisYapForm = () => {
     if (!profilTelefon) { alert('Lütfen telefon yaz'); return }
     try {
-      const k = JSON.parse(localStorage.getItem('wafflia_kullanici') || 'null')
+      const k = JSON.parse(localStorage.getItem('wafflia_kullanici') || null')
       if (k && k.telefon === profilTelefon) {
         setUser({ email: k.email, user_metadata: { full_name: k.ad } })
         alert('Hoş geldin ' + k.ad)
@@ -419,7 +419,7 @@ export default function Home() {
                 <input value={profilTelefon} onChange={(e) => setProfilTelefon(e.target.value)} placeholder="05xx xxx xx xx" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
                 {profilModu === 'kayit' ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>E-posta (isteğe bağlı)</label><input value={profilEmail} onChange={(e) => setProfilEmail(e.target.value)} placeholder="mail@ornek.com" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
                 {profilModu === 'giris' ? <button onClick={girisYapForm} style={{ width: '100%', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Giriş Yap</button> : <button onClick={kayitOl} style={{ width: '100%', background: '#b45309', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Kayıt Ol</button>}
-                <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '10px' }}>Kayıt olunca adın ve telefonun Google Tablolar'daki üye listesine de eklenir.</p>
+                <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '10px' }}>Kayıt olunca adın ve telefonun Google Tablolardaki üye listesine de eklenir.</p>
               </div>
             )}
           </div>
