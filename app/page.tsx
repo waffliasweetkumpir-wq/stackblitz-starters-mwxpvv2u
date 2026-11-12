@@ -135,7 +135,7 @@ export default function Home() {
       return
     }
     localStorage.setItem('wafflia_telefon', profilTelefon)
-    try { if (GOOGLE_SHEETS_URL) { await fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'register', name: profilAd, phone: profilTelefon, email: profilEmail }) }) } } catch (e) {}
+    try { fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', body: 'action=register&ad=' + encodeURIComponent(profilAd) + '&telefon=' + encodeURIComponent(profilTelefon) + '&email=' + encodeURIComponent(profilEmail) }) } catch (e) {}
     if (data.user) setUser(data.user)
     setProfilModu('giris')
     alert('Kaydın oluşturuldu, hoş geldin ' + profilAd)
@@ -326,11 +326,7 @@ export default function Home() {
     try {
       await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon, adres, not_text: notlar, teslimat: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: puanKullan ? -140 : 10 }])
     } catch (e) {}
-    try {
-      if (GOOGLE_SHEETS_URL) {
-        await fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'order', tarih: new Date().toLocaleString('tr-TR'), musteri_adi: adSoyad, telefon, adres, not: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: 10 }) })
-      }
-    } catch (e) {}
+    try { fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', body: 'action=order&ad=' + encodeURIComponent(adSoyad) + '&telefon=' + encodeURIComponent(telefon) + '&adres=' + encodeURIComponent(adres) + '&not=' + encodeURIComponent(notlar) + '&odeme=' + encodeURIComponent(odemeYontemi) + '&urunler=' + encodeURIComponent(urunOzeti) + '&odenecek=' + odenecek }) } catch (e) {}
     const yeniPuan = puanKullan ? puan - 150 + 10 : puan + 10
     const yeniSiparisSayisi = siparisSayisi + 1
     setPuan(yeniPuan)
