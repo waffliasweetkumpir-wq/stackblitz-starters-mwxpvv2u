@@ -172,7 +172,8 @@ export default function Home() {
         }
         if (!data.length && tel) {
           const ham = String(tel).replace(/[^0-9]/g, '')
-          const varyantlar = [ham, ham.startsWith('0') ? ham.slice(1) : '0' + ham]
+          const ham90 = ham.startsWith('90') ? ham.slice(2) : ham
+          const varyantlar = [tel, ham, ham.startsWith('0') ? ham.slice(1) : '0' + ham, '0' + ham90, ham90, '+90' + ham90, '90' + ham90]
           for (const v of varyantlar) {
             const r: any = await supabase.from('siparisler').select('*').eq('telefon', v).order('created_at', { ascending: false }).limit(20)
             if (r.data && r.data.length) { data = r.data; break }
@@ -192,11 +193,10 @@ export default function Home() {
         } else {
           try {
             const yerli: any[] = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]')
-            if (yerli.length && !localStorage.getItem('wafflia_supabase_yuklendi')) {
+            if (yerli.length) {
               for (const s of yerli) {
                 try { await supabase.from('siparisler').insert([{ musteri_adi: s.ad || isim, telefon: tel, adres: s.adres || '', odeme: s.odeme || '', urunler: s.urunler || '', ara_toplam: s.odenecek || 0, indirim: 0, odenecek: s.odenecek || 0, puan_kazanilan: 10 }]) } catch (e) {}
               }
-              localStorage.setItem('wafflia_supabase_yuklendi', '1')
               const rTekrar: any = await supabase.from('siparisler').select('*').eq('telefon', tel).order('created_at', { ascending: false }).limit(20)
               if (rTekrar.data && rTekrar.data.length) {
                 const cevrilen2 = rTekrar.data.map((o: any) => ({ tarih: o.created_at ? new Date(o.created_at).toLocaleString('tr-TR') : '', ad: o.musteri_adi || '', telefon: o.telefon || '', adres: o.adres || '', urunler: o.urunler || '', odenecek: o.odenecek || '', odeme: o.odeme || '' }))
