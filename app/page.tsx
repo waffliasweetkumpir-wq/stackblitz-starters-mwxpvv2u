@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz3otup-yujK6kWkhUKGreKE3u3Y-bYnb-RhJES6d-7-OkKXuNunfVIAkSv0eZ4oP0c/exec'
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyyV6bKeldbGPfLh0gyQIK9PjSiP_2kOfygnI0cHpKlKTvtwZJP5mwhhFje9vZ6AufY/exec'
 
 const EKSTRA_WAFFLE = [
   { ad: 'Sütlü Çikolata Sosu', fiyat: 72 },
@@ -189,6 +189,23 @@ export default function Home() {
           const toplam = data.reduce((s: number, o: any) => s + (Number(o.puan_kazanilan) || 0), 0)
           if (toplam > 0) { setPuan(toplam); try { localStorage.setItem('wafflia_puan', String(toplam)) } catch (e) {} }
           setSiparisSayisi(data.length)
+        } else {
+          try {
+            const yerli: any[] = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]')
+            if (yerli.length && !localStorage.getItem('wafflia_supabase_yuklendi')) {
+              for (const s of yerli) {
+                try { await supabase.from('siparisler').insert([{ musteri_adi: s.ad || isim, telefon: tel, adres: s.adres || '', odeme: s.odeme || '', urunler: s.urunler || '', ara_toplam: s.odenecek || 0, indirim: 0, odenecek: s.odenecek || 0, puan_kazanilan: 10 }]) } catch (e) {}
+              }
+              localStorage.setItem('wafflia_supabase_yuklendi', '1')
+              const rTekrar: any = await supabase.from('siparisler').select('*').eq('telefon', tel).order('created_at', { ascending: false }).limit(20)
+              if (rTekrar.data && rTekrar.data.length) {
+                const cevrilen2 = rTekrar.data.map((o: any) => ({ tarih: o.created_at ? new Date(o.created_at).toLocaleString('tr-TR') : '', ad: o.musteri_adi || '', telefon: o.telefon || '', adres: o.adres || '', urunler: o.urunler || '', odenecek: o.odenecek || '', odeme: o.odeme || '' }))
+                setGecmisSiparisler(cevrilen2)
+                const toplam2 = rTekrar.data.reduce((s: number, o: any) => s + (Number(o.puan_kazanilan) || 0), 0)
+                setPuan(toplam2); setSiparisSayisi(rTekrar.data.length)
+              }
+            }
+          } catch (e) {}
         }
       } catch (e) {}
     }
@@ -261,7 +278,7 @@ export default function Home() {
     const notlar = [kapiyaBirak ? 'Kapıya Bırak' : '', zileBasma ? 'Zile Basma' : '', siparisNotu].filter(Boolean).join(' - ')
     const urunOzeti = sepet.map((s) => s.ad + ' (' + (s.birimFiyat || s.fiyat) + ' TL)' + (s.kumpirMalzemeler && s.kumpirMalzemeler.length ? ' [' + s.kumpirMalzemeler.join(', ') + ']' : '') + (s.ekstralar && s.ekstralar.length ? ' +Ekstra: ' + s.ekstralar.map((e: any) => e.ad).join(', ') : '') + (s.cikartilan && s.cikartilan.length ? ' -Cikar: ' + s.cikartilan.join(', ') : '')).join('\n')
     try {
-      await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon, adres, not_text: notlar, teslimat: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: 10 }])
+      await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon: telefon, adres: adres, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek: odenecek, puan_kazanilan: 10 }])
     } catch (e) {}
     try { fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'order', tarih: new Date().toLocaleString('tr-TR'), musteri_adi: adSoyad, telefon: telefon, adres: adres, not: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek: odenecek, puan_kazanilan: 10 }) }) } catch (e) {}
     try { const yeniSip: any = { tarih: new Date().toLocaleString('tr-TR'), ad: adSoyad, telefon, adres, urunler: urunOzeti, odenecek, odeme: odemeYontemi }; const eski: any[] = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]'); const guncel = [yeniSip, ...eski].slice(0, 20); localStorage.setItem('wafflia_gecmis_siparisler', JSON.stringify(guncel)); setGecmisSiparisler(guncel) } catch (e) {}
