@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyyV6bKeldbGPfLh0gyQIK9PjSiP_2kOfygnI0cHpKlKTvtwZJP5mwhhFje9vZ6AufY/exec'
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz3otup-yujK6kWkhUKGreKE3u3Y-bYnb-RhJES6d-7-OkKXuNunfVIAkSv0eZ4oP0c/exec'
 
 const EKSTRA_WAFFLE = [
   { ad: 'Sütlü Çikolata Sosu', fiyat: 72 },
@@ -113,7 +113,11 @@ export default function Home() {
   const [gecmisAcik, setGecmisAcik] = useState(false)
   const siparisNo = siparisSayisi + 1
   useEffect(() => {
+    try { const kayitliBaslangic = parseInt(localStorage.getItem('wafflia_hazirlanma_baslangic') || '0'); const kayitliTamam = localStorage.getItem('wafflia_siparis_tamam') === '1'; if (kayitliBaslangic && kayitliTamam) { setHazirlanmaBaslangic(kayitliBaslangic); setSiparisTamam(true) } } catch (e) {}
+  }, [])
+  useEffect(() => {
     if (!siparisTamam || !hazirlanmaBaslangic) return
+    try { localStorage.setItem('wafflia_hazirlanma_baslangic', String(hazirlanmaBaslangic)); localStorage.setItem('wafflia_siparis_tamam', '1') } catch (e) {}
     const id = setInterval(() => {
       const fark = Math.floor((Date.now() - hazirlanmaBaslangic) / 1000)
       setGecenDakika(Math.floor(fark / 60))
@@ -151,7 +155,45 @@ export default function Home() {
     setUser(null); setPuan(0); setSiparisSayisi(0); setHesapSilAcik(false)
     alert('Hesabin Silindi')
   }
-  const gecmisSiparisler: any[] = (() => { try { return JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]') } catch (e) { return [] } })()
+  const [gecmisSiparisler, setGecmisSiparisler] = useState<any[]>([])
+  useEffect(() => {
+    try { const kayitli: any[] = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]'); if (kayitli.length) setGecmisSiparisler(kayitli) } catch (e) {}
+  }, [])
+  useEffect(() => {
+    if (!user) return
+    const tel: any = user?.user_metadata?.telefon || localStorage.getItem('wafflia_telefon') || ''
+    const mail: any = user?.email || ''
+    const yukleGecmis = async () => {
+      try {
+        let data: any[] = []
+        if (tel) {
+          const r1: any = await supabase.from('siparisler').select('*').eq('telefon', tel).order('created_at', { ascending: false }).limit(20)
+          if (r1.data && r1.data.length) data = r1.data
+        }
+        if (!data.length && tel) {
+          const ham = String(tel).replace(/[^0-9]/g, '')
+          const varyantlar = [ham, ham.startsWith('0') ? ham.slice(1) : '0' + ham]
+          for (const v of varyantlar) {
+            const r: any = await supabase.from('siparisler').select('*').eq('telefon', v).order('created_at', { ascending: false }).limit(20)
+            if (r.data && r.data.length) { data = r.data; break }
+          }
+        }
+        if (!data.length && mail) {
+          const r2: any = await supabase.from('siparisler').select('*').eq('email', mail).order('created_at', { ascending: false }).limit(20)
+          if (r2.data) data = r2.data
+        }
+        if (data.length) {
+          const cevrilen = data.map((o: any) => ({ tarih: o.created_at ? new Date(o.created_at).toLocaleString('tr-TR') : o.tarih || '', ad: o.musteri_adi || '', telefon: o.telefon || '', adres: o.adres || '', urunler: o.urunler || '', odenecek: o.odenecek || '', odeme: o.odeme || '' }))
+          setGecmisSiparisler(cevrilen)
+          try { localStorage.setItem('wafflia_gecmis_siparisler', JSON.stringify(cevrilen)) } catch (e) {}
+          const toplam = data.reduce((s: number, o: any) => s + (Number(o.puan_kazanilan) || 0), 0)
+          if (toplam > 0) { setPuan(toplam); try { localStorage.setItem('wafflia_puan', String(toplam)) } catch (e) {} }
+          setSiparisSayisi(data.length)
+        }
+      } catch (e) {}
+    }
+    yukleGecmis()
+  }, [user])
   useEffect(() => {
     supabase.auth.getSession().then((res) => setUser(res.data.session?.user || null))
     const kayitliPuan = localStorage.getItem('wafflia_puan')
@@ -222,7 +264,7 @@ export default function Home() {
       await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon, adres, not_text: notlar, teslimat: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: 10 }])
     } catch (e) {}
     try { fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'order', tarih: new Date().toLocaleString('tr-TR'), musteri_adi: adSoyad, telefon: telefon, adres: adres, not: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek: odenecek, puan_kazanilan: 10 }) }) } catch (e) {}
-    try { const eski: any[] = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]'); eski.unshift({ tarih: new Date().toLocaleString('tr-TR'), ad: adSoyad, telefon, adres, urunler: urunOzeti, odenecek, odeme: odemeYontemi }); localStorage.setItem('wafflia_gecmis_siparisler', JSON.stringify(eski.slice(0, 20))) } catch (e) {}
+    try { const yeniSip: any = { tarih: new Date().toLocaleString('tr-TR'), ad: adSoyad, telefon, adres, urunler: urunOzeti, odenecek, odeme: odemeYontemi }; const eski: any[] = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]'); const guncel = [yeniSip, ...eski].slice(0, 20); localStorage.setItem('wafflia_gecmis_siparisler', JSON.stringify(guncel)); setGecmisSiparisler(guncel) } catch (e) {}
     const yeniPuan = puanKullan ? puan - 150 + 10 : puan + 10
     const yeniSiparisSayisi = siparisSayisi + 1
     setPuan(yeniPuan)
@@ -296,7 +338,9 @@ export default function Home() {
               <b style={{ fontSize: '15px' }}>🍳 Siparişin Hazırlanıyor</b>
               <button onClick={() => setSiparisBannerKapali(true)} style={{ border: 'none', background: 'transparent', fontSize: '18px', cursor: 'pointer' }}>✕</button>
             </div>
-            <div style={{ fontSize: '13px', marginTop: '6px', lineHeight: '1.6' }}>Geçen süre: <b>{gecenDakika} dk {gecenSaniye} sn</b> • Tahmini teslim: <b>30-45 dk</b> • Tahmini varış: <b>{new Date(hazirlanmaBaslangic + 40 * 60000).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</b><br />Siparişin mutfağa düştü, hazırlanıyor.</div>
+            <div style={{ fontSize: '13px', marginTop: '6px', lineHeight: '1.6' }}>Geçen süre: <b>{gecenDakika} dk {gecenSaniye} sn</b> • Tahmini teslim: <b>30-45 dk</b> • Tahmini varış: <b>{hazirlanmaBaslangic ? new Date(hazirlanmaBaslangic + 40 * 60000).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '--:--'}</b><br />{gecenDakika < 10 ? '🍳 Mutfakta hazırlanıyor' : gecenDakika < 25 ? '🛵 Kurye yolda' : '📍 Kurye çok yakın, kapıda olacak'}</div>
+            <div style={{ background: '#bbf7d0', height: '10px', borderRadius: '10px', overflow: 'hidden', marginTop: '10px' }}><div style={{ background: '#16a34a', height: '10px', width: Math.min(100, Math.floor((gecenDakika * 60 + gecenSaniye) / 2400 * 100)) + '%', transition: 'width 1s' }} /></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginTop: '4px', fontWeight: 'bold' }}><span style={{ color: gecenDakika < 10 ? '#16a34a' : '#666' }}>🍳 Mutfak</span><span style={{ color: gecenDakika >= 10 && gecenDakika < 25 ? '#16a34a' : '#666' }}>🛵 Yolda</span><span style={{ color: gecenDakika >= 25 ? '#16a34a' : '#666' }}>📍 Kapıda</span></div>
             <button onClick={() => setGecmisAcik(true)} style={{ marginTop: '10px', background: '#16a34a', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer' }}>Siparişlerimi Gör</button>
           </div>
         )}
