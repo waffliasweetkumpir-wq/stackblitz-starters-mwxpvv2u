@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyyV6bKeldbGPfLh0gyQIK9PjSiP_2kOfygnI0cHpKlKTvtwZJP5mwhhFje9vZ6AufY/exec'
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyK-ZD63aNO9Qhbrk0ZxVjAghx7kUu0pTpGOUXRMrcidd6BoDDKXoiZs_IZ-Xq_9wIU/exec'
 
 const EKSTRA_WAFFLE = [
   { ad: 'Sütlü Çikolata Sosu', fiyat: 72 },
