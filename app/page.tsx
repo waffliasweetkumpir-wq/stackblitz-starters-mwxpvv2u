@@ -165,9 +165,11 @@ export default function Home() {
     setHesapSilindi(true)
   }
   const [arama, setArama] = useState('')
-  const [sepet, setSepet] = useState<any[]>(() => { try { return JSON.parse(localStorage.getItem('wafflia_sepet') || '[]') } catch (e) { return [] } })
+  const [sepet, setSepet] = useState<any[]>([])
   const [sepetAcik, setSepetAcik] = useState(false)
-  useEffect(() => { try { localStorage.setItem('wafflia_sepet', JSON.stringify(sepet)) } catch (e) {} }, [sepet])
+  const [sepetYuklendi, setSepetYuklendi] = useState(false)
+  useEffect(() => { try { const kayitliSepet = JSON.parse(localStorage.getItem('wafflia_sepet') || '[]'); if (kayitliSepet.length) setSepet(kayitliSepet) } catch (e) {} setSepetYuklendi(true) }, [])
+  useEffect(() => { if (!sepetYuklendi) return; try { localStorage.setItem('wafflia_sepet', JSON.stringify(sepet)) } catch (e) {} }, [sepet, sepetYuklendi])
   const [modalUrun, setModalUrun] = useState<any>(null)
   const [cikartilan, setCikartilan] = useState<string[]>([])
   const [ekstraSecilen, setEkstraSecilen] = useState<any[]>([])
