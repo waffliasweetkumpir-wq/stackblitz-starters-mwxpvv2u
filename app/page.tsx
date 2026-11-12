@@ -262,6 +262,7 @@ export default function Home() {
   const oneCikanUrunler = URUNLER.filter((u) => ONE_CIKAN.includes(u.id))
   const siparisiTamamla = async () => {
     if (!adSoyad || !telefon || !adres) { alert('Lütfen ad, telefon ve adresi doldur'); return }
+    if (!user) { alert('Üye olmadan indirim uygulanmaz. Sadece +10 puan kazanacaksın. İndirim istiyorsan giriş yap.') }
     setGonderiliyor(true)
     const notlar = [kapiyaBirak ? 'Kapıya Bırak' : '', zileBasma ? 'Zile Basma' : '', siparisNotu].filter(Boolean).join(' - ')
     const urunOzeti = sepet.map((s) => s.ad + ' (' + (s.birimFiyat || s.fiyat) + ' TL)' + (s.kumpirMalzemeler && s.kumpirMalzemeler.length ? ' [' + s.kumpirMalzemeler.join(', ') + ']' : '') + (s.ekstralar && s.ekstralar.length ? ' +Ekstra: ' + s.ekstralar.map((e: any) => e.ad).join(', ') : '') + (s.cikartilan && s.cikartilan.length ? ' -Cikar: ' + s.cikartilan.join(', ') : '')).join('\n')
@@ -313,7 +314,6 @@ export default function Home() {
   )
   return (
     <div style={{ fontFamily: 'sans-serif', background: '#fff7ee', minHeight: '100vh', paddingBottom: '170px' }}>
-      <div style={{ background: '#facc15', color: '#000', padding: '8px', textAlign: 'center', fontWeight: '900', fontSize: '13px' }}>SÜRÜM 9 • YENİ DOSYA YÜKLENDİ • Giriş - Çark - Profil Burada</div>
       <div style={{ background: '#3b1d0a', color: 'white', padding: '16px', textAlign: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '12px', color: '#e8c99a', fontWeight: 'bold' }}>17:00 - 05:00 • İstanbul</div>
@@ -434,14 +434,15 @@ export default function Home() {
                 <input type="password" value={profilSifre} onChange={(e) => setProfilSifre(e.target.value)} placeholder="Şifreni yaz" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
                 {profilModu === 'kayit' ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>E-posta (isteğe bağlı)</label><input value={profilEmail} onChange={(e) => setProfilEmail(e.target.value)} placeholder="mail@ornek.com" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
                 {profilModu === 'giris' ? <button onClick={girisYapForm} style={{ width: '100%', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Giriş Yap</button> : <button onClick={kayitOl} style={{ width: '100%', background: '#b45309', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Kayıt Ol</button>}
+                <button onClick={() => setHesapSilAcik(true)} style={{ width: '100%', background: '#fef2f2', border: '1px solid #fecaca', color: '#e11d48', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>Hesabımı Sil</button>
                 <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '10px' }}>Bilgilerin güvenle saklanır, tarayıcıyı silsen bile hesabın durur.</p>
               </div>
             )}
           </div>
         ) : null}
         <div style={{ display: 'flex', gap: '10px', marginTop: '16px', overflowX: 'auto' }}>
-          <div style={{ background: '#e11d48', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%25 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>1. Siparişine özel! İlk siparişinde %25 indirim sepette uygulanır.</div></div>
-          <div style={{ background: '#5b2c0e', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%40 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>5. Siparişine özel! 5. siparişinde %40 indirim sepette uygulanır.</div></div>
+          <div onClick={() => { if (!user) { setProfilModu('kayit'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) } }} style={{ background: '#e11d48', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1, cursor: !user ? 'pointer' : 'default' }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%25 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>{!user ? 'Sadece üyelere! Üye ol, ilk siparişinde %25 indirim kazan. Üye olmadan indirim yok.' : '1. Siparişine özel! İlk siparişinde %25 indirim sepette uygulanır.'}</div></div>
+          <div onClick={() => { if (!user) { setProfilModu('kayit'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) } }} style={{ background: '#5b2c0e', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1, cursor: !user ? 'pointer' : 'default' }}><div style={{ fontSize: '22px', fontWeight: '900' }}>%40 İNDİRİM</div><div style={{ fontSize: '13px', marginTop: '4px' }}>{!user ? 'Sadece üyelere! 5. siparişinde %40 indirim sadece üyelere.' : '5. Siparişine özel! 5. siparişinde %40 indirim sepette uygulanır.'}</div></div>
           <div style={{ background: '#f59e0b', color: 'white', borderRadius: '16px', padding: '14px', minWidth: '220px', flex: 1 }}><div style={{ fontSize: '22px', fontWeight: '900' }}>150 PUAN = 400 TL</div><div style={{ fontSize: '13px', marginTop: '4px' }}>Her sipariş 10 puan. 150 puana ulaşınca 400 TL indirim kazan!</div></div>
         </div>
         <div style={{ background: 'white', borderRadius: '14px', padding: '12px', marginTop: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', fontSize: '13px' }}>
@@ -575,14 +576,15 @@ export default function Home() {
           </div>
         </div>
       )}
-      {sepet.length > 0 && (
+      {true && (
         <div style={{ position: 'fixed', left: 0, right: 0, bottom: '68px', padding: '0 12px', zIndex: 30 }}>
           <button onClick={() => setSepetAcik(!sepetAcik)} style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px 18px', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
-            <span>🛒 Sepeti Görüntüle • {sepet.length} ürün</span>
+            <span>{sepet.length > 0 ? '🛒 Sepeti Görüntüle • ' + sepet.length + ' ürün' : '🛒 Sepet • Henüz ürün yok'}</span>
             <span>{odenecek.toFixed(2)} TL →</span>
           </button>
           {sepetAcik && (
             <div style={{ maxWidth: '1200px', margin: '8px auto 0', background: 'white', borderRadius: '16px', padding: '14px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', color: '#333', maxHeight: '60vh', overflowY: 'auto' }}>
+              {sepet.length === 0 ? <p style={{ textAlign: 'center', color: '#888', padding: '12px 0' }}>Sepetin boş, menüden ürün ekle</p> : null}
               {sepet.map((s, i) => (
                 <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid #eee', fontSize: '14px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{s.ad}</span><span>{(s.birimFiyat || s.fiyat)} TL <button onClick={() => azalt(s)} style={{ border: '1px solid #ddd', background: 'white', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', marginLeft: '6px' }}>−</button></span></div>
@@ -593,6 +595,7 @@ export default function Home() {
               ))}
               <div style={{ fontSize: '14px', marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Ara Toplam</span><span>{araToplam.toFixed(2)} TL</span></div>
+                {!user ? <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e11d48', fontWeight: 'bold', fontSize: '13px' }}><span>İndirim (Üye değilsin)</span><span>0 TL</span></div> : null}
                 {indirimTutari > 0 ? <div style={{ display: 'flex', justifyContent: 'space-between', color: '#16a34a', fontWeight: 'bold' }}><span>{siparisNo}. Sipariş İndirimi (%{indirimOrani * 100})</span><span>-{indirimTutari} TL</span></div> : null}
                 {puanIndirimi > 0 ? <div style={{ display: 'flex', justifyContent: 'space-between', color: '#16a34a', fontWeight: 'bold' }}><span>150 Puan İndirimi</span><span>-{puanIndirimi} TL</span></div> : null}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '16px', borderTop: '1px solid #eee', paddingTop: '8px' }}><span>Ödenecek</span><span>{odenecek.toFixed(2)} TL</span></div>
