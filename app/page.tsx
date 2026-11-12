@@ -83,39 +83,50 @@ export default function Home() {
   const [sayfa, setSayfa] = useState<'anasayfa' | 'menu' | 'profil'>('anasayfa')
   const [gecmisAcik, setGecmisAcik] = useState(false)
   const [gecmisSiparisler, setGecmisSiparisler] = useState<any[]>([])
-  const gecmisiGetir = () => {
+  const gecmisiGetir = async () => {
+    let kayitli: any[] = []
+    try { kayitli = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]') } catch (e) {}
     try {
-      const kayitli = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]')
-      setGecmisSiparisler(kayitli)
-    } catch (e) { setGecmisSiparisler([]) }
+      const tel = profilTelefon || localStorage.getItem('wafflia_telefon') || ''
+      if (tel) {
+        const { data } = await supabase.from('siparisler').select('*').eq('telefon', tel).order('created_at', { ascending: false }).limit(20)
+        if (data && data.length) {
+          const supaOrders = data.map((o: any) => ({ tarih: o.created_at ? new Date(o.created_at).toLocaleString('tr-TR') : '', ad: o.musteri_adi || '', telefon: o.telefon || '', adres: o.adres || '', urunler: o.urunler || '', odenecek: o.odenecek || '', odeme: o.odeme || '', puan: o.puan_kazanilan || 10 }))
+          kayitli = supaOrders
+        }
+      }
+    } catch (e) {}
+    setGecmisSiparisler(kayitli)
     setGecmisAcik(true)
   }
   const [profilModu, setProfilModu] = useState<'giris' | 'kayit'>('giris')
   const [profilAd, setProfilAd] = useState('')
   const [profilTelefon, setProfilTelefon] = useState('')
   const [profilEmail, setProfilEmail] = useState('')
+  const [profilSifre, setProfilSifre] = useState('')
   const kayitOl = async () => {
-    if (!profilAd || !profilTelefon) { alert('Lütfen ad ve telefon yaz'); return }
-    const yeniKullanici: any = { email: profilEmail || (profilTelefon + '@wafflia.local'), user_metadata: { full_name: profilAd } }
-    localStorage.setItem('wafflia_kullanici', JSON.stringify({ ad: profilAd, telefon: profilTelefon, email: profilEmail }))
+    if (!profilAd || !profilTelefon || !profilSifre) { alert('Lütfen ad, telefon ve şifre yaz'); return }
+    const email = profilEmail || (profilTelefon.replace(/[^0-9]/g, '') + '@wafflia.local')
+    const { data, error } = await supabase.auth.signUp({ email, password: profilSifre, options: { data: { full_name: profilAd, telefon: profilTelefon } } })
+    if (error) {
+      if (error.message && error.message.toLowerCase().includes('already')) { alert('Bu telefon zaten kayıtlı, giriş yap'); setProfilModu('giris'); return }
+      alert('Kayıt olmadı: ' + error.message)
+      return
+    }
     localStorage.setItem('wafflia_telefon', profilTelefon)
     try { if (GOOGLE_SHEETS_URL) { await fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'register', name: profilAd, phone: profilTelefon, email: profilEmail }) }) } } catch (e) {}
-    setUser(yeniKullanici)
+    if (data.user) setUser(data.user)
     setProfilModu('giris')
     alert('Kaydın oluşturuldu, hoş geldin ' + profilAd)
   }
-  const girisYapForm = () => {
-    if (!profilTelefon) { alert('Lütfen telefon yaz'); return }
-    try {
-      const k = JSON.parse(localStorage.getItem('wafflia_kullanici') || 'null')
-      if (k && k.telefon === profilTelefon) {
-        setUser({ email: k.email, user_metadata: { full_name: k.ad } })
-        alert('Hoş geldin ' + k.ad)
-        return
-      }
-    } catch (e) {}
-    if (!profilAd) { alert('İlk kez giriyorsan adını da yaz, kaydını oluşturalım'); return }
-    kayitOl()
+  const girisYapForm = async () => {
+    if (!profilTelefon || !profilSifre) { alert('Lütfen telefon ve şifre yaz'); return }
+    const email = profilEmail || (profilTelefon.replace(/[^0-9]/g, '') + '@wafflia.local')
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: profilSifre })
+    if (error) { alert('Giriş olmadı: Telefon veya şifre yanlış'); return }
+    localStorage.setItem('wafflia_telefon', profilTelefon)
+    if (data.user) setUser(data.user)
+    alert('Hoş geldin ' + (data.user?.user_metadata?.full_name || ''))
   }
   const [hesapSilAcik, setHesapSilAcik] = useState(false)
   const [hesapSilindi, setHesapSilindi] = useState(false)
@@ -126,6 +137,7 @@ export default function Home() {
   const bugun = new Date().toISOString().slice(0, 10)
   const carkBugunCevrildi = typeof window !== 'undefined' && localStorage.getItem('wafflia_cark_tarih') === bugun
   const carkCevir = () => {
+    if (!user) { alert('Çarkı çevirmek ve indirim kazanmak için giriş yap'); setProfilModu('giris'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
     if (carkDonuyor || carkBugunCevrildi) return
     setCarkDonuyor(true)
     setCarkOdul('')
@@ -241,9 +253,9 @@ export default function Home() {
     }
   }
   const araToplam = sepet.reduce((t, u) => t + (u.birimFiyat || u.fiyat), 0)
-  const indirimOrani = siparisNo === 1 ? 0.25 : siparisNo === 5 ? 0.40 : 0
+  const indirimOrani = user ? (siparisNo === 1 ? 0.25 : siparisNo === 5 ? 0.40 : 0) : 0
   const indirimTutari = Math.round(araToplam * indirimOrani)
-  const puanIndirimi = puanKullan && puan >= 150 ? 400 : 0
+  const puanIndirimi = user && puanKullan && puan >= 150 ? 400 : 0
   const odenecek = Math.max(0, araToplam - indirimTutari - puanIndirimi)
   const aramali = URUNLER.filter((u) => u.ad.toLowerCase().includes(arama.toLowerCase()) || u.aciklama.toLowerCase().includes(arama.toLowerCase()))
   const gosterilecekKats = kat === 'Tümü' ? KATS.slice(1) : [kat]
@@ -345,6 +357,7 @@ export default function Home() {
           <div>
             <div style={{ background: 'white', borderRadius: '16px', padding: '18px', marginTop: '20px', textAlign: 'center', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
               <h2 style={{ fontSize: '20px', margin: '0 0 4px' }}>🎡 Çarkıfelek</h2>
+            {!user ? <p style={{ color: '#e11d48', fontSize: '13px', fontWeight: 'bold', margin: '0 0 8px' }}>Çark ve indirimler sadece giriş yapanlara • Giriş yapmadan sadece +10 puan kazanırsın</p> : null}
               <p style={{ color: '#666', fontSize: '13px', margin: '0 0 14px' }}>Günde 1 kere çevir, ödülünü kazan. {carkBugunCevrildi ? 'Bugünkü hakkını kullandın, yarın tekrar dene.' : 'Bugünkü hakkın duruyor.'}</p>
               <div style={{ width: '200px', height: '200px', margin: '0 auto', borderRadius: '50%', border: '6px solid #5b2c0e', overflow: 'hidden', transform: 'rotate(' + carkAci + 'deg)', transition: 'transform 1.8s ease-out', background: 'conic-gradient(#e11d48 0 45deg, #f59e0b 45deg 90deg, #16a34a 90deg 135deg, #5b2c0e 135deg 180deg, #e11d48 180deg 225deg, #f59e0b 225deg 270deg, #16a34a 270deg 315deg, #5b2c0e 315deg 360deg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ background: 'white', width: '70px', height: '70px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: '900', transform: 'rotate(-' + carkAci + 'deg)' }}>🎡</div>
@@ -417,9 +430,11 @@ export default function Home() {
                 <input value={profilAd} onChange={(e) => setProfilAd(e.target.value)} placeholder="Ad Soyad" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
                 <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Telefon</label>
                 <input value={profilTelefon} onChange={(e) => setProfilTelefon(e.target.value)} placeholder="05xx xxx xx xx" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
+                <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Şifre</label>
+                <input type="password" value={profilSifre} onChange={(e) => setProfilSifre(e.target.value)} placeholder="Şifreni yaz" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
                 {profilModu === 'kayit' ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>E-posta (isteğe bağlı)</label><input value={profilEmail} onChange={(e) => setProfilEmail(e.target.value)} placeholder="mail@ornek.com" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
                 {profilModu === 'giris' ? <button onClick={girisYapForm} style={{ width: '100%', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Giriş Yap</button> : <button onClick={kayitOl} style={{ width: '100%', background: '#b45309', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Kayıt Ol</button>}
-                <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '10px' }}>Kayıt olunca adın ve telefonun Google Tablolardaki üye listesine de eklenir.</p>
+                <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '10px' }}>Bilgilerin güvenle saklanır, tarayıcıyı silsen bile hesabın durur.</p>
               </div>
             )}
           </div>
@@ -431,8 +446,8 @@ export default function Home() {
         </div>
         <div style={{ background: 'white', borderRadius: '14px', padding: '12px', marginTop: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', fontSize: '13px' }}>
           <span style={{ fontWeight: 'bold' }}>⭐ Puanın: {puan} / 150</span>
-          <span style={{ background: '#fef3c7', padding: '5px 10px', borderRadius: '12px' }}>Bu senin {siparisNo}. siparişin {indirimOrani > 0 ? '• %' + (indirimOrani * 100) + ' indirim uygulanacak' : ''}</span>
-          {puan >= 150 ? <label style={{ cursor: 'pointer', fontWeight: 'bold', color: '#16a34a' }}><input type="checkbox" checked={puanKullan} onChange={(e) => setPuanKullan(e.target.checked)} /> 400 TL puan indirimi kullan</label> : <span style={{ color: '#888' }}>150 puana {150 - puan} puan kaldı</span>}
+          <span style={{ background: '#fef3c7', padding: '5px 10px', borderRadius: '12px' }}>{!user ? 'Giriş yapmadın, indirim uygulanmıyor • Sadece +10 puan kazanacaksın' : 'Bu senin ' + siparisNo + '. siparişin ' + (indirimOrani > 0 ? '• %' + (indirimOrani * 100) + ' indirim uygulanacak' : '')}</span>
+          {user && puan >= 150 ? <label style={{ cursor: 'pointer', fontWeight: 'bold', color: '#16a34a' }}><input type="checkbox" checked={puanKullan} onChange={(e) => setPuanKullan(e.target.checked)} /> 400 TL puan indirimi kullan</label> : <span style={{ color: '#888' }}>150 puana {150 - puan} puan kaldı</span>}
         </div>
         <div style={{ background: 'white', borderRadius: '16px', padding: '16px', marginTop: '24px' }}>
           <h3 style={{ margin: '0 0 10px' }}>ℹ️ Bilgilendirme</h3>
@@ -611,7 +626,7 @@ export default function Home() {
               </label>
             ))}
             <button onClick={siparisiTamamla} disabled={gonderiliyor} style={{ width: '100%', marginTop: '12px', background: '#16a34a', color: 'white', border: 'none', padding: '15px', borderRadius: '14px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>{gonderiliyor ? 'Gönderiliyor...' : 'Siparişi Onayla • ' + odenecek.toFixed(2) + ' TL'}</button>
-            <p style={{ fontSize: '11px', color: '#999', textAlign: 'center', marginTop: '8px' }}>Onaylayınca siparişin bize WhatsApp + Supabase tablosuna düşer.</p>
+            <p style={{ fontSize: '11px', color: '#999', textAlign: 'center', marginTop: '8px' }}>Onaylayınca siparişin bize hemen ulaşır.</p>
           </div>
         </div>
       )}
