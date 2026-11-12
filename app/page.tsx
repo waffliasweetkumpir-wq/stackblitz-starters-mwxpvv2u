@@ -152,6 +152,7 @@ export default function Home() {
     }, 1800)
   }
   const hesabiSil = async () => {
+    if (!user) { setHesapSilAcik(false); alert('Hesabın yok, silinecek bir hesap yok. Önce giriş yap.'); setProfilModu('giris'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
     try { await supabase.from('hesap_silme_talepleri').insert([{ email: user?.email || '', isim: isim, tarih: new Date().toISOString() }]) } catch (e) {}
     try { await supabase.auth.signOut() } catch (e) {}
     localStorage.removeItem('wafflia_puan')
@@ -491,9 +492,9 @@ export default function Home() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 70, padding: '20px' }}>
           <div style={{ background: 'white', borderRadius: '20px', padding: '24px', textAlign: 'center', maxWidth: '400px', width: '100%' }}>
             <div style={{ fontSize: '50px' }}>⚠️</div>
-            <h2 style={{ margin: '10px 0' }}>Hesabını silmek istiyor musun?</h2>
-            <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.6' }}>Hesabın ve puanların silinecek. Bu işlem geri alınamaz. Emin misin?</p>
-            <button onClick={hesabiSil} style={{ width: '100%', marginTop: '12px', background: '#e11d48', color: 'white', border: 'none', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Evet, Hesabımı Sil</button>
+            <h2 style={{ margin: '10px 0' }}>{!user ? 'Hesabın yok' : 'Hesabını silmek istiyor musun?'}</h2>
+            <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.6' }}>{!user ? 'Giriş yapmadın, silinecek bir hesabın yok. Önce giriş yap.' : 'Hesabın ve puanların silinecek. Bu işlem geri alınamaz. Emin misin?'}</p>
+            <button onClick={hesabiSil} style={{ width: '100%', marginTop: '12px', background: '#e11d48', color: 'white', border: 'none', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>{!user ? 'Giriş Yap' : 'Evet, Hesabımı Sil'}</button>
             <button onClick={() => setHesapSilAcik(false)} style={{ width: '100%', marginTop: '8px', background: 'white', border: '1px solid #ddd', padding: '13px', borderRadius: '12px', cursor: 'pointer' }}>Vazgeç</button>
           </div>
         </div>
