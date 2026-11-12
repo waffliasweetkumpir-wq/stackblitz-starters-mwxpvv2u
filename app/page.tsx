@@ -60,7 +60,7 @@ const URUNLER = [
   { id: 31, kat: 'Sufle', ad: 'Çikolatalı Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Akışkan çikolatalı sufle.', malzemeler: ['Sufle', 'Çikolata'] },
   { id: 32, kat: 'Sufle', ad: 'Beyaz Çikolatalı Tahinli Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Beyaz çikolata ve tahinli, akışkan sufle.', malzemeler: ['Sufle', 'Beyaz Çikolata', 'Tahin'] }
 ]
-const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwxyTX5CjlRnRJtuUYYAiZbjPldhS7m-112HbgkgI6PsigRGUWj3l_RxSY6JAI7V9hY/exec' // Buraya Google Apps Script Web App URLini yapistir, ornek: https://script.google.com/macros/s/XXXX/exec
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxA5VbOhwM0i5ee1smJddWnE9T1NNWYPcXdjKqva7JupSMyy-loEmmcroFW3yhhgZ0/exec' // Buraya Google Apps Script Web App URLini yapistir, ornek: https://script.google.com/macros/s/XXXX/exec
 const KATS = ['Tümü', 'Bowl Waffle', 'Kare Waffle', 'Kumpir', 'Künefe & Katmer', 'Sufle']
 const ONE_CIKAN = [5, 6, 16]
 const KAT_BILGI: Record<string, { emoji: string; aciklama: string }> = { 'Bowl Waffle': { emoji: '🧇', aciklama: 'Kasede bol malzemeli waffle' }, 'Kare Waffle': { emoji: '🧇', aciklama: 'Klasik kare waffle' }, 'Kumpir': { emoji: '🥔', aciklama: 'İstediğin malzemeyle kumpir' }, 'Künefe & Katmer': { emoji: '🍮', aciklama: 'Sıcak künefe ve çıtır katmer' }, 'Sufle': { emoji: '🍫', aciklama: 'Akışkan çikolatalı sufle' } }
@@ -127,11 +127,15 @@ export default function Home() {
   }
   const girisYapForm = async () => {
     if (!profilTelefon || !profilSifre) { alert('Lütfen telefon ve şifre yaz'); return }
-    const email = telefonNormalize(profilTelefon) + '@wafflia.local'
-    let { data, error } = await supabase.auth.signInWithPassword({ email, password: profilSifre })
-    if (error && profilEmail) {
-      const res2 = await supabase.auth.signInWithPassword({ email: profilEmail, password: profilSifre })
-      data = res2.data; error = res2.error
+    const ham = (profilTelefon || '').replace(/[^0-9]/g, '')
+    const norm = telefonNormalize(profilTelefon)
+    const adaylar = [norm + '@wafflia.local', ham + '@wafflia.local', (ham.startsWith('0') ? ham.slice(1) : '0' + ham) + '@wafflia.local', '90' + norm.replace(/^0/, '') + '@wafflia.local']
+    if (profilEmail) adaylar.push(profilEmail)
+    let data: any = null; let error: any = null
+    for (const aday of [...new Set(adaylar)]) {
+      const res = await supabase.auth.signInWithPassword({ email: aday, password: profilSifre })
+      if (!res.error) { data = res.data; error = null; break }
+      error = res.error
     }
     if (error) { alert('Giriş olmadı: Telefon veya şifre yanlış. Kayıt olurken yazdığın telefonla aynı numarayı yazdığından emin ol (ör: 0535...)'); return }
     localStorage.setItem('wafflia_telefon', profilTelefon)
