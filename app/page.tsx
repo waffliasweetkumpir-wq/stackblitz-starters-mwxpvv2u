@@ -1,51 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabase'
 const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyyV6bKeldbGPfLh0gyQIK9PjSiP_2kOfygnI0cHpKlKTvtwZJP5mwhhFje9vZ6AufY/exec'
-// Supabase yok, ek paket istemeyen basit sistem - Google + tarayici
-const supabase: any = {
-  auth: {
-    getSession: async () => {
-      try {
-        const u = JSON.parse(localStorage.getItem('wafflia_user') || 'null')
-        return { data: { session: u ? { user: u } : null } }
-      } catch (e) { return { data: { session: null } } }
-    },
-    signInWithPassword: async ({ email, password }: any) => {
-      try {
-        const res = await fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'login', email, password }) })
-      } catch (e) {}
-      const kayitli: any[] = JSON.parse(localStorage.getItem('wafflia_users') || '[]')
-      const bulunan = kayitli.find((u: any) => (u.email === email || u.telefon + '@wafflia.local' === email) && u.password === password)
-      if (bulunan) return { data: { user: bulunan }, error: null }
-      return { data: null, error: { message: 'Giris olmadi' } }
-    },
-    signUp: async ({ email, password, options }: any) => {
-      try {
-        await fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'register', email, password, ad: options?.data?.full_name || '', telefon: options?.data?.telefon || '' }) })
-      } catch (e) {}
-      const kayitli: any[] = JSON.parse(localStorage.getItem('wafflia_users') || '[]')
-      if (kayitli.find((u: any) => u.email === email)) return { data: null, error: { message: 'Bu e-posta zaten kayitli' } }
-      const yeni = { email, password, user_metadata: { full_name: options?.data?.full_name || '', telefon: options?.data?.telefon || '', real_email: options?.data?.real_email || '' } }
-      kayitli.push(yeni)
-      localStorage.setItem('wafflia_users', JSON.stringify(kayitli))
-      return { data: { user: yeni }, error: null }
-    },
-    signOut: async () => { localStorage.removeItem('wafflia_user'); return { error: null } }
-  },
-  from: (tablo: string) => ({
-    select: () => ({ eq: () => ({ order: () => ({ limit: async () => {
-      try {
-        const kayitli = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]')
-        return { data: kayitli, error: null }
-      } catch (e) { return { data: [], error: null } }
-    } }) }) }),
-    insert: async (rows: any[]) => {
-      try { await fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'order', ...rows[0] }) }) } catch (e) {}
-      return { error: null }
-    }
-  })
-}
-
 const EKSTRA_WAFFLE = [
   { ad: 'Sütlü Çikolata Sosu', fiyat: 72 },
   { ad: 'Frambuaz Sosu', fiyat: 72 },
