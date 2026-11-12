@@ -87,11 +87,16 @@ export default function Home() {
     let kayitli: any[] = []
     try { kayitli = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]') } catch (e) {}
     try {
-      const adayTeller = [profilTelefon, user?.user_metadata?.telefon, localStorage.getItem('wafflia_telefon') || ''].filter(Boolean)
-      const normTeller = [...new Set(adayTeller.flatMap((x: any) => {
+      const adayTeller: any[] = [profilTelefon, user?.user_metadata?.telefon, localStorage.getItem('wafflia_telefon') || ''].filter(Boolean)
+      const normSet: any = {}
+      for (const x of adayTeller) {
         const h = String(x).replace(/[^0-9]/g, '')
-        return [x, h, h.startsWith('0') ? h.slice(1) : '0' + h, '90' + h.replace(/^0/, '')]
-      }))]
+        normSet[x] = true
+        normSet[h] = true
+        normSet[h.startsWith('0') ? h.slice(1) : '0' + h] = true
+        normSet['90' + h.replace(/^0/, '')] = true
+      }
+      const normTeller = Object.keys(normSet)
       for (const tel of normTeller) {
         const { data } = await supabase.from('siparisler').select('*').eq('telefon', tel).order('created_at', { ascending: false }).limit(20)
         if (data && data.length) {
@@ -236,14 +241,15 @@ export default function Home() {
   }, [])
   useEffect(() => {
     if (!user) return
-    const tel = user?.user_metadata?.telefon || profilTelefon || localStorage.getItem('wafflia_telefon') || ''
+    const tel: any = user?.user_metadata?.telefon || profilTelefon || localStorage.getItem('wafflia_telefon') || ''
     if (!tel) return
     const ham = String(tel).replace(/[^0-9]/g, '')
-    const varyantlar = [...new Set([tel, ham, ham.startsWith('0') ? ham.slice(1) : '0' + ham])]
-    ;(async () => {
+    const varyantlar: any[] = [tel, ham, ham.startsWith('0') ? ham.slice(1) : '0' + ham]
+    const yukle = async () => {
       for (const v of varyantlar) {
         try {
-          const { data } = await supabase.from('siparisler').select('*').eq('telefon', v).order('created_at', { ascending: false }).limit(50)
+          const res: any = await supabase.from('siparisler').select('*').eq('telefon', v).order('created_at', { ascending: false }).limit(50)
+          const data = res.data
           if (data && data.length) {
             const toplamPuan = data.reduce((s: number, o: any) => s + (Number(o.puan_kazanilan) || 0), 0)
             setPuan(Math.max(0, toplamPuan))
@@ -252,7 +258,8 @@ export default function Home() {
           }
         } catch (e) {}
       }
-    })()
+    }
+    yukle()
   }, [user])
   const cikisYap = async () => {
     await supabase.auth.signOut()
