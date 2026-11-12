@@ -347,12 +347,6 @@ export default function Home() {
               <button onClick={cikisYap} style={{ border: '1px solid #ddd', background: 'white', padding: '7px 14px', borderRadius: '20px', cursor: 'pointer' }}>Çıkış Yap</button><button onClick={() => setHesapSilAcik(true)} style={{ border: '1px solid #fecaca', background: '#fef2f2', color: '#e11d48', padding: '7px 14px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>Hesabımı Sil</button>
             </div>
           ) : null}
-          {!user ? (
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '12px' }}>
-              <button onClick={() => { setProfilModu('giris'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: 'white', color: '#5b2c0e', padding: '11px 22px', borderRadius: '12px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer', border: 'none' }}>Giriş Yap</button>
-              <button onClick={() => { setProfilModu('kayit'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: '#b45309', color: 'white', padding: '11px 22px', borderRadius: '12px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer', border: 'none' }}>Kayıt Ol</button>
-            </div>
-          ) : null}
           <button onClick={() => { setSayfa('menu'); setKat('Tümü'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: '#b45309', color: 'white', padding: '13px 28px', borderRadius: '12px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>Menüyü Gör →</button>
         </div>
       </div>
@@ -361,15 +355,26 @@ export default function Home() {
           <div>
             <div style={{ background: 'white', borderRadius: '16px', padding: '18px', marginTop: '20px', textAlign: 'center', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
               <h2 style={{ fontSize: '20px', margin: '0 0 4px' }}>🎡 Çarkıfelek</h2>
-            {!user ? <p style={{ color: '#e11d48', fontSize: '13px', fontWeight: 'bold', margin: '0 0 8px' }}>Çark ve indirimler sadece giriş yapanlara • Giriş yapmadan sadece +10 puan kazanırsın</p> : null}
-              <p style={{ color: '#666', fontSize: '13px', margin: '0 0 14px' }}>Günde 1 kere çevir, ödülünü kazan. {carkBugunCevrildi ? 'Bugünkü hakkını kullandın, yarın tekrar dene.' : 'Bugünkü hakkın duruyor.'}</p>
-              <div style={{ width: '200px', height: '200px', margin: '0 auto', borderRadius: '50%', border: '6px solid #5b2c0e', overflow: 'hidden', transform: 'rotate(' + carkAci + 'deg)', transition: 'transform 1.8s ease-out', background: 'conic-gradient(#e11d48 0 45deg, #f59e0b 45deg 90deg, #16a34a 90deg 135deg, #5b2c0e 135deg 180deg, #e11d48 180deg 225deg, #f59e0b 225deg 270deg, #16a34a 270deg 315deg, #5b2c0e 315deg 360deg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ background: 'white', width: '70px', height: '70px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: '900', transform: 'rotate(-' + carkAci + 'deg)' }}>🎡</div>
-              </div>
-              <div style={{ fontSize: '20px', marginTop: '8px' }}>▼</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', marginTop: '8px' }}>{CARK_ODULLER.map((o) => (<span key={o} style={{ background: '#fff7ee', border: '1px solid #eee', padding: '5px 10px', borderRadius: '16px', fontSize: '12px', fontWeight: 'bold' }}>{o}</span>))}</div>
-              <button onClick={carkCevir} disabled={carkDonuyor || carkBugunCevrildi} style={{ marginTop: '14px', background: carkBugunCevrildi ? '#ddd' : '#e11d48', color: 'white', border: 'none', padding: '13px 28px', borderRadius: '12px', fontWeight: 'bold', fontSize: '16px', cursor: carkBugunCevrildi ? 'not-allowed' : 'pointer' }}>{carkDonuyor ? 'Çark Dönüyor...' : carkBugunCevrildi ? 'Bugünkü Hakkın Bitti' : 'Çarkı Çevir'}</button>
-              {carkOdul ? <div style={{ marginTop: '12px', background: '#dcfce7', padding: '12px', borderRadius: '12px', fontWeight: 'bold', color: '#166534' }}>🎉 Kazandın: {carkOdul} {carkOdul.includes('İndirim') ? '• Sipariş notuna yazman yeterli.' : carkOdul.includes('Puan') ? '• Puanın siparişinde eklenecek.' : ''}</div> : null}
+              {!user ? (
+                <div>
+                  <p style={{ color: '#e11d48', fontSize: '14px', fontWeight: 'bold', margin: '8px 0' }}>Çarkıfelek sadece üyelere</p>
+                  <p style={{ color: '#666', fontSize: '13px', margin: '0 0 14px' }}>Çarkı çevirmek ve indirim kazanmak için giriş yap ya da üye ol.</p>
+                  <div style={{ fontSize: '48px', opacity: 0.3 }}>🎡🔒</div>
+                  <button onClick={() => { setProfilModu('giris'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ marginTop: '14px', background: '#5b2c0e', color: 'white', border: 'none', padding: '13px 28px', borderRadius: '12px', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>Giriş Yap</button>
+                  <button onClick={() => { setProfilModu('kayit'); setSayfa('profil'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ marginTop: '8px', background: 'white', color: '#5b2c0e', border: '1px solid #5b2c0e', padding: '12px 28px', borderRadius: '12px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}>Üye Ol</button>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ color: '#666', fontSize: '13px', margin: '0 0 14px' }}>Günde 1 kere çevir, ödülünü kazan. {carkBugunCevrildi ? 'Bugünkü hakkını kullandın, yarın tekrar dene.' : 'Bugünkü hakkın duruyor.'}</p>
+                  <div style={{ width: '200px', height: '200px', margin: '0 auto', borderRadius: '50%', border: '6px solid #5b2c0e', overflow: 'hidden', transform: 'rotate(' + carkAci + 'deg)', transition: 'transform 1.8s ease-out', background: 'conic-gradient(#e11d48 0 45deg, #f59e0b 45deg 90deg, #16a34a 90deg 135deg, #5b2c0e 135deg 180deg, #e11d48 180deg 225deg, #f59e0b 225deg 270deg, #16a34a 270deg 315deg, #5b2c0e 315deg 360deg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ background: 'white', width: '70px', height: '70px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: '900', transform: 'rotate(-' + carkAci + 'deg)' }}>🎡</div>
+                  </div>
+                  <div style={{ fontSize: '20px', marginTop: '8px' }}>▼</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', marginTop: '8px' }}>{CARK_ODULLER.map((o) => (<span key={o} style={{ background: '#fff7ee', border: '1px solid #eee', padding: '5px 10px', borderRadius: '16px', fontSize: '12px', fontWeight: 'bold' }}>{o}</span>))}</div>
+                  <button onClick={carkCevir} disabled={carkDonuyor || carkBugunCevrildi} style={{ marginTop: '14px', background: carkBugunCevrildi ? '#ddd' : '#e11d48', color: 'white', border: 'none', padding: '13px 28px', borderRadius: '12px', fontWeight: 'bold', fontSize: '16px', cursor: carkBugunCevrildi ? 'not-allowed' : 'pointer' }}>{carkDonuyor ? 'Çark Dönüyor...' : carkBugunCevrildi ? 'Bugünkü Hakkın Bitti' : 'Çarkı Çevir'}</button>
+                  {carkOdul ? <div style={{ marginTop: '12px', background: '#dcfce7', padding: '12px', borderRadius: '12px', fontWeight: 'bold', color: '#166534' }}>🎉 Kazandın: {carkOdul} {carkOdul.includes('İndirim') ? '• Sipariş notuna yazman yeterli.' : carkOdul.includes('Puan') ? '• Puanın siparişinde eklenecek.' : ''}</div> : null}
+                </div>
+              )}
             </div>
             <h2 style={{ fontSize: '22px', margin: '20px 4px 10px' }}>Menüler</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '14px' }}>
@@ -472,7 +477,8 @@ export default function Home() {
             </div>
           ))}
           <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid #eee', textAlign: 'center' }}>
-            <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#16a34a' }}>🔒 SSL ile Güvenli Bağlantı • Bilgileriniz şifrelenerek iletilir</div>
+            <button onClick={() => setHesapSilAcik(true)} style={{ width: '100%', background: '#fef2f2', border: '1px solid #fecaca', color: '#e11d48', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Hesabımı Sil</button>
+            <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#16a34a', marginTop: '12px' }}>🔒 SSL ile Güvenli Bağlantı • Bilgileriniz şifrelenerek iletilir</div>
             <div style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>💳 Kapıda Nakit • 💳 Kapıda Kredi Kartı • Fiyatlara KDV dahildir</div>
             <div style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>WaffLia Sweet Kumpir • İstanbul • Telefon / WhatsApp: 0535 273 28 65 • Instagram: @wafflia</div>
             <div style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>Her gün 17:00 - 05:00 • Ortalama teslimat 30-45 dakika</div>
