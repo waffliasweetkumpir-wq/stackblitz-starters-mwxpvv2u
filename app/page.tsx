@@ -87,12 +87,21 @@ export default function Home() {
     let kayitli: any[] = []
     try { kayitli = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]') } catch (e) {}
     try {
-      const tel = profilTelefon || localStorage.getItem('wafflia_telefon') || ''
-      if (tel) {
+      const adayTeller = [profilTelefon, user?.user_metadata?.telefon, localStorage.getItem('wafflia_telefon') || ''].filter(Boolean)
+      const normTeller = [...new Set(adayTeller.flatMap((x: any) => {
+        const h = String(x).replace(/[^0-9]/g, '')
+        return [x, h, h.startsWith('0') ? h.slice(1) : '0' + h, '90' + h.replace(/^0/, '')]
+      }))]
+      for (const tel of normTeller) {
         const { data } = await supabase.from('siparisler').select('*').eq('telefon', tel).order('created_at', { ascending: false }).limit(20)
         if (data && data.length) {
           const supaOrders = data.map((o: any) => ({ tarih: o.created_at ? new Date(o.created_at).toLocaleString('tr-TR') : '', ad: o.musteri_adi || '', telefon: o.telefon || '', adres: o.adres || '', urunler: o.urunler || '', odenecek: o.odenecek || '', odeme: o.odeme || '', puan: o.puan_kazanilan || 10 }))
           kayitli = supaOrders
+          // Supabase'den puan ve siparis sayisini da guncelle - tarayici silinse bile kalsin
+          const toplamPuan = data.reduce((s: number, o: any) => s + (Number(o.puan_kazanilan) || 0), 0)
+          setPuan(Math.max(0, toplamPuan))
+          setSiparisSayisi(data.length)
+          break
         }
       }
     } catch (e) {}
@@ -112,7 +121,8 @@ export default function Home() {
   }
   const kayitOl = async () => {
     if (!profilAd || !profilTelefon || !profilSifre) { alert('Lütfen ad, telefon ve şifre yaz'); return }
-    const email = telefonNormalize(profilTelefon) + '@wafflia.local'
+    if (!profilEmail || !profilEmail.includes('@')) { alert('Lütfen geçerli bir e-posta yaz, tarayıcıyı silsen bile hesabına bu e-postayla gireceksin'); return }
+    const email = profilEmail.trim().toLowerCase()
     const { data, error } = await supabase.auth.signUp({ email, password: profilSifre, options: { data: { full_name: profilAd, telefon: telefonNormalize(profilTelefon), real_email: profilEmail || '' } } })
     if (error) {
       if (error.message && error.message.toLowerCase().includes('already')) { alert('Bu telefon zaten kayıtlı, giriş yap'); setProfilModu('giris'); return }
@@ -127,10 +137,10 @@ export default function Home() {
   }
   const girisYapForm = async () => {
     if (!profilTelefon || !profilSifre) { alert('Lütfen telefon ve şifre yaz'); return }
+    if (!profilEmail || !profilEmail.includes('@')) { alert('Giriş için e-postanı yaz. Tarayıcıyı silsen bile hesabına e-postanla gireceksin.'); return }
     const ham = (profilTelefon || '').replace(/[^0-9]/g, '')
     const norm = telefonNormalize(profilTelefon)
-    const adaylar = [norm + '@wafflia.local', ham + '@wafflia.local', (ham.startsWith('0') ? ham.slice(1) : '0' + ham) + '@wafflia.local', '90' + norm.replace(/^0/, '') + '@wafflia.local']
-    if (profilEmail) adaylar.push(profilEmail)
+    const adaylar = [profilEmail.trim().toLowerCase(), norm + '@wafflia.local', ham + '@wafflia.local', (ham.startsWith('0') ? ham.slice(1) : '0' + ham) + '@wafflia.local', '90' + norm.replace(/^0/, '') + '@wafflia.local']
     let data: any = null; let error: any = null
     for (const aday of [...new Set(adaylar)]) {
       const res = await supabase.auth.signInWithPassword({ email: aday, password: profilSifre })
@@ -224,6 +234,26 @@ export default function Home() {
     if (kayitliPuan) setPuan(parseInt(kayitliPuan))
     if (kayitliSiparis) setSiparisSayisi(parseInt(kayitliSiparis))
   }, [])
+  useEffect(() => {
+    if (!user) return
+    const tel = user?.user_metadata?.telefon || profilTelefon || localStorage.getItem('wafflia_telefon') || ''
+    if (!tel) return
+    const ham = String(tel).replace(/[^0-9]/g, '')
+    const varyantlar = [...new Set([tel, ham, ham.startsWith('0') ? ham.slice(1) : '0' + ham])]
+    ;(async () => {
+      for (const v of varyantlar) {
+        try {
+          const { data } = await supabase.from('siparisler').select('*').eq('telefon', v).order('created_at', { ascending: false }).limit(50)
+          if (data && data.length) {
+            const toplamPuan = data.reduce((s: number, o: any) => s + (Number(o.puan_kazanilan) || 0), 0)
+            setPuan(Math.max(0, toplamPuan))
+            setSiparisSayisi(data.length)
+            break
+          }
+        } catch (e) {}
+      }
+    })()
+  }, [user])
   const cikisYap = async () => {
     await supabase.auth.signOut()
     setUser(null)
@@ -285,7 +315,7 @@ export default function Home() {
     const notlar = [kapiyaBirak ? 'Kapıya Bırak' : '', zileBasma ? 'Zile Basma' : '', siparisNotu].filter(Boolean).join(' - ')
     const urunOzeti = sepet.map((s) => s.ad + ' (' + (s.birimFiyat || s.fiyat) + ' TL)' + (s.kumpirMalzemeler && s.kumpirMalzemeler.length ? ' [' + s.kumpirMalzemeler.join(', ') + ']' : '') + (s.ekstralar && s.ekstralar.length ? ' +Ekstra: ' + s.ekstralar.map((e: any) => e.ad).join(', ') : '') + (s.cikartilan && s.cikartilan.length ? ' -Cikar: ' + s.cikartilan.join(', ') : '')).join('\n')
     try {
-      await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon, adres, not_text: notlar, teslimat: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: 10 }])
+      await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon, adres, not_text: notlar, teslimat: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek, puan_kazanilan: puanKullan ? -140 : 10 }])
     } catch (e) {}
     try {
       if (GOOGLE_SHEETS_URL) {
@@ -456,7 +486,7 @@ export default function Home() {
                 <input value={profilTelefon} onChange={(e) => setProfilTelefon(e.target.value)} placeholder="05xx xxx xx xx" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
                 <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Şifre</label>
                 <input type="password" value={profilSifre} onChange={(e) => setProfilSifre(e.target.value)} placeholder="Şifreni yaz" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
-                {true ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>E-posta (kayıtta kullandıysan, yoksa boş bırak)</label><input value={profilEmail} onChange={(e) => setProfilEmail(e.target.value)} placeholder="mail@ornek.com" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
+                {true ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>E-posta * (hesabın buna bağlı, tarayıcıyı silsen bile bununla gireceksin)</label><input value={profilEmail} onChange={(e) => setProfilEmail(e.target.value)} placeholder="mail@ornek.com" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
                 {profilModu === 'giris' ? <button onClick={girisYapForm} style={{ width: '100%', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Giriş Yap</button> : <button onClick={kayitOl} style={{ width: '100%', background: '#b45309', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Kayıt Ol</button>}
                 <button onClick={() => setHesapSilAcik(true)} style={{ width: '100%', background: '#fef2f2', border: '1px solid #fecaca', color: '#e11d48', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>Hesabımı Sil</button>
                 <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '10px' }}>Bilgilerin güvenle saklanır, tarayıcıyı silsen bile hesabın durur.</p>
