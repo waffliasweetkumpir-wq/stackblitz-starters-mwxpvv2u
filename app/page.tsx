@@ -60,7 +60,7 @@ const URUNLER = [
   { id: 31, kat: 'Sufle', ad: 'Çikolatalı Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Akışkan çikolatalı sufle.', malzemeler: ['Sufle', 'Çikolata'] },
   { id: 32, kat: 'Sufle', ad: 'Beyaz Çikolatalı Tahinli Sufle', fiyat: 380, populer: false, begeni: '', aciklama: 'Beyaz çikolata ve tahinli, akışkan sufle.', malzemeler: ['Sufle', 'Beyaz Çikolata', 'Tahin'] }
 ]
-const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxA5VbOhwM0i5ee1smJddWnE9T1NNWYPcXdjKqva7JupSMyy-loEmmcroFW3yhhgZ0/exec' // Buraya Google Apps Script Web App URLini yapistir, ornek: https://script.google.com/macros/s/XXXX/exec
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwxyTX5CjlRnRJtuUYYAiZbjPldhS7m-112HbgkgI6PsigRGUWj3l_RxSY6JAI7V9hY/exec' // Buraya Google Apps Script Web App URLini yapistir, ornek: https://script.google.com/macros/s/XXXX/exec
 const KATS = ['Tümü', 'Bowl Waffle', 'Kare Waffle', 'Kumpir', 'Künefe & Katmer', 'Sufle']
 const ONE_CIKAN = [5, 6, 16]
 const KAT_BILGI: Record<string, { emoji: string; aciklama: string }> = { 'Bowl Waffle': { emoji: '🧇', aciklama: 'Kasede bol malzemeli waffle' }, 'Kare Waffle': { emoji: '🧇', aciklama: 'Klasik kare waffle' }, 'Kumpir': { emoji: '🥔', aciklama: 'İstediğin malzemeyle kumpir' }, 'Künefe & Katmer': { emoji: '🍮', aciklama: 'Sıcak künefe ve çıtır katmer' }, 'Sufle': { emoji: '🍫', aciklama: 'Akışkan çikolatalı sufle' } }
@@ -104,10 +104,16 @@ export default function Home() {
   const [profilTelefon, setProfilTelefon] = useState('')
   const [profilEmail, setProfilEmail] = useState('')
   const [profilSifre, setProfilSifre] = useState('')
+  const telefonNormalize = (tel: string) => {
+    let d = (tel || '').replace(/[^0-9]/g, '')
+    if (d.length === 12 && d.startsWith('90')) d = d.slice(2)
+    if (d.length === 10) d = '0' + d
+    return d
+  }
   const kayitOl = async () => {
     if (!profilAd || !profilTelefon || !profilSifre) { alert('Lütfen ad, telefon ve şifre yaz'); return }
-    const email = profilEmail || (profilTelefon.replace(/[^0-9]/g, '') + '@wafflia.local')
-    const { data, error } = await supabase.auth.signUp({ email, password: profilSifre, options: { data: { full_name: profilAd, telefon: profilTelefon } } })
+    const email = telefonNormalize(profilTelefon) + '@wafflia.local'
+    const { data, error } = await supabase.auth.signUp({ email, password: profilSifre, options: { data: { full_name: profilAd, telefon: telefonNormalize(profilTelefon), real_email: profilEmail || '' } } })
     if (error) {
       if (error.message && error.message.toLowerCase().includes('already')) { alert('Bu telefon zaten kayıtlı, giriş yap'); setProfilModu('giris'); return }
       alert('Kayıt olmadı: ' + error.message)
@@ -121,9 +127,13 @@ export default function Home() {
   }
   const girisYapForm = async () => {
     if (!profilTelefon || !profilSifre) { alert('Lütfen telefon ve şifre yaz'); return }
-    const email = profilEmail || (profilTelefon.replace(/[^0-9]/g, '') + '@wafflia.local')
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password: profilSifre })
-    if (error) { alert('Giriş olmadı: Telefon veya şifre yanlış'); return }
+    const email = telefonNormalize(profilTelefon) + '@wafflia.local'
+    let { data, error } = await supabase.auth.signInWithPassword({ email, password: profilSifre })
+    if (error && profilEmail) {
+      const res2 = await supabase.auth.signInWithPassword({ email: profilEmail, password: profilSifre })
+      data = res2.data; error = res2.error
+    }
+    if (error) { alert('Giriş olmadı: Telefon veya şifre yanlış. Kayıt olurken yazdığın telefonla aynı numarayı yazdığından emin ol (ör: 0535...)'); return }
     localStorage.setItem('wafflia_telefon', profilTelefon)
     if (data.user) setUser(data.user)
     alert('Hoş geldin ' + (data.user?.user_metadata?.full_name || ''))
@@ -442,7 +452,7 @@ export default function Home() {
                 <input value={profilTelefon} onChange={(e) => setProfilTelefon(e.target.value)} placeholder="05xx xxx xx xx" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
                 <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Şifre</label>
                 <input type="password" value={profilSifre} onChange={(e) => setProfilSifre(e.target.value)} placeholder="Şifreni yaz" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
-                {profilModu === 'kayit' ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>E-posta (isteğe bağlı)</label><input value={profilEmail} onChange={(e) => setProfilEmail(e.target.value)} placeholder="mail@ornek.com" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
+                {true ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>E-posta (kayıtta kullandıysan, yoksa boş bırak)</label><input value={profilEmail} onChange={(e) => setProfilEmail(e.target.value)} placeholder="mail@ornek.com" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
                 {profilModu === 'giris' ? <button onClick={girisYapForm} style={{ width: '100%', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Giriş Yap</button> : <button onClick={kayitOl} style={{ width: '100%', background: '#b45309', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Kayıt Ol</button>}
                 <button onClick={() => setHesapSilAcik(true)} style={{ width: '100%', background: '#fef2f2', border: '1px solid #fecaca', color: '#e11d48', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>Hesabımı Sil</button>
                 <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '10px' }}>Bilgilerin güvenle saklanır, tarayıcıyı silsen bile hesabın durur.</p>
