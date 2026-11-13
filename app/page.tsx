@@ -146,7 +146,7 @@ export default function Home() {
     const norm = telefonNormalize(profilTelefon)
     const adaylar = [profilEmail.trim().toLowerCase(), norm + '@wafflia.local', ham + '@wafflia.local', (ham.startsWith('0') ? ham.slice(1) : '0' + ham) + '@wafflia.local', '90' + norm.replace(/^0/, '') + '@wafflia.local']
     let data: any = null; let error: any = null
-    for (const aday of [...new Set(adaylar)]) {
+    for (const aday of adaylar.filter((v: any, i: number, a: any[]) => a.indexOf(v) === i)) {
       const res = await supabase.auth.signInWithPassword({ email: aday, password: profilSifre })
       if (!res.error) { data = res.data; error = null; break }
       error = res.error
