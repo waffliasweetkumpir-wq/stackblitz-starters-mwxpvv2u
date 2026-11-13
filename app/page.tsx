@@ -472,7 +472,7 @@ export default function Home() {
               <button onClick={() => { gecmisiGetir(); setMenuAcik(false) }} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', borderBottom: '1px solid #F1EFE9', padding: '16px 4px', fontSize: '16px', fontWeight: '700', color: '#FF2E7A', cursor: 'pointer', textAlign: 'left', width: '100%' }}><span style={{ background: '#FFF5F2', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>📦</span>Siparişlerim<span style={{ marginLeft: 'auto' }}>›</span></button>
             </div>
             <div style={{ marginTop: '20px', background: '#FF2E7A', borderRadius: '14px', padding: '16px', textAlign: 'center' }}>
-              <div style={{ color: '#FF7A00', fontWeight: '900', fontSize: '16px' }}>17:00 - 05:00 • İstanbul</div>
+              <div style={{ color: '#FF7A00', fontWeight: '900', fontSize: '16px' }}>14:00 - 02:00 • İstanbul</div>
               <div style={{ color: 'white', fontSize: '13px', marginTop: '6px' }}>30-45 dk teslimat • 0535 273 28 65</div>
             </div>
           </div>
@@ -482,7 +482,7 @@ export default function Home() {
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '56px', lineHeight: '1.1' }}>🧇 🥔</div>
           <h1 style={{ fontSize: '30px', lineHeight: '1.15', margin: '10px 0', fontWeight: '900' }}>Ne canın çekiyor?</h1>
-          <p style={{ color: '#FF7A00', fontSize: '14px', margin: '0 0 14px' }}>Menüden birini seç, ürünler gelsin. 17:00 - 05:00 • İstanbul</p>
+          <p style={{ color: '#FF7A00', fontSize: '14px', margin: '0 0 14px' }}>Menüden birini seç, ürünler gelsin. 14:00 - 02:00 • İstanbul</p>
           {user ? (
             <div style={{ background: 'white', color: '#FF2E7A', borderRadius: '14px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '13px', textAlign: 'left' }}>Hoş geldin, <b>{isim}!</b> 👋 • ⭐ {puan} Puan {siparisSayisi > 0 ? '• ' + siparisSayisi + ' sipariş verdin' : '• Henüz siparişin yok'}</span>
@@ -621,8 +621,8 @@ export default function Home() {
             { id: 'mesafeli', baslik: '📄 Mesafeli Satış Sözleşmesi', icerik: 'Satıcı: WaffLia Sweet Kumpir - İstanbul. Alıcı: sipariş formunda bilgileri bulunan kişi. Ürünler: menüde listelenen gıda ürünleri. Fiyatlar: menüde yazan fiyatlar KDV dahildir, teslimat ücreti ayrıca alınmaz. Ödeme: kapıda nakit veya kapıda kredi kartı ile yapılır. Teslimat: sipariş onaylandıktan sonra ortalama 30-45 dakika içinde belirtilen adrese yapılır. Siparişi onayladığınızda bu sözleşmeyi kabul etmiş sayılırsınız.' },
             { id: 'cerez', baslik: '🍪 Çerez Politikası', icerik: 'Sitemiz, sepetinizin ve puanınızın kaybolmaması için cihazınızda küçük çerezler / yerel depolama kullanır. Bu bilgiler yalnızca sitedeki deneyiminizi iyileştirmek içindir. Reklam takibi yapılmaz, bilgileriniz reklam amacıyla satılmaz. Tarayıcınızdan çerezleri silebilirsiniz, bu durumda sepetiniz sıfırlanabilir.' },
             { id: 'iade', baslik: '↩️ İade & İptal', icerik: 'Gıda ürünleri hijyen gereği iade edilemez. Siparişiniz henüz hazırlanmadıysa iptal için hemen 0535 273 28 65 numarasından WhatsApp ile bize ulaşın. Yanlış / eksik ürün gelirse 30 dakika içinde ürünün fotoğrafı ile bize ulaşmanız halinde ürününüz yeniden gönderilir veya ücretiniz iade edilir.' },
-            { id: 'kargo', baslik: '🛵 Teslimat & Çalışma Saatleri', icerik: 'Her gün 17:00 - 05:00 arası açığız. Ortalama teslimat 30-45 dakikadır.' },
-            { id: 'iletisim', baslik: '📞 İletişim', icerik: 'Telefon / WhatsApp: 0535 273 28 65 • İstanbul • Instagram: @wafflia • Her gün 17:00 - 05:00' },
+            { id: 'kargo', baslik: '🛵 Teslimat & Çalışma Saatleri', icerik: 'Her gün 14:00 - 02:00 arası açığız. Ortalama teslimat 30-45 dakikadır.' },
+            { id: 'iletisim', baslik: '📞 İletişim', icerik: 'Telefon / WhatsApp: 0535 273 28 65 • İstanbul • Instagram: @wafflia • Her gün 14:00 - 02:00' },
           ].map((b) => (
             <div key={b.id} style={{ borderBottom: '1px solid #eee' }}>
               <button onClick={() => setFooterAcik(footerAcik === b.id ? '' : b.id)} style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: '12px 0', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}>{b.baslik} <span>{footerAcik === b.id ? '▲' : '▼'}</span></button>
@@ -634,7 +634,7 @@ export default function Home() {
             <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#16a34a', marginTop: '12px' }}>🔒 SSL ile Güvenli Bağlantı • Bilgileriniz şifrelenerek iletilir</div>
             <div style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>💳 Kapıda Nakit • 💳 Kapıda Kredi Kartı • Fiyatlara KDV dahildir</div>
             <div style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>WaffLia Sweet Kumpir • İstanbul • Telefon / WhatsApp: 0535 273 28 65 • Instagram: @wafflia</div>
-            <div style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>Her gün 17:00 - 05:00 • Ortalama teslimat 30-45 dakika</div>
+            <div style={{ fontSize: '12px', color: '#666', marginTop: '6px' }}>Her gün 14:00 - 02:00 • Ortalama teslimat 30-45 dakika</div>
           </div>
           <p style={{ fontSize: '11px', color: '#999', marginTop: '12px', textAlign: 'center' }}>© 2026 WaffLia Sweet Kumpir • Tüm hakları saklıdır • Fiyatlara KDV dahildir</p>
         </div>
