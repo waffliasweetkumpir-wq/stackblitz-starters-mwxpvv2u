@@ -80,47 +80,43 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [kat, setKat] = useState('Tümü')
   const [sayfa, setSayfa] = useState<'anasayfa' | 'menu' | 'profil'>('anasayfa')
-  const [menuAcik, setMenuAcik] = useState(false)
+
   const [gecmisAcik, setGecmisAcik] = useState(false)
   const [gecmisSiparisler, setGecmisSiparisler] = useState<any[]>([])
-  const gecmisiGetir = async () => {
-    let kayitli: any[] = []
+  const [gecmisYukleniyor, setGecmisYukleniyor] = useState(false)
+  const gecmisiGetir = () => {
+    // 1. ONCE ANINDA AC - telefondaki listeyi hemen goster, Supabase'i bekleme
+    let yerel: any[] = []
     try {
       const hamListe = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]')
       const buTel = (user?.user_metadata?.telefon || '').replace(/[^0-9]/g, '')
       const oturumTel = (() => { try { return (JSON.parse(localStorage.getItem('wafflia_oturum') || 'null')?.telefon || '').replace(/[^0-9]/g, '') } catch (e) { return '' } })()
       const gecerliTeller = [buTel, oturumTel].filter(Boolean)
-      kayitli = gecerliTeller.length ? hamListe.filter((s: any) => { const t = String(s.telefon || '').replace(/[^0-9]/g, ''); return gecerliTeller.includes(t) || gecerliTeller.some((g: string) => t.endsWith(g.slice(-10)) || g.endsWith(t.slice(-10))) }) : []
+      yerel = gecerliTeller.length ? hamListe.filter((s: any) => { const t = String(s.telefon || '').replace(/[^0-9]/g, ''); return gecerliTeller.includes(t) || gecerliTeller.some((g: string) => t.endsWith(g.slice(-10)) || g.endsWith(t.slice(-10))) }) : []
     } catch (e) {}
-    try {
-      const mevcutEmail = (user?.email || profilEmail || '').trim().toLowerCase()
-      const kayitliOturum: any = (() => { try { return JSON.parse(localStorage.getItem('wafflia_oturum') || 'null') } catch (e) { return null } })()
-      const buHesabinTelefonu = user?.user_metadata?.telefon || kayitliOturum?.telefon || ''
-      const adayTeller: any[] = [buHesabinTelefonu, profilTelefon].filter(Boolean)
-      const normSet: any = {}
-      for (const x of adayTeller) {
-        const h = String(x).replace(/[^0-9]/g, '')
-        normSet[x] = true
-        normSet[h] = true
-        normSet[h.startsWith('0') ? h.slice(1) : '0' + h] = true
-        normSet['90' + h.replace(/^0/, '')] = true
-      }
-      const normTeller = Object.keys(normSet)
-      for (const tel of normTeller) {
-        const { data } = await supabase.from('siparisler').select('*').eq('telefon', tel).order('created_at', { ascending: false }).limit(20)
+    setGecmisSiparisler(yerel)
+    setGecmisAcik(true)
+    // 2. SONRA ARKADA GUNCELLE - tek sorgu, 8 kere degil 1 kere sor
+    setGecmisYukleniyor(true)
+    ;(async () => {
+      try {
+        const kayitliOturum: any = (() => { try { return JSON.parse(localStorage.getItem('wafflia_oturum') || 'null') } catch (e) { return null } })()
+        const buHesabinTelefonu = user?.user_metadata?.telefon || kayitliOturum?.telefon || profilTelefon || ''
+        if (!buHesabinTelefonu) { setGecmisYukleniyor(false); return }
+        const h = String(buHesabinTelefonu).replace(/[^0-9]/g, '')
+        const varyantlar = [buHesabinTelefonu, h, h.startsWith('0') ? h.slice(1) : '0' + h, '90' + h.replace(/^0/, '')]
+        const tekil = varyantlar.filter((v: any, i: number, a: any[]) => a.indexOf(v) === i)
+        const { data } = await supabase.from('siparisler').select('*').in('telefon', tekil).order('created_at', { ascending: false }).limit(20)
         if (data && data.length) {
           const supaOrders = data.map((o: any) => ({ tarih: o.created_at ? new Date(o.created_at).toLocaleString('tr-TR') : '', ad: o.musteri_adi || '', telefon: o.telefon || '', adres: o.adres || '', urunler: o.urunler || '', odenecek: o.odenecek || '', odeme: o.odeme || '', puan: o.puan_kazanilan || 10 }))
-          kayitli = supaOrders
-          // Supabase'den puan ve siparis sayisini da guncelle - tarayici silinse bile kalsin
+          setGecmisSiparisler(supaOrders)
           const toplamPuan = data.reduce((s: number, o: any) => s + (Number(o.puan_kazanilan) || 0), 0)
           setPuan(Math.max(0, toplamPuan))
           setSiparisSayisi(data.length)
-          break
         }
-      }
-    } catch (e) {}
-    setGecmisSiparisler(kayitli)
-    setGecmisAcik(true)
+      } catch (e) {}
+      setGecmisYukleniyor(false)
+    })()
   }
   const [profilModu, setProfilModu] = useState<'giris' | 'kayit'>('giris')
   const [profilAd, setProfilAd] = useState('')
@@ -439,7 +435,6 @@ export default function Home() {
     <div style={{ fontFamily: 'sans-serif', background: '#FFFBF0', minHeight: '100vh', paddingBottom: '170px' }}>
       <div style={{ background: 'white', padding: '10px 12px 0', position: 'sticky', top: 0, zIndex: 40, boxShadow: '0 1px 8px rgba(10,35,82,0.08)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', maxWidth: '1200px', margin: '0 auto' }}>
-          <button onClick={() => setMenuAcik(true)} style={{ background: 'none', border: 'none', fontSize: '26px', cursor: 'pointer', color: '#0A2352', padding: '4px' }}>☰</button>
           <div onClick={() => { setSayfa('anasayfa'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: '#0A2352', color: '#F5C518', padding: '10px 14px', fontWeight: '900', fontSize: '20px', letterSpacing: '-0.5px', cursor: 'pointer', lineHeight: 1 }}>WaffLia</div>
           <div style={{ flex: 1 }}></div>
           {user ? <span style={{ fontSize: '12px', fontWeight: '800', color: '#0A2352' }}>Merhaba, {isim}</span> : null}
@@ -456,27 +451,6 @@ export default function Home() {
           {KATS.slice(1).map((k) => (<button key={k} onClick={() => { setKat(k); setSayfa('menu'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: kat === k && sayfa === 'menu' ? '#F5C518' : '#FFFBF0', color: '#0A2352', border: '1px solid #EDEBE6', padding: '8px 14px', borderRadius: '20px', fontWeight: '800', fontSize: '13px', whiteSpace: 'nowrap', cursor: 'pointer' }}>{emojiFor(k)} {k}</button>))}
         </div>
       </div>
-      {menuAcik ? (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 80 }} onClick={() => setMenuAcik(false)}>
-          <div onClick={(e) => e.stopPropagation()} style={{ background: 'white', width: '85%', maxWidth: '340px', height: '100%', overflowY: 'auto', padding: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ background: '#0A2352', color: '#F5C518', padding: '10px 14px', fontWeight: '900', fontSize: '20px' }}>WaffLia</div>
-              <button onClick={() => setMenuAcik(false)} style={{ background: '#F1EFE9', border: 'none', width: '36px', height: '36px', borderRadius: '50%', fontSize: '18px', cursor: 'pointer' }}>✕</button>
-            </div>
-            <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column' }}>
-              {KATS.slice(1).map((k) => (
-                <button key={k} onClick={() => { setKat(k); setSayfa('menu'); setMenuAcik(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', borderBottom: '1px solid #F1EFE9', padding: '16px 4px', fontSize: '16px', fontWeight: '700', color: '#0A2352', cursor: 'pointer', textAlign: 'left', width: '100%' }}><span style={{ background: '#FFFBF0', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>{emojiFor(k)}</span>{k}<span style={{ marginLeft: 'auto', color: '#0A2352' }}>›</span></button>
-              ))}
-              <button onClick={() => { setSayfa('profil'); setMenuAcik(false) }} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', borderBottom: '1px solid #F1EFE9', padding: '16px 4px', fontSize: '16px', fontWeight: '700', color: '#0A2352', cursor: 'pointer', textAlign: 'left', width: '100%' }}><span style={{ background: '#FFFBF0', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👤</span>Hesabım<span style={{ marginLeft: 'auto' }}>›</span></button>
-              <button onClick={() => { gecmisiGetir(); setMenuAcik(false) }} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', borderBottom: '1px solid #F1EFE9', padding: '16px 4px', fontSize: '16px', fontWeight: '700', color: '#0A2352', cursor: 'pointer', textAlign: 'left', width: '100%' }}><span style={{ background: '#FFFBF0', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>📦</span>Siparişlerim<span style={{ marginLeft: 'auto' }}>›</span></button>
-            </div>
-            <div style={{ marginTop: '20px', background: '#0A2352', borderRadius: '14px', padding: '16px', textAlign: 'center' }}>
-              <div style={{ color: '#F5C518', fontWeight: '900', fontSize: '16px' }}>17:00 - 05:00 • İstanbul</div>
-              <div style={{ color: 'white', fontSize: '13px', marginTop: '6px' }}>30-45 dk teslimat • 0535 273 28 65</div>
-            </div>
-          </div>
-        </div>
-      ) : null}
       <div style={{ background: '#0A2352', color: 'white', padding: '18px 16px 22px', textAlign: 'center' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '56px', lineHeight: '1.1' }}>🧇 🥔</div>
@@ -668,7 +642,8 @@ export default function Home() {
           <div style={{ background: 'white', width: '100%', maxWidth: '600px', maxHeight: '88vh', overflowY: 'auto', borderRadius: '20px 20px 0 0', padding: '18px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><h2 style={{ margin: 0 }}>Siparişlerim</h2><button onClick={() => setGecmisAcik(false)} style={{ border: 'none', background: '#eee', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' }}>✕</button></div>
             <p style={{ fontSize: '13px', color: '#666' }}>{user ? isim + ' hesabının geçmiş siparişleri' : 'Geçmiş siparişlerin bu telefonda saklanıyor.'}</p>
-            {gecmisSiparisler.length === 0 ? (
+            {gecmisYukleniyor ? <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', padding: '8px 12px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold', color: '#92400E', marginBottom: '10px' }}>⏳ Siparişler güncelleniyor...</div> : null}
+            {gecmisSiparisler.length === 0 && !gecmisYukleniyor ? (
               <div style={{ textAlign: 'center', padding: '30px 0', color: '#888' }}>Henüz siparişin yok.<br />İlk siparişini verince burada görünecek.</div>
             ) : gecmisSiparisler.map((s: any, i: number) => (
               <div key={i} style={{ border: '1px solid #eee', borderRadius: '14px', padding: '12px', marginBottom: '10px' }}>
