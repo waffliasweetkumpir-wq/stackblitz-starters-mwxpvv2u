@@ -1,12 +1,3 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: '/api/supabase/:path*',
-        destination: 'https://jsyjwaykeuntnlrdzxkxb.supabase.co/:path*',
-      },
-    ]
-  },
-}
+const nextConfig = {};
 module.exports = nextConfig
