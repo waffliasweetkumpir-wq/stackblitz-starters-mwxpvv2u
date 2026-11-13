@@ -84,9 +84,18 @@ export default function Home() {
   const [gecmisSiparisler, setGecmisSiparisler] = useState<any[]>([])
   const gecmisiGetir = async () => {
     let kayitli: any[] = []
-    try { kayitli = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]') } catch (e) {}
     try {
-      const adayTeller: any[] = [profilTelefon, user?.user_metadata?.telefon, localStorage.getItem('wafflia_telefon') || ''].filter(Boolean)
+      const hamListe = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]')
+      const buTel = (user?.user_metadata?.telefon || '').replace(/[^0-9]/g, '')
+      const oturumTel = (() => { try { return (JSON.parse(localStorage.getItem('wafflia_oturum') || 'null')?.telefon || '').replace(/[^0-9]/g, '') } catch (e) { return '' } })()
+      const gecerliTeller = [buTel, oturumTel].filter(Boolean)
+      kayitli = gecerliTeller.length ? hamListe.filter((s: any) => { const t = String(s.telefon || '').replace(/[^0-9]/g, ''); return gecerliTeller.includes(t) || gecerliTeller.some((g: string) => t.endsWith(g.slice(-10)) || g.endsWith(t.slice(-10))) }) : []
+    } catch (e) {}
+    try {
+      const mevcutEmail = (user?.email || profilEmail || '').trim().toLowerCase()
+      const kayitliOturum: any = (() => { try { return JSON.parse(localStorage.getItem('wafflia_oturum') || 'null') } catch (e) { return null } })()
+      const buHesabinTelefonu = user?.user_metadata?.telefon || kayitliOturum?.telefon || ''
+      const adayTeller: any[] = [buHesabinTelefonu, profilTelefon].filter(Boolean)
       const normSet: any = {}
       for (const x of adayTeller) {
         const h = String(x).replace(/[^0-9]/g, '')
@@ -275,18 +284,23 @@ export default function Home() {
     return () => clearInterval(id)
   }, [siparisTamam, hazirlanmaBaslangic])
   useEffect(() => {
+    // Yeni hesapta eski hesabin puani gozukmesin diye global puani burada yukleme, user gelince hesaba gore yuklenecek
     supabase.auth.getSession().then((res) => {
       if (res.data.session?.user) setUser(res.data.session.user)
       else { try { const o = JSON.parse(localStorage.getItem('wafflia_oturum') || 'null'); if (o) setUser({ user_metadata: { full_name: o.ad, telefon: o.telefon }, email: o.email } as any) } catch (e) {} }
     }).catch(() => { try { const o = JSON.parse(localStorage.getItem('wafflia_oturum') || 'null'); if (o) setUser({ user_metadata: { full_name: o.ad, telefon: o.telefon }, email: o.email } as any) } catch (e) {} })
-    const kayitliPuan = localStorage.getItem('wafflia_puan')
-    const kayitliSiparis = localStorage.getItem('wafflia_siparis')
-    if (kayitliPuan) setPuan(parseInt(kayitliPuan))
-    if (kayitliSiparis) setSiparisSayisi(parseInt(kayitliSiparis))
+    // Global puan yukleme yok - puan user effect'te hesaba gore yukleniyor, yoksa 0 kalir
   }, [])
   useEffect(() => {
-    if (!user) return
-    const tel: any = user?.user_metadata?.telefon || profilTelefon || localStorage.getItem('wafflia_telefon') || ''
+    if (!user) { setPuan(0); setSiparisSayisi(0); return }
+    const emailKey = (user?.email || '').trim().toLowerCase()
+    if (emailKey) {
+      const ozelPuan = localStorage.getItem('wafflia_puan_' + emailKey)
+      const ozelSiparis = localStorage.getItem('wafflia_siparis_' + emailKey)
+      if (ozelPuan) setPuan(parseInt(ozelPuan)); else setPuan(0)
+      if (ozelSiparis) setSiparisSayisi(parseInt(ozelSiparis)); else setSiparisSayisi(0)
+    }
+    const tel: any = user?.user_metadata?.telefon || (() => { try { return JSON.parse(localStorage.getItem('wafflia_oturum') || 'null')?.telefon || '' } catch (e) { return '' } })() || ''
     if (!tel) return
     const ham = String(tel).replace(/[^0-9]/g, '')
     const varyantlar: any[] = [tel, ham, ham.startsWith('0') ? ham.slice(1) : '0' + ham]
@@ -299,6 +313,7 @@ export default function Home() {
             const toplamPuan = data.reduce((s: number, o: any) => s + (Number(o.puan_kazanilan) || 0), 0)
             setPuan(Math.max(0, toplamPuan))
             setSiparisSayisi(data.length)
+            try { const ek = (user?.email || '').trim().toLowerCase(); if (ek) { localStorage.setItem('wafflia_puan_' + ek, String(Math.max(0, toplamPuan))); localStorage.setItem('wafflia_siparis_' + ek, String(data.length)) } } catch (e) {}
             break
           }
         } catch (e) {}
@@ -309,6 +324,7 @@ export default function Home() {
   const cikisYap = async () => {
     try { await supabase.auth.signOut() } catch (e) {}
     try { localStorage.removeItem('wafflia_oturum') } catch (e) {}
+    setPuan(0); setSiparisSayisi(0)
     setUser(null)
     window.location.reload()
   }
@@ -387,6 +403,7 @@ export default function Home() {
     } catch (e) {}
     localStorage.setItem('wafflia_puan', String(yeniPuan))
     localStorage.setItem('wafflia_siparis', String(yeniSiparisSayisi))
+    try { const ek = (user?.email || profilEmail || '').trim().toLowerCase(); if (ek) { localStorage.setItem('wafflia_puan_' + ek, String(yeniPuan)); localStorage.setItem('wafflia_siparis_' + ek, String(yeniSiparisSayisi)) } } catch (e) {}
     const waMesaj = encodeURIComponent('YENI SIPARIS - ' + adSoyad + ' - ' + telefon + ' - ' + adres + ' - Not: ' + (notlar || 'Yok') + ' - Odeme: ' + odemeYontemi + ' - ' + urunOzeti + ' - Ara Toplam: ' + araToplam + ' TL - Indirim: -' + (indirimTutari + puanIndirimi) + ' TL - ODENECEK: ' + odenecek + ' TL')
     setSonWaMesaj(waMesaj)
     // WhatsApp otomatik acilmiyor - mail Google'a gitti, isteyen butonla gonderir
