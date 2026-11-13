@@ -80,6 +80,7 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [kat, setKat] = useState('Tümü')
   const [sayfa, setSayfa] = useState<'anasayfa' | 'menu' | 'profil'>('anasayfa')
+  const [menuAcik, setMenuAcik] = useState(false)
 
   const [gecmisAcik, setGecmisAcik] = useState(false)
   const [gecmisSiparisler, setGecmisSiparisler] = useState<any[]>([])
@@ -435,6 +436,7 @@ export default function Home() {
     <div style={{ fontFamily: 'sans-serif', background: '#FFFBF0', minHeight: '100vh', paddingBottom: '170px' }}>
       <div style={{ background: 'white', padding: '10px 12px 0', position: 'sticky', top: 0, zIndex: 40, boxShadow: '0 1px 8px rgba(10,35,82,0.08)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', maxWidth: '1200px', margin: '0 auto' }}>
+          <button onClick={() => setMenuAcik(true)} style={{ background: 'none', border: 'none', fontSize: '26px', cursor: 'pointer', color: '#0A2352', padding: '4px' }}>☰</button>
           <div onClick={() => { setSayfa('anasayfa'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: '#0A2352', color: '#F5C518', padding: '10px 14px', fontWeight: '900', fontSize: '20px', letterSpacing: '-0.5px', cursor: 'pointer', lineHeight: 1 }}>WaffLia</div>
           <div style={{ flex: 1 }}></div>
           {user ? <span style={{ fontSize: '12px', fontWeight: '800', color: '#0A2352' }}>Merhaba, {isim}</span> : null}
@@ -451,6 +453,27 @@ export default function Home() {
           {KATS.slice(1).map((k) => (<button key={k} onClick={() => { setKat(k); setSayfa('menu'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: kat === k && sayfa === 'menu' ? '#F5C518' : '#FFFBF0', color: '#0A2352', border: '1px solid #EDEBE6', padding: '8px 14px', borderRadius: '20px', fontWeight: '800', fontSize: '13px', whiteSpace: 'nowrap', cursor: 'pointer' }}>{emojiFor(k)} {k}</button>))}
         </div>
       </div>
+      {menuAcik ? (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 80 }} onClick={() => setMenuAcik(false)}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: 'white', width: '85%', maxWidth: '340px', height: '100%', overflowY: 'auto', padding: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ background: '#0A2352', color: '#F5C518', padding: '10px 14px', fontWeight: '900', fontSize: '20px' }}>WaffLia</div>
+              <button onClick={() => setMenuAcik(false)} style={{ background: '#F1EFE9', border: 'none', width: '36px', height: '36px', borderRadius: '50%', fontSize: '18px', cursor: 'pointer' }}>✕</button>
+            </div>
+            <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column' }}>
+              {KATS.slice(1).map((k) => (
+                <button key={k} onClick={() => { setKat(k); setSayfa('menu'); setMenuAcik(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', borderBottom: '1px solid #F1EFE9', padding: '16px 4px', fontSize: '16px', fontWeight: '700', color: '#0A2352', cursor: 'pointer', textAlign: 'left', width: '100%' }}><span style={{ background: '#FFFBF0', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>{emojiFor(k)}</span>{k}<span style={{ marginLeft: 'auto', color: '#0A2352' }}>›</span></button>
+              ))}
+              <button onClick={() => { setSayfa('profil'); setMenuAcik(false) }} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', borderBottom: '1px solid #F1EFE9', padding: '16px 4px', fontSize: '16px', fontWeight: '700', color: '#0A2352', cursor: 'pointer', textAlign: 'left', width: '100%' }}><span style={{ background: '#FFFBF0', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👤</span>Hesabım<span style={{ marginLeft: 'auto' }}>›</span></button>
+              <button onClick={() => { gecmisiGetir(); setMenuAcik(false) }} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', borderBottom: '1px solid #F1EFE9', padding: '16px 4px', fontSize: '16px', fontWeight: '700', color: '#0A2352', cursor: 'pointer', textAlign: 'left', width: '100%' }}><span style={{ background: '#FFFBF0', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>📦</span>Siparişlerim<span style={{ marginLeft: 'auto' }}>›</span></button>
+            </div>
+            <div style={{ marginTop: '20px', background: '#0A2352', borderRadius: '14px', padding: '16px', textAlign: 'center' }}>
+              <div style={{ color: '#F5C518', fontWeight: '900', fontSize: '16px' }}>17:00 - 05:00 • İstanbul</div>
+              <div style={{ color: 'white', fontSize: '13px', marginTop: '6px' }}>30-45 dk teslimat • 0535 273 28 65</div>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div style={{ background: '#0A2352', color: 'white', padding: '18px 16px 22px', textAlign: 'center' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ fontSize: '56px', lineHeight: '1.1' }}>🧇 🥔</div>
