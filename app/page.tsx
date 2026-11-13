@@ -175,10 +175,7 @@ export default function Home() {
     try {
     const { data, error } = await supabase.auth.signUp({ email, password: profilSifre, options: { data: { full_name: profilAd, telefon: telefonNormalize(profilTelefon), real_email: profilEmail || '' } } })
     if (error) {
-      const msg = (error.message || '').toLowerCase()
-      if (msg.includes('already')) { alert('Bu telefon zaten kayıtlı, giriş yap'); setProfilModu('giris'); return }
-      if (msg.includes('fetch') || msg.includes('network') || msg.includes('failed')) { yerelKayitYap(); return }
-      alert('Kayıt olmadı: ' + error.message)
+      alert('Supabase hatası: ' + error.message)
       return
     }
     localStorage.setItem('wafflia_telefon', profilTelefon)
@@ -186,7 +183,7 @@ export default function Home() {
     if (data.user) setUser(data.user)
     setProfilModu('giris')
     alert('Kaydın oluşturuldu, hoş geldin ' + profilAd)
-    } catch (e: any) { yerelKayitYap(); return }
+    } catch (e: any) { alert('Bağlantı hatası: ' + (e?.message || e)); return }
   }
   const girisYapForm = async () => {
     if (!profilTelefon || !profilSifre) { alert('Lütfen telefon ve şifre yaz'); return }
