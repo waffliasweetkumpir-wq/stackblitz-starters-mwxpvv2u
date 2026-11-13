@@ -522,25 +522,6 @@ export default function Home() {
                 </div>
               )}
             </div>
-            <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#FF2E7A', margin: '20px 4px 10px' }}>Menüler</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '14px' }}>
-              {KATS.slice(1).map((k) => {
-                const ilk = URUNLER.find((u) => u.kat === k)
-                const adet = URUNLER.filter((u) => u.kat === k).length
-                return (
-                  <button key={k} onClick={() => { setKat(k); const el = document.getElementById('urunler'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }} style={{ textAlign: 'left', background: kat === k ? '#FFE4EC' : 'white', border: kat === k ? '2px solid #FF2E7A' : '1px solid #eee', borderRadius: '16px', padding: 0, overflow: 'hidden', cursor: 'pointer', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
-                    <div style={{ height: '140px', background: renkFor(k), overflow: 'hidden', position: 'relative' }}>
-                      {ilk?.resim ? <img src={ilk.resim} alt={k} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px' }}>{KAT_BILGI[k]?.emoji || '🧇'}</div>}
-                    </div>
-                    <div style={{ padding: '14px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><b style={{ fontSize: '18px' }}>{k}</b><span style={{ fontSize: '18px' }}>→</span></div>
-                      <div style={{ color: '#777', fontSize: '13px', marginTop: '4px' }}>{KAT_BILGI[k]?.aciklama || ''}</div>
-                      <div style={{ color: '#FF2E7A', fontSize: '13px', fontWeight: 'bold', marginTop: '6px' }}>{adet} çeşit • {kat === k ? '✓ Seçili - Aşağıda' : 'Ürünleri Gör →'}</div>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
             <h2 id="urunler" style={{ fontSize: '24px', fontWeight: '900', color: '#FF2E7A', margin: '20px 4px 6px', scrollMarginTop: '120px' }}>{kat === 'Tümü' ? 'Tüm Ürünler' : kat} • {URUNLER.filter((u) => (kat === 'Tümü' || u.kat === kat) && (arama === '' || u.ad.toLowerCase().includes(arama.toLowerCase()) || u.aciklama.toLowerCase().includes(arama.toLowerCase()))).length} çeşit</h2>
             <p style={{ fontSize: '13px', color: '#666', margin: '0 4px 10px' }}>{kat === 'Tümü' ? 'Hepsi burada, saklı ürün yok. İstediğini seç, Sepete Ekle’ye bas, opsiyonlar açılacak.' : kat + ' menüsündesin. Başka menü için yukarıdan birine bas.'}</p>
             <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '10px' }}>{KATS.map((k) => (<button key={k} onClick={() => { setKat(k); const el = document.getElementById('urunler'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }} style={{ padding: '9px 16px', borderRadius: '20px', border: kat === k ? '1px solid #FF2E7A' : '1px solid #ddd', background: kat === k ? '#FF2E7A' : 'white', color: kat === k ? 'white' : '#333', fontWeight: 'bold', fontSize: '13px', whiteSpace: 'nowrap', cursor: 'pointer' }}>{k}</button>))}</div>
