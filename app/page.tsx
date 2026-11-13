@@ -163,9 +163,23 @@ export default function Home() {
     if (!user) return
     const tel: any = user?.user_metadata?.telefon || localStorage.getItem('wafflia_telefon') || ''
     const mail: any = user?.email || ''
+    const isimYedek: any = user?.user_metadata?.full_name || isim || ''
     const yukleGecmis = async () => {
       try {
         let data: any[] = []
+        // Isimle hepsini çek - telefon boşsa bile isimden bulur
+        try {
+          const rHepsi: any = await supabase.from('siparisler').select('*').order('created_at', { ascending: false }).limit(100)
+          if (rHepsi.data && rHepsi.data.length) {
+            const filtreli = rHepsi.data.filter((o: any) => {
+              const telUyusuyor = tel && o.telefon && String(o.telefon).replace(/[^0-9]/g, '').slice(-10) === String(tel).replace(/[^0-9]/g, '').slice(-10)
+              const mailUyusuyor = mail && o.email && o.email === mail
+              const isimUyusuyor = isimYedek && o.musteri_adi && o.musteri_adi.toLowerCase() === String(isimYedek).toLowerCase()
+              return telUyusuyor || mailUyusuyor || isimUyusuyor
+            })
+            if (filtreli.length) data = filtreli
+          }
+        } catch (e) {}
         if (tel) {
           const r1: any = await supabase.from('siparisler').select('*').eq('telefon', tel).order('created_at', { ascending: false }).limit(20)
           if (r1.data && r1.data.length) data = r1.data
@@ -278,7 +292,7 @@ export default function Home() {
     const notlar = [kapiyaBirak ? 'Kapıya Bırak' : '', zileBasma ? 'Zile Basma' : '', siparisNotu].filter(Boolean).join(' - ')
     const urunOzeti = sepet.map((s) => s.ad + ' (' + (s.birimFiyat || s.fiyat) + ' TL)' + (s.kumpirMalzemeler && s.kumpirMalzemeler.length ? ' [' + s.kumpirMalzemeler.join(', ') + ']' : '') + (s.ekstralar && s.ekstralar.length ? ' +Ekstra: ' + s.ekstralar.map((e: any) => e.ad).join(', ') : '') + (s.cikartilan && s.cikartilan.length ? ' -Cikar: ' + s.cikartilan.join(', ') : '')).join('\n')
     try {
-      await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon: telefon, adres: adres, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek: odenecek, puan_kazanilan: 10 }])
+      await supabase.from('siparisler').insert([{ musteri_adi: adSoyad, telefon: telefon, adres: adres, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek: odenecek, puan_kazanilan: 10, email: user?.email || '' }])
     } catch (e) {}
     try { fetch(GOOGLE_SHEETS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'order', tarih: new Date().toLocaleString('tr-TR'), musteri_adi: adSoyad, telefon: telefon, adres: adres, not: notlar, odeme: odemeYontemi, urunler: urunOzeti, ara_toplam: araToplam, indirim: indirimTutari + puanIndirimi, odenecek: odenecek, puan_kazanilan: 10 }) }) } catch (e) {}
     try { const yeniSip: any = { tarih: new Date().toLocaleString('tr-TR'), ad: adSoyad, telefon, adres, urunler: urunOzeti, odenecek, odeme: odemeYontemi }; const eski: any[] = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]'); const guncel = [yeniSip, ...eski].slice(0, 20); localStorage.setItem('wafflia_gecmis_siparisler', JSON.stringify(guncel)); setGecmisSiparisler(guncel) } catch (e) {}
