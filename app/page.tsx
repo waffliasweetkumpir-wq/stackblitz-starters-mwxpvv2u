@@ -120,7 +120,7 @@ export default function Home() {
     })()
   }
   // Hesabim acilinca siparisleri modal acmadan yukle - tek sayfada gorunsun diye
-  useEffect(() => { if (sayfa === 'profil' && user) gecmisiGetir(false) }, [sayfa, user])
+  useEffect(() => { if (sayfa === 'profil' && user) gecmisiGetir(false) }, [sayfa, user?.email])
   const [profilModu, setProfilModu] = useState<'giris' | 'kayit'>('giris')
   const [profilAd, setProfilAd] = useState('')
   const [profilTelefon, setProfilTelefon] = useState('')
@@ -576,8 +576,8 @@ export default function Home() {
                 <div style={{ background: '#FFF5F2', border: '1px solid #FFE4EC', borderRadius: '14px', padding: '14px', margin: '12px 0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #FFE4EC' }}><span style={{ color: '#888', fontSize: '13px' }}>Ad Soyad</span><b style={{ fontSize: '14px', textAlign: 'right' }}>{isim || '-'}</b></div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #FFE4EC' }}><span style={{ color: '#888', fontSize: '13px' }}>E-posta</span><b style={{ fontSize: '13px', textAlign: 'right', wordBreak: 'break-all' }}>{user?.email || profilEmail || '-'}</b></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #FFE4EC' }}><span style={{ color: '#888', fontSize: '13px' }}>Telefon</span><b style={{ fontSize: '14px' }}>{user?.user_metadata?.telefon || (() => { try { return JSON.parse(localStorage.getItem('wafflia_oturum') || 'null')?.telefon || '-' } catch (e) { return '-' } })()}</b></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0' }}><span style={{ color: '#888', fontSize: '13px' }}>Adres</span><b style={{ fontSize: '13px', textAlign: 'right', maxWidth: '65%' }}>{gecmisSiparisler[0]?.adres || (() => { try { const l = JSON.parse(localStorage.getItem('wafflia_gecmis_siparisler') || '[]'); return l[0]?.adres || 'Henüz adres eklenmemiş - ilk siparişinde eklenecek' } catch (e) { return 'Henüz adres eklenmemiş' } })()}</b></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #FFE4EC' }}><span style={{ color: '#888', fontSize: '13px' }}>Telefon</span><b style={{ fontSize: '14px' }}>{user?.user_metadata?.telefon || telefon || profilTelefon || gecmisSiparisler[0]?.telefon || '-'}</b></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0' }}><span style={{ color: '#888', fontSize: '13px' }}>Adres</span><b style={{ fontSize: '13px', textAlign: 'right', maxWidth: '65%' }}>{gecmisSiparisler[0]?.adres || adres || 'Henüz adres eklenmemiş - ilk siparişinde eklenecek'}</b></div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0 8px' }}><h3 style={{ margin: 0, fontSize: '17px' }}>Siparişlerim</h3><button onClick={() => gecmisiGetir(false)} style={{ background: 'white', border: '1px solid #ddd', padding: '7px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}>↻ Yenile</button></div>
                 {gecmisYukleniyor ? <div style={{ background: '#FFFBEB', padding: '10px', borderRadius: '10px', fontSize: '13px', fontWeight: 'bold', color: '#92400E', marginBottom: '10px' }}>⏳ Siparişler yükleniyor...</div> : null}
