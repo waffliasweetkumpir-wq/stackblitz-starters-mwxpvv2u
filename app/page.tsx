@@ -123,13 +123,44 @@ export default function Home() {
     if (d.length === 10) d = '0' + d
     return d
   }
+
+  const yerelKullanicilariGetir = () => { try { return JSON.parse(localStorage.getItem('wafflia_kullanicilar') || '[]') } catch (e) { return [] } }
+  const yerelKayitYap = () => {
+    const liste: any[] = yerelKullanicilariGetir()
+    const emailKucuk = profilEmail.trim().toLowerCase()
+    const normTel = telefonNormalize(profilTelefon)
+    if (liste.find((k: any) => k.email === emailKucuk || k.telefon === normTel)) { alert('Bu e-posta veya telefon zaten kayıtlı, Giriş Yap yap'); setProfilModu('giris'); return false }
+    liste.push({ ad: profilAd, telefon: normTel, hamTelefon: profilTelefon, email: emailKucuk, sifre: profilSifre })
+    localStorage.setItem('wafflia_kullanicilar', JSON.stringify(liste))
+    localStorage.setItem('wafflia_telefon', profilTelefon)
+    localStorage.setItem('wafflia_oturum', JSON.stringify({ ad: profilAd, telefon: normTel, email: emailKucuk }))
+    setUser({ user_metadata: { full_name: profilAd, telefon: normTel }, email: emailKucuk } as any)
+    setProfilModu('giris')
+    alert('Kaydın oluşturuldu, hoş geldin ' + profilAd + ' (telefona kaydedildi)')
+    return true
+  }
+  const yerelGirisYap = () => {
+    const liste: any[] = yerelKullanicilariGetir()
+    const emailKucuk = profilEmail.trim().toLowerCase()
+    const normTel = telefonNormalize(profilTelefon)
+    const bulunan = liste.find((k: any) => (k.email === emailKucuk || k.telefon === normTel) && k.sifre === profilSifre)
+    if (!bulunan) { alert('Giriş olmadı: Önce Kayıt Ol yap. Aynı telefon, e-posta ve şifre ile kayıt olman lazım.'); return false }
+    localStorage.setItem('wafflia_telefon', profilTelefon)
+    localStorage.setItem('wafflia_oturum', JSON.stringify({ ad: bulunan.ad, telefon: bulunan.telefon, email: bulunan.email }))
+    setUser({ user_metadata: { full_name: bulunan.ad, telefon: bulunan.telefon }, email: bulunan.email } as any)
+    alert('Hoş geldin ' + bulunan.ad)
+    return true
+  }
   const kayitOl = async () => {
     if (!profilAd || !profilTelefon || !profilSifre) { alert('Lütfen ad, telefon ve şifre yaz'); return }
-    if (!profilEmail || !profilEmail.includes('@')) { alert('Lütfen geçerli bir e-posta yaz, tarayıcıyı silsen bile hesabına bu e-postayla gireceksin'); return }
+    if (!profilEmail || !profilEmail.includes('@')) { alert('Lütfen geçerli bir e-posta yaz'); return }
     const email = profilEmail.trim().toLowerCase()
+    try {
     const { data, error } = await supabase.auth.signUp({ email, password: profilSifre, options: { data: { full_name: profilAd, telefon: telefonNormalize(profilTelefon), real_email: profilEmail || '' } } })
     if (error) {
-      if (error.message && error.message.toLowerCase().includes('already')) { alert('Bu telefon zaten kayıtlı, giriş yap'); setProfilModu('giris'); return }
+      const msg = (error.message || '').toLowerCase()
+      if (msg.includes('already')) { alert('Bu telefon zaten kayıtlı, giriş yap'); setProfilModu('giris'); return }
+      if (msg.includes('fetch') || msg.includes('network') || msg.includes('failed')) { yerelKayitYap(); return }
       alert('Kayıt olmadı: ' + error.message)
       return
     }
@@ -138,6 +169,7 @@ export default function Home() {
     if (data.user) setUser(data.user)
     setProfilModu('giris')
     alert('Kaydın oluşturuldu, hoş geldin ' + profilAd)
+    } catch (e: any) { yerelKayitYap(); return }
   }
   const girisYapForm = async () => {
     if (!profilTelefon || !profilSifre) { alert('Lütfen telefon ve şifre yaz'); return }
@@ -146,12 +178,21 @@ export default function Home() {
     const norm = telefonNormalize(profilTelefon)
     const adaylar = [profilEmail.trim().toLowerCase(), norm + '@wafflia.local', ham + '@wafflia.local', (ham.startsWith('0') ? ham.slice(1) : '0' + ham) + '@wafflia.local', '90' + norm.replace(/^0/, '') + '@wafflia.local']
     let data: any = null; let error: any = null
+    try {
     for (const aday of adaylar.filter((v: any, i: number, a: any[]) => a.indexOf(v) === i)) {
       const res = await supabase.auth.signInWithPassword({ email: aday, password: profilSifre })
       if (!res.error) { data = res.data; error = null; break }
       error = res.error
     }
-    if (error) { alert('Giriş olmadı: Telefon veya şifre yanlış. Kayıt olurken yazdığın telefonla aynı numarayı yazdığından emin ol (ör: 0535...)'); return }
+    } catch (e: any) { yerelGirisYap(); return }
+    if (error) {
+      const msg = (error.message || '').toLowerCase()
+      if (msg.includes('fetch') || msg.includes('network') || msg.includes('failed')) { yerelGirisYap(); return }
+      // Supabase ulasiliyor ama sifre yanlis olabilir - yerelde de dene
+      const liste: any[] = yerelKullanicilariGetir()
+      if (liste.length) { if (yerelGirisYap()) return }
+      alert('Giriş olmadı: Telefon veya şifre yanlış. Kayıt olurken yazdığın aynı telefon, e-posta ve şifreyi yaz.'); return
+    }
     localStorage.setItem('wafflia_telefon', profilTelefon)
     if (data.user) setUser(data.user)
     alert('Hoş geldin ' + (data.user?.user_metadata?.full_name || ''))
@@ -234,7 +275,10 @@ export default function Home() {
     return () => clearInterval(id)
   }, [siparisTamam, hazirlanmaBaslangic])
   useEffect(() => {
-    supabase.auth.getSession().then((res) => setUser(res.data.session?.user || null)).catch(() => {})
+    supabase.auth.getSession().then((res) => {
+      if (res.data.session?.user) setUser(res.data.session.user)
+      else { try { const o = JSON.parse(localStorage.getItem('wafflia_oturum') || 'null'); if (o) setUser({ user_metadata: { full_name: o.ad, telefon: o.telefon }, email: o.email } as any) } catch (e) {} }
+    }).catch(() => { try { const o = JSON.parse(localStorage.getItem('wafflia_oturum') || 'null'); if (o) setUser({ user_metadata: { full_name: o.ad, telefon: o.telefon }, email: o.email } as any) } catch (e) {} })
     const kayitliPuan = localStorage.getItem('wafflia_puan')
     const kayitliSiparis = localStorage.getItem('wafflia_siparis')
     if (kayitliPuan) setPuan(parseInt(kayitliPuan))
@@ -263,7 +307,8 @@ export default function Home() {
     yukle()
   }, [user])
   const cikisYap = async () => {
-    await supabase.auth.signOut()
+    try { await supabase.auth.signOut() } catch (e) {}
+    try { localStorage.removeItem('wafflia_oturum') } catch (e) {}
     setUser(null)
     window.location.reload()
   }
@@ -491,13 +536,13 @@ export default function Home() {
                   <button onClick={() => setProfilModu('giris')} style={{ flex: 1, padding: '10px', borderRadius: '10px', border: 'none', background: profilModu === 'giris' ? '#5b2c0e' : '#eee', color: profilModu === 'giris' ? 'white' : '#333', fontWeight: 'bold', cursor: 'pointer' }}>Giriş Yap</button>
                   <button onClick={() => setProfilModu('kayit')} style={{ flex: 1, padding: '10px', borderRadius: '10px', border: 'none', background: profilModu === 'kayit' ? '#5b2c0e' : '#eee', color: profilModu === 'kayit' ? 'white' : '#333', fontWeight: 'bold', cursor: 'pointer' }}>Kayıt Ol</button>
                 </div>
-                <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Ad Soyad</label>
-                <input value={profilAd} onChange={(e) => setProfilAd(e.target.value)} placeholder="Ad Soyad" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
+                {profilModu === 'kayit' ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>Ad Soyad</label>
+                <input value={profilAd} onChange={(e) => setProfilAd(e.target.value)} placeholder="Adın Soyadın - örn: Haktan Başalan" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
                 <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Telefon</label>
-                <input value={profilTelefon} onChange={(e) => setProfilTelefon(e.target.value)} placeholder="05xx xxx xx xx" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
+                <input value={profilTelefon} onChange={(e) => setProfilTelefon(e.target.value)} placeholder="Telefonun - örn: 0535 273 28 65" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
                 <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Şifre</label>
                 <input type="password" value={profilSifre} onChange={(e) => setProfilSifre(e.target.value)} placeholder="Şifreni yaz" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
-                {true ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>E-posta * (hesabın buna bağlı, tarayıcıyı silsen bile bununla gireceksin)</label><input value={profilEmail} onChange={(e) => setProfilEmail(e.target.value)} placeholder="mail@ornek.com" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
+                {true ? (<div><label style={{ fontSize: '13px', fontWeight: 'bold' }}>E-posta *</label><input value={profilEmail} onChange={(e) => setProfilEmail(e.target.value)} placeholder="mail@ornek.com" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} /></div>) : null}
                 {profilModu === 'giris' ? <button onClick={girisYapForm} style={{ width: '100%', background: '#5b2c0e', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Giriş Yap</button> : <button onClick={kayitOl} style={{ width: '100%', background: '#b45309', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Kayıt Ol</button>}
                 <button onClick={() => setHesapSilAcik(true)} style={{ width: '100%', background: '#fef2f2', border: '1px solid #fecaca', color: '#e11d48', padding: '13px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>Hesabımı Sil</button>
                 <p style={{ fontSize: '12px', color: '#888', textAlign: 'center', marginTop: '10px' }}>Bilgilerin güvenle saklanır, tarayıcıyı silsen bile hesabın durur.</p>
@@ -691,7 +736,7 @@ export default function Home() {
             <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Ad Soyad *</label>
             <input value={adSoyad} onChange={(e) => setAdSoyad(e.target.value)} placeholder="Ad Soyad" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
             <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Telefon *</label>
-            <input value={telefon} onChange={(e) => setTelefon(e.target.value)} placeholder="05xx xxx xx xx" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
+            <input value={telefon} onChange={(e) => setTelefon(e.target.value)} placeholder="Telefonun - örn: 0535 273 28 65" style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
             <label style={{ fontSize: '13px', fontWeight: 'bold' }}>Adres *</label>
             <textarea value={adres} onChange={(e) => setAdres(e.target.value)} placeholder="Mahalle, sokak, bina, daire..." rows={3} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #ddd', margin: '6px 0 12px', boxSizing: 'border-box' }} />
             <h3 style={{ fontSize: '15px', margin: '6px 0' }}>Teslimat Notu</h3>
