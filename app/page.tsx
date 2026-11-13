@@ -431,7 +431,8 @@ export default function Home() {
   const UrunKarti = ({ u }: { u: any }) => (
     <div style={{ background: 'white', borderRadius: '18px', padding: '0 0 12px', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 8px rgba(255,46,122,0.10)', overflow: 'hidden', border: '1px solid #F0EDE6' }}>
       <div onClick={() => urunAc(u)} style={{ width: '100%', height: '170px', background: renkFor(u.kat), position: 'relative', cursor: 'pointer', overflow: 'hidden' }}>
-        {u.resim ? <img src={u.resim} alt={u.ad} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px' }}>{emojiFor(u.kat)}</div>}
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px' }}>{emojiFor(u.kat)}</div>
+        {u.resim ? <img src={u.resim} alt={u.ad} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block', position: 'relative' }} /> : null}
         {u.populer ? <span style={{ position: 'absolute', top: '10px', left: '10px', background: '#FF7A00', color: '#FF2E7A', fontSize: '11px', padding: '4px 10px', borderRadius: '20px', fontWeight: '900' }}>ÇOK SATAN</span> : null}
       </div>
       <div style={{ padding: '12px 12px 0', flex: 1, display: 'flex', flexDirection: 'column' }}>
