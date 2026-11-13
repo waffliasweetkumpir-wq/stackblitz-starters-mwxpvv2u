@@ -5,7 +5,7 @@ export const viewport = { width: 'device-width', initialScale: 1 }
 
 export const metadata: Metadata = {
   title: 'WaffLia Sweet Kumpir',
-  description: 'En tatli waffle ve kumpir burada - Bowl Waffle, Kare Waffle, Kumpir, Künefe, Katmer ve Sufle. 17:00 - 05:00 İstanbul, 30-45 dk teslimat.',
+  description: 'En tatli waffle ve kumpir burada - Bowl Waffle, Kare Waffle, Kumpir, Künefe, Katmer ve Sufle. 14:00 - 02:00 İstanbul, 30-45 dk teslimat.',
   metadataBase: new URL('https://waffliasweetkumpir.com'),
   icons: {
     icon: '/logo.png',
